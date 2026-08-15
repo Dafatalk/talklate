@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "softverse-mcp"
+version = "1.0.0"
+description = "SoftVerse Framework MCP Orchestrator Server"
+authors = [{ name = "Diego Franco" }]
+dependencies = [
+    "fastmcp>=0.1.0",
+    "pydantic>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0"
+]

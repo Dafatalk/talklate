@@ -1,0 +1,78 @@
+{
+  "proyecto": "talklate",
+  "framework": "SoftVerse",
+  "descripcion": "TalkLate - Aplicación móvil de traducción en tiempo real con conciencia de matices culturales",
+  "version": "1.0.0",
+  "creado": "2026-08-15T19:00:00Z",
+  "fases": {
+    "F0": {
+      "nombre": "Línea Base & Convenciones",
+      "estado": "completada",
+      "timestamp": "2026-08-15T19:00:00Z",
+      "notas": "Clonado y adaptado el catálogo institucional de convenciones transversales desde vetCare (git, seguridad, producto-ux-ia, diagramas-como-codigo, patrones-arquitectonicos, api-rest). Pendientes los manuales por tecnología hasta decidir el stack (ver F3)."
+    },
+    "F1": {
+      "nombre": "Definición del Contexto",
+      "estado": "completada",
+      "timestamp": "2026-08-15T19:00:00Z",
+      "notas": "contexto.md migrado desde Visión.xlsx. La visión fue confirmada como completa por el equipo en la sesión de mentoría del 2026-08-15 (ver seguimiento/2026-08-15-mentoria.md)."
+    },
+    "F2": {
+      "nombre": "Especificación de Requerimientos",
+      "estado": "desbloqueada",
+      "timestamp": "2026-08-15T19:00:00Z",
+      "bloqueo": null,
+      "notas": "2026-08-15: requerimientos/mapa_impacto.md ahora tiene los 9 entregables desglosados en características e historias de usuario (no solo 'Traductor de mensajes'), aplicando la metodología del mentor y fundamentando cada historia nueva en arquitectura/modelo_datos.md. requerimientos/req.md se amplió con los REQ correspondientes (HIST, IDIOMA, AUDIO, IA, CONV-005/006). Pendiente antes de dar F2 por completada: (1) que el equipo valide con el mentor las dos consolidaciones de entregables sugeridas en mapa_impacto.md (Captura de mensajes por voz y texto = Traductor de mensajes; redefinición de Gestión de conversaciones), (2) resolver las preguntas abiertas marcadas con ⚠️ (compartir conversaciones, editar perfil, personalizar audio, ampliar idiomas/reentrenar modelo), (3) crear la matriz de sensibilidad de datos, (4) definir roles/actores adicionales si aplica, (5) el cronograma de trabajo de las próximas semanas."
+    },
+    "F3": {
+      "nombre": "Arquitectura de Software & Base de Datos",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F2",
+      "notas": "arquitectura/modelo_datos.md ya contiene la transcripción completa del Modelo de Dominio Enriquecido (10 entidades, atributos, reglas de negocio RN-*, datos simulados) migrado desde el xlsx original, pero le faltan las 'combinaciones únicas' por entidad — gap señalado explícitamente por el mentor en la sesión del 2026-08-15 y aún no resuelto. arquitectura/tech_stack.md queda como TBD: el stack técnico de TalkLate (frontend móvil, backend, motor de traducción/IA) no se ha decidido todavía."
+    },
+    "F4": {
+      "nombre": "Diagramas C4 & Especificación de Componentes UI",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F3"
+    },
+    "F5": {
+      "nombre": "Prototipado UI / Alineación de Template UI",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F3",
+      "notas": "componentes/especificacion_vistas_ui.md ya contiene el Customer Journey Map (9 etapas) migrado desde el xlsx, como insumo UX. No hay mapeo a componentes de un template de UI concreto porque no se ha decidido el stack/template de frontend."
+    },
+    "F6": {
+      "nombre": "Scaffolding & Configuración Inicial de Código",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F4, F5"
+    },
+    "F7": {
+      "nombre": "Desarrollo Backend API & Base de Datos",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F6"
+    },
+    "F8": {
+      "nombre": "Desarrollo Frontend Móvil",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F6"
+    },
+    "F9": {
+      "nombre": "Integración & Verificación E2E",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F7, F8"
+    },
+    "F10": {
+      "nombre": "Despliegue & Producción",
+      "estado": "bloqueada",
+      "timestamp": null,
+      "bloqueo": "Requiere completar: F9"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# Secretos
+.env
+*.pem
+*.key
+credentials.json
+
+# Python / MCP server
+softverse-mcp/.venv/
+__pycache__/
+*.pyc
+
+# Build
+dist/
+build/
+node_modules/
+
+# IDE
+.idea/
+.vscode/settings.json
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

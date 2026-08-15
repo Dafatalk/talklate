@@ -1,0 +1,13 @@
+{
+  "framework": "SoftVerse",
+  "version": "1.0.0",
+  "orquestador": {
+    "puerto_mcp": "stdio",
+    "lenguaje": "python3",
+    "validador_estricto": true
+  },
+  "proyecto": {
+    "nombre": "TalkLate",
+    "tipo": "Aplicación móvil de traducción en tiempo real con matices culturales"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "softverse": {
+      "command": "/Users/dafa/Documents/Talklate/talklate-framework/softverse-mcp/.venv/bin/python3",
+      "args": ["-m", "src.mcp_server"],
+      "cwd": "softverse-mcp"
+    }
+  }
+}
