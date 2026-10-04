@@ -3,11 +3,12 @@
 **Fase 3 · Arquitectura de Software & Base de Datos**
 
 **Estado:** en construcción. Migrado íntegramente desde `Modelo de Dominio Enriquecido.xlsx`.
-**Gap explícito y pendiente:** a casi todas las entidades les falta modelar las **combinaciones
+**Combinaciones unicas:** ya hay una propuesta por entidad (falta validarla con Farid y pasarla al xlsx, que esta usando Julian).
+**Gap original:** a casi todas las entidades les faltaba modelar las **combinaciones
 únicas** (constraints de unicidad, simples o compuestas) — señalado por el mentor Wider Farid
 Sánchez Garzón en la sesión del 2026-08-15 (ver `seguimiento/2026-08-15-mentoria.md` para la
 explicación completa de la metodología de combinaciones únicas con el ejemplo de País/Departamento).
-No se inventan combinaciones únicas aquí: se deja indicado el pendiente por entidad.
+Las propuestas salen de las reglas de negocio de cada entidad y de lo que explico Farid; son una propuesta hasta que el las valide.
 
 Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/modelo_dominio.drawio).
 
@@ -32,7 +33,11 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 
 ## Usuario
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar (candidato evidente por las reglas de negocio: `correo`, dado Usuario-RN-1).
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Simple | correo | Usuario-RN-1: no puede haber dos cuentas con el mismo correo. |
 
 | Atributo | Tipo | Longitud | Obligatorio | Sensible | Descripción |
 | --- | --- | --- | --- | --- | --- |
@@ -68,7 +73,7 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 
 ## Conversación
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar.
+**Combinaciones unicas (propuesta, validar con Farid):** ninguna. El nombre tiene valor por defecto "Nueva Conversacion", asi que se repite. El identificador no cuenta porque ya es unico.
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -108,7 +113,14 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 
 ## Lenguaje
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar (candidato: `nombre` — RN indica que no puede repetirse; `codigo` también es candidato natural por ser código ISO).
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Simple | nombre | La regla del lenguaje dice que el nombre no puede repetirse. |
+| 2 | Simple | codigo | El codigo ISO (es, en, fr) identifica un idioma. |
+
+Duda: si un mismo idioma se usara en varias regiones (Espanol de Antioquia y de Madrid), el nombre se repetiria y habria que cambiar la combinacion 1 a (nombre, region).
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -138,7 +150,11 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 
 ## LenguajePorConversación
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar.
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Compuesta | conversacion + lenguaje | Un mismo lenguaje no puede estar dos veces en la misma conversacion. |
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -163,7 +179,7 @@ iguales.
 
 ## MensajeOriginal
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar.
+**Combinaciones unicas (propuesta, validar con Farid):** ninguna. Dos mensajes pueden tener el mismo contenido ("Hola") en la misma conversacion.
 
 | Atributo | Tipo | Longitud | Obligatorio | Sensible | Descripción |
 | --- | --- | --- | --- | --- | --- |
@@ -185,7 +201,7 @@ iguales.
 
 ## MensajeDestino
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar.
+**Combinaciones unicas (propuesta, validar con Farid):** ninguna por ahora. Si se decide que un mensaje original tiene una sola traduccion por lenguaje, seria (mensajeOriginal + lenguajeConversacion).
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -207,7 +223,11 @@ iguales.
 
 ## Canal
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar (candidato: `nombre`).
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Simple | nombre | No puede haber dos canales llamados "Voz" o "Texto". |
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -233,7 +253,11 @@ iguales.
 
 ## Entonación
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar (candidato: `nombre`).
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Simple | nombre | No puede haber dos entonaciones con el mismo nombre. |
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -259,10 +283,11 @@ iguales.
 
 ## Región
 
-**Combinaciones únicas:** ⚠️ pendiente de modelar — este es precisamente el caso que el mentor usó
-como ejemplo de **combinación única compuesta**: el nombre de una región no puede repetirse
-*dentro del mismo país* (ej. "Antioquia" no puede existir dos veces dentro de "Colombia"), aunque
-sí podría repetirse el nombre entre países distintos.
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Compuesta | nombre + identificador de pais | El nombre de una region no se repite dentro del mismo pais (caso del ejemplo de Farid). Si puede repetirse en paises distintos. |
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -290,10 +315,12 @@ sí podría repetirse el nombre entre países distintos.
 
 ## País
 
-**Combinaciones únicas:** ⚠️ pendiente de formalizar en tabla — pero es el caso **ya explicado
-como ejemplo por el mentor**: el `nombre` del país es una combinación única simple (no pueden
-existir dos países con el mismo nombre). El identificador nunca se marca como combinación única
-porque ya es único por naturaleza.
+**Combinaciones unicas (propuesta, validar con Farid):**
+
+| N. | Tipo | Atributos | Por que |
+| --- | --- | --- | --- |
+| 1 | Simple | nombre | No pueden existir dos paises con el mismo nombre. |
+| 2 | Simple | codigo | No debe repetirse el codigo del pais (ISO 3166-1). |
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
@@ -316,7 +343,7 @@ porque ya es único por naturaleza.
 
 ---
 
-## Nota metodológica sobre combinaciones únicas (pendiente de aplicar al resto de entidades)
+## Nota metodológica sobre combinaciones únicas (ya aplicada como propuesta a todas las entidades)
 
 Explicada por el mentor en la sesión del 2026-08-15: las combinaciones únicas indican qué datos
 no se pueden repetir dentro de un registro (numeradas Combinación Única 1, 2, 3... si hay más de
