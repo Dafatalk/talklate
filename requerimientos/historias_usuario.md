@@ -2,7 +2,7 @@
 
 **Fase 2 - Especificacion de Requerimientos**
 
-**Estado:** borrador para revision del profesor/mentor.
+**Estado:** borrador. OJO: los 'problemas' de este archivo son riesgos TECNICOS de construir cada funcion. El profesor pidio otra cosa: el problema que existe si el IMPACTO no se logra. Eso esta en `problemas_impacto.md`.
 **Fuente:** `mapa_impacto.md` (entregables, caracteristicas, historias Como/Necesito/Para),
 `req.md` (REQ-*) y `arquitectura/modelo_datos.md` (reglas de negocio RN-*).
 
