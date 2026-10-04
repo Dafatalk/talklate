@@ -1,0 +1,45 @@
+﻿Etapa,Sub etapa,Artefacto,¿Aplica?,Estado,Fecha inicio,Fecha fin,Observaciones
+Diseño estratégico,Diseño estratégico,Visión,SI,Terminado,2026-08-15,2026-08-15,Visión.xlsx y contexto.md; el equipo la confirmo como completa con el mentor.
+Diseño estratégico,Diseño estratégico,Mapa de impacto,SI,En progreso,2026-08-15,,"Mapa de Impacto.xlsx: 9 impactos con problema y beneficio (la fila 4 la hizo Julian, las filas 5 a 12 estan en develop). Falta cerrar el impacto del perfil (fila 8, esta en DUDAS) y el impacto de revisar reportes, que no tiene fila."
+Diseño estratégico,Diseño estratégico,Project Canvas,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Modelo de procesos del negocio,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Modelo de dominio anémico,SI,Terminado,2026-08-15,,Modelo de Dominio.drawio en seguimiento/follow-up/modelo_dominio. Falta confirmar con el mentor.
+Diseño estratégico,Diseño estratégico,Modelo de dominio enriquecido,SI,En progreso,2026-08-15,,Modelo de Dominio Enriquecido.xlsx y arquitectura/modelo_datos.md con 10 entidades. Faltan las combinaciones unicas en casi todas las entidades.
+Diseño estratégico,Diseño estratégico,Requisitos de información,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Colaboraciones y responsabilidades,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Event Storming,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Mapa de historias de usuario,SI,En progreso,2026-10-02,,"Hoja Backlog del Excel de Mapa de Impacto, 25 historias agrupadas por entregable. Falta ordenarlas como mapa (actividades, pasos e historias)."
+Diseño estratégico,Diseño estratégico,Matriz de roles por operaciones,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Matriz de comandos por impacto,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Mapa de viaje del cliente,SI,Terminado,2026-08-15,,Customer Journey Map de 9 etapas en componentes/especificacion_vistas_ui.md.
+Diseño estratégico,Diseño estratégico,Plan de liberaciones del producto,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,En progreso,2026-10-02,,HU0001 a HU0022 en la hoja Entregables del Mapa de Impacto. Falta mejorar la redaccion de Necesito poder y agregar criterios de aceptacion.
+Diseño estratégico,Diseño estratégico,Flujo de transacciones en diagramas de actividades,SI,No planeado,,,
+Diseño estratégico,Diseño estratégico,Flujo de estados en diagramas de estado,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Drivers arquitectónicos,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Spikes/Pruebas de concepto,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Alternativas de solución,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Arquitectura de referencia,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Arquetipo de solución,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Plataforma tecnológica/Stack tecnológico,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Diagrama de clases,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Diagrama de componentes,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Diagrama de paquetes,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Diagrama de secuencia,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Diagrama de despliegue,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Modelo de fuente de información,SI,No planeado,,,
+Diseño táctico,Línea base,Línea base del producto,SI,No planeado,,,
+Construcción,Repositorio,Repositorio de control de versiones,SI,Terminado,2026-08-15,,GitHub dafatalk/talklate con ramas main y develop. Convencion en convenciones/git-versionamiento.md.
+Construcción,Calidad de código,Pruebas unitarias,SI,No planeado,,,
+Construcción,Calidad de código,Análisis de calidad de código y deuda técnica,SI,No planeado,,,
+Construcción,Calidad de código,Cobertura de código,SI,No planeado,,,
+Construcción,DEVOPS,Integración continua,SI,No planeado,,,
+Construcción,DEVOPS,Entrega continua,SI,No planeado,,,
+Construcción,DEVOPS,Despliegue continuo,SI,No planeado,,,
+Pruebas,Aseguramiento de la calidad,Casos de prueba,SI,No planeado,,,
+Pruebas,Aseguramiento de la calidad,Pruebas funcionales automatizadas,SI,No planeado,,,
+Pruebas,Aseguramiento de la calidad,Certificación funcional,SI,No planeado,,,
+Puesta en marcha,Despliegue,Plan de despliegue y puesta en operación,SI,No planeado,,,
+Puesta en marcha,Despliegue,Manual de instalación y de configuración,SI,No planeado,,,
+Puesta en marcha,Despliegue,Manual de operación del producto,SI,No planeado,,,
+Documento técnico final,Documento técnico final,Documento técnico final,SI,No planeado,,,
