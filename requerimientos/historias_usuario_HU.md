@@ -2,7 +2,7 @@
 
 Salen de la hoja Entregables de Mapa de Impacto.xlsx. Cada entregable es una epica (modulo del sistema) que se abre en varias historias.
 
-## Modulo de traduccion de mensajes
+## Traduccion de mensajes
 
 **HU0001** - Como Cliente Traductor, necesito poder ingresar mi mensaje hablando, para traducir un mensaje de un idioma origen a un idioma destino en tiempo real, para interactuar facil y rapidamente con personas que hablan otro idioma conservando el contexto cultural, el tono y los modismos.
 
@@ -14,7 +14,7 @@ Salen de la hoja Entregables de Mapa de Impacto.xlsx. Cada entregable es una epi
 
 **HU0005** - Como Cliente Traductor, necesito poder recibir la traduccion por el mismo canal que use, para sostener una conversacion natural, hablando y escuchando como lo haria en su propio idioma.
 
-## Modulo de configuracion de conversacion
+## Configuracion de conversacion
 
 **HU0006** - Como Cliente Traductor, necesito poder seleccionar el idioma y la region destino, para comunicarse de inmediato sin tener que repetir la configuracion de idioma en cada mensaje.
 
@@ -28,7 +28,7 @@ Salen de la hoja Entregables de Mapa de Impacto.xlsx. Cada entregable es una epi
 
 **HU0011** - Como Cliente Traductor, necesito poder mantener el hilo continuo, para conversar de forma fluida y continua sin reconfigurar los idiomas ni los parametros en cada mensaje.
 
-## Modulo de historial de conversaciones
+## Historial de conversaciones
 
 **HU0012** - Como Cliente Traductor, necesito poder consultar mi historial, para aprender y ganar confianza en el otro idioma apoyandose en conversaciones pasadas.
 
@@ -38,7 +38,7 @@ Salen de la hoja Entregables de Mapa de Impacto.xlsx. Cada entregable es una epi
 
 **HU0015** - Como Cliente Traductor, necesito poder eliminar una conversacion, para aprender y ganar confianza en el otro idioma apoyandose en conversaciones pasadas.
 
-## Modulo de cuenta de usuario
+## Cuenta de usuario
 
 **HU0016** - Como Cliente Traductor, necesito poder registrarme en la aplicacion, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
 
@@ -48,19 +48,19 @@ Salen de la hoja Entregables de Mapa de Impacto.xlsx. Cada entregable es una epi
 
 **HU0019** - Como Cliente Traductor, necesito poder cerrar sesion, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
 
-## Modulo de participacion del interlocutor
+## Participacion del interlocutor
 
 **HU0020** - Como Interlocutor, necesito poder recibir el mensaje traducido, para participar en la conversacion en el propio idioma y en igualdad de condiciones, sin necesidad de conocer ni operar la aplicacion.
 
 **HU0021** - Como Interlocutor, necesito poder responder en mi idioma, para participar en la conversacion en el propio idioma y en igualdad de condiciones, sin necesidad de conocer ni operar la aplicacion.
 
-## Modulo de reportes de calidad
+## Reportes de calidad
 
 **HU0022** - Como Cliente Traductor, necesito poder reportar una mala traduccion, para contribuir a mejorar la calidad del servicio senalando las traducciones que no fueron correctas o naturales.
 
 **HU0023** - Como Administrador, necesito poder revisar los reportes de mala traduccion, para revisar los reportes de mala traduccion que envian los clientes, para decidir que mejoras priorizar en el servicio.
 
-## Modulo de administracion de idiomas y regiones
+## Administracion de idiomas y regiones
 
 **HU0024** - Como Administrador, necesito poder agregar un idioma o una region, para gestionar la configuracion de la aplicacion a nivel de idiomas o regiones
 
