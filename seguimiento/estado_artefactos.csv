@@ -1,6 +1,6 @@
 ﻿Etapa,Sub etapa,Artefacto,¿Aplica?,Estado,Fecha inicio,Fecha fin,Observaciones
 Diseño estratégico,Diseño estratégico,Visión,SI,Terminado,2026-08-15,2026-08-15,Visión.xlsx y contexto.md; el equipo la confirmo como completa con el mentor.
-Diseño estratégico,Diseño estratégico,Mapa de impacto,SI,Terminado,2026-08-15,2026-10-04,10 impactos con problema y beneficio. Se reescribio el impacto del perfil y se agrego la fila del Administrador que revisa reportes. Falta que Farid lo valide.
+Diseño estratégico,Diseño estratégico,Mapa de impacto,SI,Terminado,2026-08-15,2026-10-04,"10 impactos con problema y beneficio. La columna Entregable ahora son epicas (modulos del sistema), como indico el profesor. Falta que Farid lo valide."
 Diseño estratégico,Diseño estratégico,Project Canvas,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Modelo de procesos del negocio,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Modelo de dominio anémico,SI,Terminado,2026-08-15,,Modelo de Dominio.drawio en seguimiento/follow-up/modelo_dominio. Falta confirmar con el mentor.
@@ -8,12 +8,12 @@ Diseño estratégico,Diseño estratégico,Modelo de dominio enriquecido,SI,En pr
 Diseño estratégico,Diseño estratégico,Requisitos de información,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Colaboraciones y responsabilidades,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Colaboraciones y responsabilidades.xlsx. Falta validar con Farid si Reporte es una entidad.
 Diseño estratégico,Diseño estratégico,Event Storming,SI,No planeado,,,
-Diseño estratégico,Diseño estratégico,Mapa de historias de usuario,SI,En progreso,2026-10-02,,"Hoja Backlog del Excel de Mapa de Impacto, 25 historias agrupadas por entregable. Falta ordenarlas como mapa (actividades, pasos e historias)."
+Diseño estratégico,Diseño estratégico,Mapa de historias de usuario,SI,En progreso,2026-10-02,,Epicas (modulos) y sus historias en la hoja Entregables; hay una hoja por modulo. Falta presentarlo como mapa.
 Diseño estratégico,Diseño estratégico,Matriz de roles por operaciones,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Matriz de roles por operaciones.xlsx. Queda pendiente definir si el Administrador inicia sesion igual que los demas.
 Diseño estratégico,Diseño estratégico,Matriz de comandos por impacto,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Matriz de comandos por impacto.xlsx.
 Diseño estratégico,Diseño estratégico,Mapa de viaje del cliente,SI,Terminado,2026-08-15,,Customer Journey Map de 9 etapas en componentes/especificacion_vistas_ui.md.
 Diseño estratégico,Diseño estratégico,Plan de liberaciones del producto,SI,No planeado,,,
-Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,En progreso,2026-10-02,,"HU0001 a HU0022 en el Mapa de Impacto, con la caracteristica redactada en verbo. Faltan criterios de aceptacion."
+Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,En progreso,2026-10-02,,"HU0001 a HU0025 en la hoja Entregables del Mapa de Impacto, agrupadas en 7 epicas (modulos). Faltan criterios de aceptacion."
 Diseño estratégico,Diseño estratégico,Flujo de transacciones en diagramas de actividades,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Flujo de estados en diagramas de estado,SI,No planeado,,,
 Diseño táctico,Diseño arquitectónico,Drivers arquitectónicos,SI,No planeado,,,
