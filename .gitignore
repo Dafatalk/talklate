@@ -25,3 +25,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Archivos temporales de Office y editores
+~$*
+*.swp

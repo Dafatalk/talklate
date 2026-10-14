@@ -34,7 +34,7 @@ npm start          # Expo: escanea el QR con Expo Go (celular y computador en la
 La app encuentra el backend sola: en web usa `http://<host>:3000/api`; en Expo Go usa la IP del computador
 que corre Expo. Si necesitas otra direccion: `EXPO_PUBLIC_API_URL=http://192.168.1.10:3000/api npm start`.
 
-Usuario administrador de prueba: `admin@talklate.app` / `Admin123!` (se crea al arrancar el backend).
+Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!` (se crea al arrancar el backend).
 
 ## Voz
 

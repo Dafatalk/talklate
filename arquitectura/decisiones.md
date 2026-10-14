@@ -2,24 +2,24 @@
 
 **Fase 3 - Arquitectura de Software & Base de Datos**
 
-**Estado:** las decisiones se tomaron al empezar a construir el codigo (primero hacer y luego argumentar, como acordamos con el mentor) y quedan aqui como ADR en estado **propuesta**: el equipo debe revisarlas, completar las alternativas que de verdad evaluo y marcarlas como aceptadas. Los drivers estan en `drivers.md`.
+**Estado:** primero se construyo y ahora se justifica, como acordamos con Farid: las decisiones ya estan tomadas en el codigo y este documento las sustenta. Estado **tomada, justificacion por completar**: antes de la sustentacion hay que completar con las alternativas que el equipo si evaluo o descarto y dejar claro por que. Los drivers estan en `drivers.md`.
 
 | ADR | Decision | Estado |
 | --- | --- | --- |
-| ADR-001 | App movil con Expo (React Native) y NativeWind | propuesta |
-| ADR-002 | Backend en Node.js con Express | propuesta |
-| ADR-003 | SQLite como base de datos inicial | propuesta |
-| ADR-004 | Traduccion con Claude y motor local de respaldo | propuesta |
-| ADR-005 | Voz: dictado en el cliente y voz de salida con expo-speech | propuesta |
-| ADR-006 | Autenticacion con JWT, revocacion en servidor y bcrypt | propuesta |
-| ADR-007 | Interfaz basada en el template Luna | propuesta |
-| ADR-008 | Cambios al modelo de dominio al implementarlo | propuesta |
+| ADR-001 | App movil con Expo (React Native) y NativeWind | tomada, justificacion por completar |
+| ADR-002 | Backend en Node.js con Express | tomada, justificacion por completar |
+| ADR-003 | SQLite como base de datos inicial | tomada, justificacion por completar |
+| ADR-004 | Traduccion con Claude y motor local de respaldo | tomada, justificacion por completar |
+| ADR-005 | Voz: dictado en el cliente y voz de salida con expo-speech | tomada, justificacion por completar |
+| ADR-006 | Autenticacion con JWT, revocacion en servidor y bcrypt | tomada, justificacion por completar |
+| ADR-007 | Interfaz basada en el template Luna | tomada, justificacion por completar |
+| ADR-008 | Cambios al modelo de dominio al implementarlo | tomada, justificacion por completar |
 
 ---
 
 ## ADR-001: App movil con Expo (React Native) y NativeWind
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta · **Responde a:** DRV-07
+**Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-07
 
 ### Contexto
 Dos personas desarrollan y la app debe servir en iOS y Android; el template de interfaz elegido (Luna) ya esta hecho en Expo.
@@ -37,7 +37,7 @@ Se puede probar en Expo Go sin compilar. El reconocimiento de voz nativo y las n
 
 ## ADR-002: Backend en Node.js con Express
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta · **Responde a:** DRV-07, DRV-08
+**Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-07, DRV-08
 
 ### Contexto
 La app esta en JavaScript/TypeScript y el equipo es pequeno.
@@ -55,7 +55,7 @@ Un solo lenguaje en todo el proyecto. Si el proyecto crece conviene pasar a Type
 
 ## ADR-003: SQLite como base de datos inicial
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta · **Responde a:** DRV-04, DRV-08
+**Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-04, DRV-08
 
 ### Contexto
 Hace falta persistir usuarios, conversaciones y mensajes con integridad referencial, y que cualquiera pueda correr el proyecto sin instalar un servidor de base de datos.
@@ -73,7 +73,7 @@ Instalacion cero. Para produccion habra que migrar a PostgreSQL; las consultas s
 
 ## ADR-004: Traduccion con Claude y motor local de respaldo
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta · **Responde a:** DRV-01, DRV-02, DRV-05, DRV-06, DRV-08
+**Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-01, DRV-02, DRV-05, DRV-06, DRV-08
 
 ### Contexto
 El valor de TalkLate es traducir conservando tono, intencion y modismos. Un traductor literal no lo logra.
@@ -91,7 +91,7 @@ La calidad real depende de Claude y tiene costo por mensaje (DRV-06). El motor l
 
 ## ADR-005: Voz: dictado en el cliente y expo-speech para la salida
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta · **Responde a:** DRV-07
+**Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-07
 
 ### Contexto
 El usuario habla y escucha la traduccion. Transcribir audio en el servidor exige un servicio adicional y subir audio.
@@ -108,7 +108,7 @@ Funciona sin costos extra. La voz en celular depende del teclado. Pendiente: rec
 
 ## ADR-006: Autenticacion con JWT, revocacion en servidor y bcrypt
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta · **Responde a:** DRV-03
+**Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-03
 
 ### Contexto
 Usuario-RN-5 y RN-10: iniciar sesion y cerrar sesion invalidando el token.
@@ -125,7 +125,7 @@ Cada peticion consulta si el token fue revocado. El envio real del codigo por co
 
 ## ADR-007: Interfaz basada en el template Luna
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta
+**Fecha:** 2026-10-14 · **Estado:** tomada
 
 ### Contexto
 El equipo compro el template Luna (chatbot) para no disenar la interfaz desde cero.
@@ -138,7 +138,7 @@ La interfaz es consistente y rapida de construir. Las pantallas de TalkLate esta
 
 ## ADR-008: Cambios al modelo de dominio al implementarlo
 
-**Fecha:** 2026-10-14 · **Estado:** propuesta, **validar con el mentor** · **Responde a:** DRV-04
+**Fecha:** 2026-10-14 · **Estado:** tomada, **validar con el mentor** · **Responde a:** DRV-04
 
 ### Contexto
 Al implementar aparecieron dos diferencias con `modelo_datos.md`.

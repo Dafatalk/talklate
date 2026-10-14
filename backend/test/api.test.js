@@ -132,7 +132,7 @@ test('reportar mala traduccion y revisarla como administrador', async () => {
   assert.equal(rep.estado, 201);
   assert.equal((await api('POST', `/mensajes/${destinoId}/reportar`, { motivo: 'Suena muy formal' }, token)).estado, 409);
   assert.equal((await api('GET', '/admin/reportes', null, token)).estado, 403);
-  const admin = await api('POST', '/auth/login', { correo: 'admin@talklate.app', password: 'Admin123!' });
+  const admin = await api('POST', '/auth/login', { correo: 'dafa123.daf@gmail.com', password: 'Admin123!' });
   const lista = await api('GET', '/admin/reportes?estado=abierto', null, admin.datos.token);
   assert.equal(lista.datos.reportes.length, 1);
   assert.equal(lista.datos.reportes[0].original, 'Hay que ponerse las pilas con el trabajo');
@@ -140,7 +140,7 @@ test('reportar mala traduccion y revisarla como administrador', async () => {
 });
 
 test('el administrador activa un idioma y agrega una region; el cliente no puede', async () => {
-  const admin = await api('POST', '/auth/login', { correo: 'admin@talklate.app', password: 'Admin123!' });
+  const admin = await api('POST', '/auth/login', { correo: 'dafa123.daf@gmail.com', password: 'Admin123!' });
   const todos = await api('GET', '/catalogo?todos=1', null, admin.datos.token);
   const fr = todos.datos.idiomas.find((i) => i.codigo === 'fr');
   assert.equal(fr.activo, false);

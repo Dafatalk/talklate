@@ -17,7 +17,7 @@ npm test           # 17 pruebas: API completa y motores de traduccion
 Variables de entorno (ver `.env.example`): `PORT`, `JWT_SECRET`, `TALKLATE_DB`, `ADMIN_CORREO`, `ADMIN_PASSWORD`,
 `TRADUCTOR`, `ANTHROPIC_API_KEY`, `TALKLATE_MODEL`, `CORREO_MODO`.
 
-Al arrancar se crea un administrador (`admin@talklate.app` / `Admin123!`, cambialo con las variables) y un catalogo
+Al arrancar se crea un administrador (`dafa123.daf@gmail.com` / `Admin123!`, cambialo con las variables) y un catalogo
 inicial: Espanol e Ingles activos; Frances y Portugues inactivos; paises, regiones, canales (Texto, Voz) y
 entonaciones (Neutral, Amigable, Alegre, Preocupado, Enojado, Formal).
 

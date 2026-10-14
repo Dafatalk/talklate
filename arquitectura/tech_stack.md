@@ -2,7 +2,7 @@
 
 **Fase 3 - Arquitectura de Software & Base de Datos**
 
-**Estado:** definido al empezar a construir (propuesta, a validar con el equipo y el mentor). Cada decision tiene su ADR en `decisiones.md` y responde a un driver de `drivers.md`.
+**Estado:** definido construyendo; la justificacion esta en los ADR (primero construimos y despues justificamos, como dijo Farid). Cada decision tiene su ADR en `decisiones.md` y responde a un driver de `drivers.md`.
 
 | Capa | Tecnologia | ADR |
 | --- | --- | --- |

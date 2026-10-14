@@ -172,7 +172,7 @@ function sembrar(db) {
     for (const n of ENTONACIONES) db.prepare('INSERT INTO entonacion (id, nombre) VALUES (?,?)').run(randomUUID(), n);
     for (const n of CANALES) db.prepare('INSERT INTO canal (id, nombre) VALUES (?,?)').run(randomUUID(), n);
   }
-  const correo = (process.env.ADMIN_CORREO || 'admin@talklate.app').toLowerCase();
+  const correo = (process.env.ADMIN_CORREO || 'dafa123.daf@gmail.com').toLowerCase();
   const existe = db.prepare('SELECT id FROM usuario WHERE correo = ?').get(correo);
   if (!existe) {
     db.prepare(

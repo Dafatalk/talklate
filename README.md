@@ -30,7 +30,7 @@ cd backend && npm install && npm start
 cd frontend && npm install --legacy-peer-deps && npm run web
 ```
 
-Usuario administrador de prueba: `admin@talklate.app` / `Admin123!`. Sin `ANTHROPIC_API_KEY` el backend usa
+Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!`. Sin `ANTHROPIC_API_KEY` el backend usa
 un motor de traducción local de demostración (español ⇄ inglés).
 
 ## Estado del proyecto
