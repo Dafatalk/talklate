@@ -159,7 +159,7 @@ module.exports = function conversacionesRouter(db) {
     if (!origenLpc) {
       if (remitente === 'interlocutor') throw mal('Primero envia tu mensaje para que reconozcamos tu idioma.');
       let codigo = b.idioma_origen_id ? db.prepare('SELECT codigo FROM lenguaje WHERE id = ?').get(b.idioma_origen_id)?.codigo : traductor.detectarIdioma(contenido);
-      if (!codigo) throw mal('No pudimos reconocer tu idioma. Escribe un poco mas o elige tu idioma de origen.');
+      if (!codigo) throw mal('No pudimos reconocer tu idioma. Escribe un poco mas para poder detectarlo.');
       let origen = db.prepare('SELECT * FROM lenguaje WHERE codigo = ? AND activo = 1').get(codigo);
       if (!origen) throw mal('No pudimos reconocer tu idioma entre los disponibles. Elige tu idioma de origen.');
       if (!traductor.soportaPar(origen.codigo, destinoLpc.idioma_codigo)) throw mal('Esa combinacion de idiomas todavia no esta disponible.');

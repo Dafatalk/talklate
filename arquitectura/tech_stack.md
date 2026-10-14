@@ -1,33 +1,33 @@
-# Stack Técnico — TalkLate
+# Stack Tecnico - TalkLate
 
-**Fase 3 · Arquitectura de Software & Base de Datos**
+**Fase 3 - Arquitectura de Software & Base de Datos**
 
-**Estado:** TBD (por decidir). Esta fase está bloqueada en `.softverse/estado_fases.json` hasta
-que F2 (Requerimientos) esté completa y se tome esta decisión explícitamente.
+**Estado:** definido al empezar a construir (propuesta, a validar con el equipo y el mentor). Cada decision tiene su ADR en `decisiones.md` y responde a un driver de `drivers.md`.
 
----
+| Capa | Tecnologia | ADR |
+| --- | --- | --- |
+| App movil | Expo SDK 54, React Native 0.81, expo-router, NativeWind (Tailwind) | ADR-001, ADR-007 |
+| Interfaz | Template Luna adaptado (componentes Header, Button, Chip, Input, ThemedText; tema claro y oscuro) | ADR-007 |
+| Voz | `expo-speech` para escuchar la traduccion; dictado del navegador o del teclado para hablar | ADR-005 |
+| Backend | Node.js 22, Express 4 (API REST) | ADR-002 |
+| Base de datos | SQLite (`node:sqlite`); migracion futura a PostgreSQL | ADR-003 |
+| Traduccion e IA | Claude (API de Anthropic) con motor local espanol/ingles de respaldo | ADR-004 |
+| Autenticacion | JWT con revocacion en servidor, bcrypt | ADR-006 |
+| Pruebas | `node:test` (backend, 17 pruebas); TypeScript y compilacion web en el frontend | - |
 
-## Pendiente de decidir
+## Estructura del codigo
 
-- **Frontend móvil**: framework (nativo iOS/Android, React Native, Flutter, etc.).
-- **Backend**: lenguaje/framework, y si es monolito modular o microservicios.
-- **Base de datos**: motor y estrategia de persistencia para conversaciones y mensajes.
-- **Motor de traducción / IA**: si se construye modelo propio, se integra un proveedor externo
-  (ej. modelos de traducción con conciencia de contexto), o un enfoque híbrido — dado que la
-  visión de TalkLate (ver `contexto.md`) exige más que traducción literal (contexto, emociones,
-  matices culturales), esta decisión es probablemente la más crítica del stack.
-- **Procesamiento de voz**: transcripción de audio a texto y síntesis de audio traducido (voz
-  natural), necesarios para las responsabilidades de Canal/MensajeOriginal/MensajeDestino en
-  `arquitectura/modelo_datos.md`.
-- **Template de UI obligatorio**: no se ha definido ninguno todavía (a diferencia de otros
-  proyectos que fijan un template desde el día 1).
+- `backend/`: API (rutas en `src/routes`, reglas en `src/lib`, esquema en `src/db.js`). Ver `backend/README.md`.
+- `frontend/`: app (pantallas en `app`, componentes de TalkLate en `components/talklate`). Ver `frontend/README.md`.
+- `componentes/template/native-luna/`: template original, sin cambios.
 
-## Restricción de dominio ya conocida (no depende del stack)
+## Como correrlo
 
-El modelo de datos (`arquitectura/modelo_datos.md`) ya establece que el sistema debe soportar
-mensajes por **voz y texto**, con traducción **en tiempo real**, preservando **canal**,
-**entonación** y **contexto regional** — cualquier stack elegido debe poder cumplir estas
-restricciones funcionales.
+Ver el `README.md` de la raiz: el backend en `http://localhost:3000` y la app con `npm run web` o Expo Go.
 
-Una vez decidido, actualizar este documento y `convenciones/README.md` (agregar manuales por
-tecnología) y avanzar la fase F3 con `softverse_advance_phase("F3")`.
+## Pendiente
+
+- Medir la latencia real de la traduccion con Claude (DRV-01).
+- Servicio de correo para el codigo de recuperacion de contrasena.
+- Reconocimiento de voz nativo o en servidor, y validar el audio (formato y duracion).
+- Migrar a PostgreSQL y desplegar (F10).
