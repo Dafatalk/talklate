@@ -1,0 +1,18 @@
+{
+  "name": "talklate-backend",
+  "version": "1.0.0",
+  "description": "API de TalkLate: traduccion en tiempo real con conciencia de matices culturales",
+  "main": "src/server.js",
+  "engines": { "node": ">=22.5" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
