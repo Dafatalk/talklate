@@ -93,7 +93,7 @@ module.exports = function conversacionesRouter(db) {
     if (b.idioma_origen_id) {
       origen = idiomaActivo(db, b.idioma_origen_id, 'de origen');
       if (!traductor.soportaPar(origen.codigo, destino.codigo)) throw mal('Esa combinacion de idiomas todavia no esta disponible.');
-    } else if (!['es', 'en'].some((c) => traductor.soportaPar(c, destino.codigo)) && traductor.modo() === 'local') {
+    } else if (!['es', 'en'].some((c) => traductor.soportaPar(c, destino.codigo))) {
       throw mal('Ese idioma de destino todavia no esta disponible.');
     }
     const id = randomUUID();

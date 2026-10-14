@@ -8,7 +8,7 @@ function crearApp(db) {
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
 
-  app.get('/api/salud', (_req, res) => res.json({ ok: true, servicio: 'talklate', motor_traduccion: traductor.modo() }));
+  app.get('/api/salud', (_req, res) => res.json({ ok: true, servicio: 'talklate', motor_traduccion: traductor.modo(), motores: traductor.cadena() }));
   app.use('/api/auth', require('./routes/auth')(db));
   app.use('/api', require('./routes/catalogo')(db));
   app.use('/api', require('./routes/conversaciones')(db));

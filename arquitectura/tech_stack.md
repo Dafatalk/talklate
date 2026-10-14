@@ -11,9 +11,9 @@
 | Voz | `expo-speech` para escuchar la traduccion; dictado del navegador o del teclado para hablar | ADR-005 |
 | Backend | Node.js 22, Express 4 (API REST) | ADR-002 |
 | Base de datos | SQLite (`node:sqlite`); migracion futura a PostgreSQL | ADR-003 |
-| Traduccion e IA | Claude (API de Anthropic) con motor local espanol/ingles de respaldo | ADR-004 |
+| Traduccion e IA | Qwen local (Ollama), Claude Sonnet de respaldo y motor de reglas espanol/ingles | ADR-004 |
 | Autenticacion | JWT con revocacion en servidor, bcrypt | ADR-006 |
-| Pruebas | `node:test` (backend, 17 pruebas); TypeScript y compilacion web en el frontend | - |
+| Pruebas | `node:test` (backend, 19 pruebas); TypeScript y compilacion web en el frontend | - |
 
 ## Estructura del codigo
 
@@ -27,7 +27,7 @@ Ver el `README.md` de la raiz: el backend en `http://localhost:3000` y la app co
 
 ## Pendiente
 
-- Medir la latencia real de la traduccion con Claude (DRV-01).
+- Medir la latencia y la calidad real de Qwen local (y de Claude Sonnet si hace falta) con jerga (DRV-01, DRV-02).
 - Servicio de correo para el codigo de recuperacion de contrasena.
 - Reconocimiento de voz nativo o en servidor, y validar el audio (formato y duracion).
 - Migrar a PostgreSQL y desplegar (F10).

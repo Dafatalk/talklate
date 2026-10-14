@@ -71,23 +71,24 @@ SQLite mediante `node:sqlite` (incluido en Node 22). El esquema sigue el modelo 
 ### Consecuencias
 Instalacion cero. Para produccion habra que migrar a PostgreSQL; las consultas son SQL estandar, asi que el cambio es acotado. `node:sqlite` aun es experimental.
 
-## ADR-004: Traduccion con Claude y motor local de respaldo
+## ADR-004: Traduccion con Qwen local, Claude Sonnet de respaldo y motor de reglas
 
 **Fecha:** 2026-10-14 · **Estado:** tomada · **Responde a:** DRV-01, DRV-02, DRV-05, DRV-06, DRV-08
 
 ### Contexto
-El valor de TalkLate es traducir conservando tono, intencion y modismos. Un traductor literal no lo logra.
+El valor de TalkLate es traducir conservando tono, intencion y modismos. Un traductor literal no lo logra. El equipo decidio usar **Qwen corriendo local** por ahora y volver a **Claude Sonnet** si no funciona.
 
 ### Decision
-Una fachada (`traductor.js`) con dos motores: **Claude** (API de Anthropic) con un prompt que pide equivalente cultural segun la region destino y devuelve tono, region de origen y una nota cultural; y un **motor local** espanol/ingles con modismos y variantes por pais, usado sin clave o si Claude falla. El idioma, el tono y la region de origen tambien se estiman con reglas locales.
+Una fachada (`traductor.js`) prueba los motores en orden: **Qwen local** (servido por Ollama), luego **Claude Sonnet** (API de Anthropic, si hay clave) y por ultimo un **motor de reglas** espanol/ingles con modismos y variantes por pais. Los dos modelos reciben el mismo prompt, que pide el equivalente cultural segun la region destino y devuelve tono, region de origen y una nota cultural. El idioma, el tono y la region de origen tambien se estiman con reglas locales. Si un motor falla se salta durante un minuto.
 
 ### Alternativas
 - **DeepL o Google Translate:** buena calidad literal, pero no explican ni adaptan modismos por region.
-- **Modelo abierto propio (por ejemplo Argos o NLLB):** sin costo por uso, pero poca calidad con jerga y mas infraestructura.
-- **Solo motor local:** gratis y rapido, pero no escala a mas idiomas ni a jerga nueva.
+- **Solo Claude:** mejor calidad esperada, pero con costo por mensaje y dependencia de internet.
+- **Solo motor de reglas:** gratis y rapido, pero no escala a mas idiomas ni a jerga nueva.
+- **Otro modelo abierto (por ejemplo Argos o NLLB):** poca calidad con jerga.
 
 ### Consecuencias
-La calidad real depende de Claude y tiene costo por mensaje (DRV-06). El motor local sirve para demostrar y probar sin clave, no para produccion. Falta medir la latencia real (DRV-01).
+Qwen local no tiene costo por uso ni envia los mensajes a terceros (ayuda a DRV-03 y DRV-06), pero exige un computador con Ollama y el modelo descargado, y su velocidad y calidad dependen de ese equipo y del modelo elegido. Falta medir la latencia y la calidad real con jerga (DRV-01 y DRV-02). Claude Sonnet queda como respaldo de calidad, con costo por uso.
 
 ## ADR-005: Voz: dictado en el cliente y expo-speech para la salida
 

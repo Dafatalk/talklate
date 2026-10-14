@@ -12,13 +12,13 @@
 ## 2. Historias de usuario
 - [ ] **"Traducir mi mensaje"** como historia (HU0003). Antes se hablo de que "procesar" era un detalle interno; en el audio dijo "ingresar, traducir y escuchar el mensaje". Confirmar.
 - [ ] La redaccion Como / Necesito poder / Para y que el "Para" apunte al impacto correcto.
-- [ ] Criterios de aceptacion: no estan hechos. Preguntar si los quiere.
+- [ ] Criterios de aceptacion (Dado / Cuando / Entonces) de las 25 historias, en la hoja Entregables y en `criterios_aceptacion.md`.
 
 ## 3. Priorizacion y sprints
 - [ ] Prioridad por valor (traducir primero; registro y cerrar sesion al final) y la frase para defenderla: "se priorizo por valor para el negocio, no por dependencia".
 - [ ] Tabla de tallas a horas: XS 1, S 2, M 4, L 6, XL 8, XXL 12.
 - [ ] Capacidad: 2 personas por 4 horas al dia por 5 dias = 40 horas, usable 75 % = 30. Confirmar que el sprint dura una semana.
-- [ ] Resultado: 90 horas en 3 sprints. Falta el **plan de liberaciones** con fechas.
+- [ ] Resultado: 90 horas en 3 sprints. Plan de liberaciones: el sprint 1 empieza el lunes 19/10/2026 y cada sprint termina con una liberacion (`plan_liberaciones.md`).
 
 ## 4. Modelo de dominio (ADR-008)
 - [ ] Un idioma con varias regiones y una region con varios idiomas (el modelo tenia una sola region por lenguaje).
@@ -34,7 +34,7 @@
 ## 6. Arquitectura
 - [ ] Drivers y sus umbrales (por ejemplo traducir en 3 segundos o menos) en `arquitectura/drivers.md`.
 - [ ] Los 8 ADR: primero construimos y despues justificamos. Completar con las alternativas que de verdad se evaluaron.
-- [ ] Motor de traduccion: Claude con clave de API (costo por uso) y motor local solo de demostracion. Que proveedor de IA aceptaria el.
+- [ ] Motor de traduccion: Qwen local (Ollama) primero, Claude Sonnet de respaldo y motor de reglas al final. Confirmar que le parece bien y que modelo Qwen usar; falta medir latencia y calidad con jerga.
 - [ ] Voz: hoy el dictado es del navegador o del teclado del celular; no hay reconocimiento nativo ni transcripcion en servidor. Confirmar que sirve para el alcance.
 
 ## 7. Para la sustentacion

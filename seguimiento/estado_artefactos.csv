@@ -12,8 +12,8 @@ Diseño estratégico,Diseño estratégico,Mapa de historias de usuario,SI,En pro
 Diseño estratégico,Diseño estratégico,Matriz de roles por operaciones,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Matriz de roles por operaciones.xlsx. Queda pendiente definir si el Administrador inicia sesion igual que los demas.
 Diseño estratégico,Diseño estratégico,Matriz de comandos por impacto,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Matriz de comandos por impacto.xlsx.
 Diseño estratégico,Diseño estratégico,Mapa de viaje del cliente,SI,Terminado,2026-08-15,,Customer Journey Map de 9 etapas en componentes/especificacion_vistas_ui.md.
-Diseño estratégico,Diseño estratégico,Plan de liberaciones del producto,SI,En progreso,2026-10-14,,3 sprints de 30 horas en requerimientos/planificacion_sprints.md y en la hoja Planificacion del Excel. Falta el plan de liberaciones con fechas.
-Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,En progreso,2026-10-02,,"HU0001 a HU0025 en 6 epicas, con prioridad por valor, talla, horas y sprint. Faltan criterios de aceptacion."
+Diseño estratégico,Diseño estratégico,Plan de liberaciones del producto,SI,Terminado,2026-10-14,2026-10-14,"3 liberaciones, una por sprint; el sprint 1 empieza el lunes 19/10/2026 (requerimientos/plan_liberaciones.md y hoja Plan de liberaciones). Falta validar con Farid."
+Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,En progreso,2026-10-02,,"HU0001 a HU0025 en 6 epicas, con prioridad por valor, talla, horas, sprint y criterios de aceptacion. Falta validar con Farid."
 Diseño estratégico,Diseño estratégico,Flujo de transacciones en diagramas de actividades,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Flujo de estados en diagramas de estado,SI,No planeado,,,
 Diseño táctico,Diseño arquitectónico,Drivers arquitectónicos,SI,En progreso,2026-10-14,,arquitectura/drivers.md con 8 drivers y objetivos por validar.
@@ -21,7 +21,7 @@ Diseño táctico,Diseño arquitectónico,Spikes/Pruebas de concepto,SI,No planea
 Diseño táctico,Diseño arquitectónico,Alternativas de solución,SI,En progreso,2026-10-14,,Alternativas dentro de cada ADR; falta documentarlas como artefacto aparte.
 Diseño táctico,Diseño arquitectónico,Arquitectura de referencia,SI,No planeado,,,
 Diseño táctico,Diseño arquitectónico,Arquetipo de solución,SI,No planeado,,,
-Diseño táctico,Diseño arquitectónico,Plataforma tecnológica/Stack tecnológico,SI,En progreso,2026-10-14,,arquitectura/tech_stack.md y 8 ADR propuestos en arquitectura/decisiones.md. Falta aceptarlos con el equipo y el mentor.
+Diseño táctico,Diseño arquitectónico,Plataforma tecnológica/Stack tecnológico,SI,En progreso,2026-10-14,,arquitectura/tech_stack.md y 8 ADR (Qwen local con Claude Sonnet de respaldo). Falta completar la justificacion.
 Diseño táctico,Diseño detallado,Diagrama de clases,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Diagrama de componentes,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Diagrama de paquetes,SI,No planeado,,,
@@ -30,7 +30,7 @@ Diseño táctico,Diseño detallado,Diagrama de despliegue,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Modelo de fuente de información,SI,En progreso,2026-10-14,,Esquema SQLite en backend/src/db.js. El MER lo hace Julian.
 Diseño táctico,Línea base,Línea base del producto,SI,No planeado,,,
 Construcción,Repositorio,Repositorio de control de versiones,SI,Terminado,2026-08-15,,GitHub dafatalk/talklate con main y develop.
-Construcción,Calidad de código,Pruebas unitarias,SI,En progreso,2026-10-14,,17 pruebas en backend/test. Faltan pruebas del frontend.
+Construcción,Calidad de código,Pruebas unitarias,SI,En progreso,2026-10-14,,19 pruebas en backend/test. Faltan pruebas del frontend.
 Construcción,Calidad de código,Análisis de calidad de código y deuda técnica,SI,No planeado,,,
 Construcción,Calidad de código,Cobertura de código,SI,No planeado,,,
 Construcción,DEVOPS,Integración continua,SI,No planeado,,,

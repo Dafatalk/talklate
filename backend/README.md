@@ -11,11 +11,11 @@ Requiere **Node 22.5 o superior** (usa `node:sqlite`, incluido en Node).
 cd backend
 npm install
 npm start          # http://localhost:3000  (crea data/talklate.db y los datos iniciales)
-npm test           # 17 pruebas: API completa y motores de traduccion
+npm test           # 19 pruebas: API completa y motores de traduccion
 ```
 
 Variables de entorno (ver `.env.example`): `PORT`, `JWT_SECRET`, `TALKLATE_DB`, `ADMIN_CORREO`, `ADMIN_PASSWORD`,
-`TRADUCTOR`, `ANTHROPIC_API_KEY`, `TALKLATE_MODEL`, `CORREO_MODO`.
+`TRADUCTOR`, `OLLAMA_URL`, `QWEN_MODEL`, `ANTHROPIC_API_KEY`, `TALKLATE_MODEL`, `CORREO_MODO`.
 
 Al arrancar se crea un administrador (`dafa123.daf@gmail.com` / `Admin123!`, cambialo con las variables) y un catalogo
 inicial: Espanol e Ingles activos; Frances y Portugues inactivos; paises, regiones, canales (Texto, Voz) y
@@ -23,13 +23,29 @@ entonaciones (Neutral, Amigable, Alegre, Preocupado, Enojado, Formal).
 
 ## Motor de traduccion
 
-- **Con `ANTHROPIC_API_KEY`:** usa Claude con un prompt que pide conservar intencion, tono y modismos, usar el
-  equivalente cultural en la region destino y devolver tono, region de origen y nota cultural.
-- **Sin clave (por defecto):** motor local de demostracion espanol <-> ingles (`src/lib/motorLocal.js`): cambia
-  modismos y frases hechas por su equivalente cultural (con variantes por pais) y el resto lo traduce palabra por
-  palabra; si quedan palabras sin traducir marca la traduccion como `aproximada`. Sirve para probar sin internet,
-  no para produccion.
-- Si Claude falla, cae al motor local. `TRADUCTOR=local|claude|auto` fuerza uno.
+`TRADUCTOR=auto` (por defecto) prueba los motores en este orden y usa el primero que responde:
+
+1. **Qwen local con Ollama.** Instala [Ollama](https://ollama.com), baja el modelo y dejalo corriendo:
+   ```bash
+   ollama pull qwen2.5:7b      # o el modelo que quieras: QWEN_MODEL=qwen3:8b
+   ollama serve                # normalmente ya queda corriendo solo
+   ```
+   Variables: `OLLAMA_URL` (por defecto `http://localhost:11434`), `QWEN_MODEL`, `QWEN_TIMEOUT_MS`.
+2. **Claude Sonnet**, si hay `ANTHROPIC_API_KEY` (`TALKLATE_MODEL`, por defecto `claude-sonnet-5-5`).
+3. **Motor de reglas** (`src/lib/motorLocal.js`), espanol <-> ingles: cambia modismos y frases hechas por su
+   equivalente cultural (con variantes por pais) y el resto lo traduce palabra por palabra; si quedan palabras sin
+   traducir marca la traduccion como `aproximada`. Sirve para probar sin nada instalado, no para produccion.
+
+Los dos modelos reciben el mismo prompt (`src/lib/prompt.js`): conservar intencion, tono y modismos, usar el
+equivalente cultural de la region destino y devolver `traduccion`, `tono`, `nota_cultural` y `region_origen`.
+Si un motor falla se pasa al siguiente y no se vuelve a intentar durante un minuto (para no esperar en cada
+mensaje). Cada traduccion guarda que motor la hizo (`qwen:qwen2.5:7b`, `claude:...` o `local`) y `/api/salud` muestra
+la cadena activa. `TRADUCTOR=qwen|claude|local` fuerza otra opcion.
+
+Con Qwen o Claude se aceptan idiomas distintos de espanol e ingles; con solo el motor de reglas no.
+
+> La conexion real con Ollama y con Claude esta cubierta por pruebas con respuestas simuladas; falta probarla con
+> el modelo corriendo en tu computador (calidad y tiempo de respuesta).
 
 ## Endpoints (`/api`)
 

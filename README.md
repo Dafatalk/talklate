@@ -30,8 +30,8 @@ cd backend && npm install && npm start
 cd frontend && npm install --legacy-peer-deps && npm run web
 ```
 
-Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!`. Sin `ANTHROPIC_API_KEY` el backend usa
-un motor de traducción local de demostración (español ⇄ inglés).
+Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!`. La traducción usa **Qwen local (Ollama)**, luego Claude Sonnet si hay `ANTHROPIC_API_KEY`, y si ninguno
+responde un motor de reglas (español ⇄ inglés). Para Qwen: `ollama pull qwen2.5:7b` (ver `backend/README.md`).
 
 ## Estado del proyecto
 
