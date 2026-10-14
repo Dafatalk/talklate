@@ -5,6 +5,7 @@ const { detectarIdioma, detectarTono, detectarRegionOrigen } = require('./analis
 const { traducirLocal, PARES_LOCALES } = require('./motorLocal');
 const { traducirClaude, disponible: hayClaude, MODELO: MODELO_CLAUDE } = require('./motorClaude');
 const { traducirQwen, MODELO: modeloQwen } = require('./motorQwen');
+const log = require('./log');
 
 const ESPERA_TRAS_FALLO_MS = 60 * 1000;
 const caidos = new Map(); // motor -> hasta cuando no se intenta (para no esperar el timeout en cada mensaje)
@@ -52,7 +53,7 @@ async function traducir(entrada, opciones = {}) {
     } catch (e) {
       caidos.set(motor, Date.now() + ESPERA_TRAS_FALLO_MS);
       errores.push(`${motor}: ${e.message}`);
-      console.warn(`[talklate] ${motor} no respondio (${e.message}); sigo con el siguiente motor.`);
+      log.advertencia('motor_no_respondio', { motor, detalle: e.message });
     }
   }
 

@@ -1,0 +1,451 @@
+openapi: 3.0.3
+info:
+  title: TalkLate API
+  version: 1.0.0
+  description: |
+    API de TalkLate: traduccion en tiempo real (por turno) con conciencia de matices culturales.
+    Sigue `convenciones/api-rest.md`: base `/api/v1`, errores con `statusCode`, `error`, `message`, `timestamp` y `path`,
+    `201` con cabecera `Location`, `204` al eliminar, `422` para reglas de negocio y listas paginadas.
+    Los mensajes de error estan en espanol y salen tal cual al usuario.
+servers:
+  - url: /api/v1
+tags:
+  - name: Cuenta de usuario
+  - name: Gestion de conversaciones
+  - name: Traduccion de mensajes
+  - name: Reportes
+  - name: Administracion de idiomas y regiones
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    page: { name: page, in: query, schema: { type: integer, default: 1, minimum: 1 } }
+    limit: { name: limit, in: query, schema: { type: integer, default: 20, minimum: 1, maximum: 100 } }
+    id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+  schemas:
+    Error:
+      type: object
+      properties:
+        statusCode: { type: integer, example: 422 }
+        error: { type: string, example: Unprocessable Entity }
+        message: { type: string, example: Esa combinacion de idiomas todavia no esta disponible. }
+        timestamp: { type: string, format: date-time }
+        path: { type: string, example: /api/v1/conversaciones }
+    Paginacion:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+    Usuario:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nombre: { type: string }
+        apellido: { type: string }
+        correo: { type: string, format: email }
+        fecha_nacimiento: { type: string, format: date }
+        rol: { type: string, enum: [cliente, admin] }
+    Sesion:
+      type: object
+      properties:
+        token: { type: string, description: Token de acceso JWT de vida corta (15 minutos por defecto) }
+        token_refresco: { type: string, description: Token de refresco (30 dias), se rota en cada uso }
+        expira_en: { type: integer, description: Segundos de vida del token de acceso }
+        usuario: { $ref: '#/components/schemas/Usuario' }
+    Region:
+      type: object
+      properties:
+        id: { type: string }
+        nombre: { type: string }
+        pais: { type: object, properties: { id: { type: string }, nombre: { type: string }, codigo: { type: string } } }
+    Idioma:
+      type: object
+      properties:
+        id: { type: string }
+        nombre: { type: string }
+        codigo: { type: string, example: es }
+        activo: { type: boolean }
+        regiones: { type: array, items: { $ref: '#/components/schemas/Region' } }
+    ConfigIdioma:
+      type: object
+      nullable: true
+      properties:
+        lenguaje_conversacion_id: { type: string }
+        idioma_id: { type: string }
+        idioma: { type: string }
+        codigo: { type: string }
+        region_id: { type: string, nullable: true }
+        region: { type: string, nullable: true }
+        pais: { type: string, nullable: true }
+    Conversacion:
+      type: object
+      properties:
+        id: { type: string }
+        nombre: { type: string }
+        fecha_inicio: { type: string, format: date-time }
+        configuracion:
+          type: object
+          properties:
+            origen: { $ref: '#/components/schemas/ConfigIdioma' }
+            destino: { $ref: '#/components/schemas/ConfigIdioma' }
+        total_mensajes: { type: integer }
+        ultimo_mensaje:
+          type: object
+          nullable: true
+          properties: { contenido: { type: string }, traduccion: { type: string }, fecha: { type: string } }
+    Mensaje:
+      type: object
+      properties:
+        id: { type: string }
+        remitente: { type: string, enum: [usuario, interlocutor] }
+        canal: { type: string, enum: [Texto, Voz] }
+        tono: { type: string, example: Preocupado }
+        contenido: { type: string }
+        fecha: { type: string, format: date-time }
+        traduccion:
+          type: object
+          properties:
+            id: { type: string }
+            contenido: { type: string }
+            nota_cultural: { type: string, nullable: true }
+            aproximada: { type: boolean }
+            motor: { type: string, example: 'qwen:qwen2.5:7b' }
+            estado_entrega: { type: string, enum: [Pendiente, Enviado, Entregado, Fallido] }
+            reportado: { type: boolean }
+    Reporte:
+      type: object
+      properties:
+        id: { type: string }
+        motivo: { type: string }
+        sugerencia: { type: string, nullable: true }
+        estado: { type: string, enum: [abierto, revisado, descartado] }
+        nota_admin: { type: string, nullable: true }
+        fecha: { type: string, format: date-time }
+        original: { type: string }
+        traduccion: { type: string }
+        motor: { type: string }
+        idioma_origen: { type: string }
+        idioma_destino: { type: string }
+        reportado_por: { type: string }
+  responses:
+    Error: { description: Error, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+security:
+  - bearer: []
+paths:
+  /auth/registro:
+    post:
+      tags: [Cuenta de usuario]
+      summary: Registrarme (HU0015). Usuario-RN-1 a RN-4 y consentimiento de datos
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, apellido, correo, password, fecha_nacimiento, acepta_tratamiento_datos]
+              properties:
+                nombre: { type: string }
+                apellido: { type: string }
+                correo: { type: string }
+                password: { type: string, description: 8 o mas caracteres, mayuscula, numero y simbolo }
+                fecha_nacimiento: { type: string, format: date }
+                acepta_tratamiento_datos: { type: boolean, description: Debe ser true (Ley 1581 de 2012) }
+      responses:
+        '201': { description: Cuenta creada, headers: { Location: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Sesion' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/login:
+    post:
+      tags: [Cuenta de usuario]
+      summary: Iniciar sesion (HU0016). Usuario-RN-5
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { correo: { type: string }, password: { type: string } } } } } }
+      responses:
+        '200': { description: Sesion iniciada, content: { application/json: { schema: { $ref: '#/components/schemas/Sesion' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/refrescar:
+    post:
+      tags: [Cuenta de usuario]
+      summary: Renovar el token de acceso con el token de refresco (que se rota)
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { token_refresco: { type: string } } } } } }
+      responses:
+        '200': { description: Nueva sesion, content: { application/json: { schema: { $ref: '#/components/schemas/Sesion' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+  /auth/recuperar:
+    post:
+      tags: [Cuenta de usuario]
+      summary: Pedir codigo de recuperacion (HU0017). Usuario-RN-6 y RN-7
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { correo: { type: string } } } } } }
+      responses:
+        '200': { description: Codigo enviado. En desarrollo incluye codigo_dev. }
+        '404': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+        '502': { $ref: '#/components/responses/Error' }
+  /auth/restablecer:
+    post:
+      tags: [Cuenta de usuario]
+      summary: Definir nueva contrasena con el codigo (HU0017). Usuario-RN-8 y RN-9
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { correo: { type: string }, codigo: { type: string }, password: { type: string } } } } } }
+      responses:
+        '200': { description: Contrasena actualizada }
+        '400': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /auth/logout:
+    post:
+      tags: [Cuenta de usuario]
+      summary: Cerrar sesion (HU0018). Usuario-RN-10
+      requestBody: { content: { application/json: { schema: { type: object, properties: { token_refresco: { type: string } } } } } }
+      responses:
+        '204': { description: Sesion cerrada }
+        '401': { $ref: '#/components/responses/Error' }
+  /usuarios/yo:
+    get:
+      tags: [Cuenta de usuario]
+      summary: Datos del usuario autenticado
+      responses:
+        '200': { description: Usuario, content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Cuenta de usuario]
+      summary: Eliminar mi cuenta y todos mis datos (HU0026, derecho al olvido)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { password: { type: string } } } } } }
+      responses:
+        '204': { description: Cuenta eliminada }
+        '401': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /catalogo:
+    get:
+      tags: [Administracion de idiomas y regiones]
+      summary: Consultar los idiomas disponibles con sus regiones, entonaciones y canales (HU0023)
+      parameters: [{ name: todos, in: query, schema: { type: string, enum: ['1'] }, description: Solo administrador, incluye inactivos }]
+      responses:
+        '200':
+          description: Catalogo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idiomas: { type: array, items: { $ref: '#/components/schemas/Idioma' } }
+                  entonaciones: { type: array, items: { type: object, properties: { id: { type: string }, nombre: { type: string } } } }
+                  canales: { type: array, items: { type: object, properties: { id: { type: string }, nombre: { type: string } } } }
+  /conversaciones:
+    get:
+      tags: [Gestion de conversaciones]
+      summary: Consultar mi historial (HU0011), lo mas reciente primero
+      parameters: [{ $ref: '#/components/parameters/page' }, { $ref: '#/components/parameters/limit' }]
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Conversacion' } }
+                  pagination: { $ref: '#/components/schemas/Paginacion' }
+    post:
+      tags: [Gestion de conversaciones]
+      summary: Crear una conversacion y configurar sus parametros una sola vez (HU0006, HU0008, HU0009). Conversacion-RN-1, RN-3, RN-4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idioma_destino_id, region_destino_id]
+              properties:
+                nombre: { type: string, description: 3 a 80 caracteres; por defecto "Nueva Conversacion" }
+                idioma_destino_id: { type: string }
+                region_destino_id: { type: string }
+                idioma_origen_id: { type: string, description: Opcional; si no se envia se reconoce con el primer mensaje }
+      responses:
+        '201': { description: Creada, headers: { Location: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Conversacion' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /conversaciones/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get:
+      tags: [Gestion de conversaciones]
+      summary: Abrir una conversacion anterior con sus mensajes (HU0012)
+      responses:
+        '200':
+          description: Conversacion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Conversacion'
+                  - type: object
+                    properties: { mensajes: { type: array, items: { $ref: '#/components/schemas/Mensaje' } } }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      tags: [Gestion de conversaciones]
+      summary: Renombrar una conversacion (HU0013). Conversacion-RN-4 y RN-5
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { nombre: { type: string } } } } } }
+      responses:
+        '200': { description: Renombrada, content: { application/json: { schema: { $ref: '#/components/schemas/Conversacion' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+    delete:
+      tags: [Gestion de conversaciones]
+      summary: Eliminar una conversacion con sus mensajes (HU0014)
+      responses:
+        '204': { description: Eliminada }
+        '404': { $ref: '#/components/responses/Error' }
+  /conversaciones/{id}/mensajes:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    post:
+      tags: [Traduccion de mensajes]
+      summary: Ingresar un mensaje (texto o voz) y traducirlo (HU0001 a HU0005, HU0007, HU0010, HU0019, HU0020)
+      description: |
+        Reconoce el idioma de origen con el primer mensaje (Conversacion-RN-2), traduce con la cadena de motores
+        (Qwen local, Claude Sonnet, reglas) y devuelve como entregar la traduccion por el mismo canal.
+        `remitente: interlocutor` traduce la respuesta de la otra persona al idioma del usuario.
+        Limite por usuario: 30 mensajes por minuto (configurable).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contenido]
+              properties:
+                contenido: { type: string, maxLength: 5000 }
+                canal: { type: string, enum: [texto, voz], default: texto }
+                remitente: { type: string, enum: [usuario, interlocutor], default: usuario }
+                idioma_origen_id: { type: string }
+      responses:
+        '201':
+          description: Mensaje traducido
+          headers: { Location: { schema: { type: string } } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje: { $ref: '#/components/schemas/Mensaje' }
+                  entrega: { type: object, properties: { canal: { type: string }, reproducir_audio: { type: boolean }, idioma_codigo: { type: string }, region_origen_detectada: { type: string, nullable: true } } }
+                  configuracion: { type: object }
+                  aviso: { type: string, nullable: true }
+        '400': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+        '502': { $ref: '#/components/responses/Error' }
+  /conversaciones/{id}/mensajes/{mensajeId}:
+    parameters: [{ $ref: '#/components/parameters/id' }, { name: mensajeId, in: path, required: true, schema: { type: string } }]
+    get:
+      tags: [Traduccion de mensajes]
+      summary: Consultar un mensaje con su traduccion
+      responses:
+        '200': { description: Mensaje, content: { application/json: { schema: { $ref: '#/components/schemas/Mensaje' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /reportes:
+    post:
+      tags: [Reportes]
+      summary: Reportar una mala traduccion (HU0021)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mensaje_destino_id, motivo]
+              properties:
+                mensaje_destino_id: { type: string }
+                motivo: { type: string, minLength: 3, maxLength: 500 }
+                sugerencia: { type: string }
+      responses:
+        '201': { description: Reporte creado, headers: { Location: { schema: { type: string } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/reportes:
+    get:
+      tags: [Reportes]
+      summary: Revisar los reportes de mala traduccion (HU0022, administrador)
+      parameters:
+        - { name: estado, in: query, schema: { type: string, enum: [abierto, revisado, descartado] } }
+        - { $ref: '#/components/parameters/page' }
+        - { $ref: '#/components/parameters/limit' }
+      responses:
+        '200':
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Reporte' } }
+                  pagination: { $ref: '#/components/schemas/Paginacion' }
+        '403': { $ref: '#/components/responses/Error' }
+  /admin/reportes/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get:
+      tags: [Reportes]
+      summary: Consultar un reporte (administrador)
+      responses:
+        '200': { description: Reporte, content: { application/json: { schema: { $ref: '#/components/schemas/Reporte' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      tags: [Reportes]
+      summary: Marcar un reporte como revisado o descartado (HU0022)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { estado: { type: string, enum: [abierto, revisado, descartado] }, nota_admin: { type: string } } } } } }
+      responses:
+        '200': { description: Reporte actualizado, content: { application/json: { schema: { $ref: '#/components/schemas/Reporte' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /admin/idiomas:
+    post:
+      tags: [Administracion de idiomas y regiones]
+      summary: Agregar un idioma (HU0024). Queda inactivo hasta que se active
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { nombre: { type: string }, codigo: { type: string }, activo: { type: boolean }, regiones: { type: array, items: { type: string } } } } } } }
+      responses:
+        '201': { description: Creado, headers: { Location: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Idioma' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/idiomas/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get:
+      tags: [Administracion de idiomas y regiones]
+      summary: Consultar un idioma (administrador)
+      responses:
+        '200': { description: Idioma, content: { application/json: { schema: { $ref: '#/components/schemas/Idioma' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      tags: [Administracion de idiomas y regiones]
+      summary: Activar o desactivar un idioma, renombrarlo o cambiar sus regiones (HU0025)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { nombre: { type: string }, activo: { type: boolean }, regiones: { type: array, items: { type: string } } } } } } }
+      responses:
+        '200': { description: Idioma actualizado, content: { application/json: { schema: { $ref: '#/components/schemas/Idioma' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/regiones:
+    post:
+      tags: [Administracion de idiomas y regiones]
+      summary: Agregar una region (HU0024). La region no se repite dentro del pais
+      requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { nombre: { type: string }, pais: { type: string }, pais_codigo: { type: string }, idiomas: { type: array, items: { type: string } } } } } } }
+      responses:
+        '201': { description: Creada, headers: { Location: { schema: { type: string } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/regiones/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get:
+      tags: [Administracion de idiomas y regiones]
+      summary: Consultar una region (administrador)
+      responses:
+        '200': { description: Region }
+        '404': { $ref: '#/components/responses/Error' }
