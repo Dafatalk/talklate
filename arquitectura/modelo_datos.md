@@ -3,7 +3,7 @@
 **Fase 3 · Arquitectura de Software & Base de Datos**
 
 **Estado:** en construcción. Migrado íntegramente desde `Modelo de Dominio Enriquecido.xlsx`.
-**Combinaciones unicas:** ya hay una propuesta por entidad (falta validarla con Farid y pasarla al xlsx, que esta usando Julian).
+**Combinaciones unicas:** propuesta por entidad (validar con Farid). **Alineado con la base de datos** (`backend/src/db.js`) el 2026-10-14: ver "Correspondencia con la base de datos" al final. El `Modelo de Dominio Enriquecido.xlsx` y el MER (Julian) deben actualizarse con estos cambios.
 **Gap original:** a casi todas las entidades les faltaba modelar las **combinaciones
 únicas** (constraints de unicidad, simples o compuestas) — señalado por el mentor Wider Farid
 Sánchez Garzón en la sesión del 2026-08-15 (ver `seguimiento/2026-08-15-mentoria.md` para la
@@ -45,7 +45,10 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 | nombre | Alfanumérico | 1–50 | Sí | No | Nombre del usuario. |
 | apellido | Alfanumérico | 1–50 | Sí | No | Apellido del usuario. |
 | correo | Alfanumérico | 5–320 | Sí | **Sí** | Correo electrónico, usado para contacto privado y seguridad. |
-| fechaNacimiento | Fecha | — | Sí | No | Fecha de nacimiento; no puede ser mayor a la actual. |
+| fechaNacimiento | Fecha | — | Sí | **Sí** | Fecha de nacimiento; no puede ser mayor a la actual. |
+| contrasena | Alfanumérico (hash bcrypt) | 60 | Sí | **Sí** | Solo se guarda el hash (Usuario-RN-4); nunca se devuelve ni se registra. |
+| rol | Alfanumérico | 5–7 | Sí | No | `cliente` (por defecto) o `admin`. Lo asigna el sistema. |
+| consentimientoDatos | Fecha y tiempo | — | Sí | **Sí** | Cuándo aceptó la política de tratamiento de datos (Ley 1581 de 2012). |
 
 ### Responsabilidades y reglas de negocio
 
@@ -88,7 +91,7 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 | Regla | Descripción |
 | --- | --- |
 | Conversacion-RN-1 | Una conversación debe tener definido un idioma destino antes de iniciar la traducción; la Región seleccionada debe ser válida para el Lenguaje elegido. |
-| Conversacion-RN-2 | El idioma origen se detecta automáticamente con el primer mensaje de audio y no puede cambiar durante esa conversación. |
+| Conversacion-RN-2 | El idioma origen se detecta automáticamente con el primer mensaje (de voz o de texto) y no puede cambiar durante esa conversación. |
 | Conversacion-RN-3 | Los pares de idiomas origen-destino deben estar soportados por el sistema antes de iniciar la conversación. |
 | Conversacion-RN-4 | El nombre de la conversación no puede contener caracteres especiales o palabras ofensivas. |
 | Conversacion-RN-5 | No se puede modificar el identificador. |
@@ -120,13 +123,13 @@ Diagrama editable de referencia: [`diagramas/modelo_dominio.drawio`](diagramas/m
 | 1 | Simple | nombre | La regla del lenguaje dice que el nombre no puede repetirse. |
 | 2 | Simple | codigo | El codigo ISO (es, en, fr) identifica un idioma. |
 
-Duda: si un mismo idioma se usara en varias regiones (Espanol de Antioquia y de Madrid), el nombre se repetiria y habria que cambiar la combinacion 1 a (nombre, region).
+Como la region ya no es un atributo del lenguaje sino una relacion muchos a muchos (`LenguajeRegion`), el nombre del lenguaje si puede ser unico: "Espanol" existe una vez y se relaciona con Antioquia, Bogota, Madrid, etc. Decision registrada en ADR-008.
 
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
 | identificador | Alfanumérico (UUID) | 36 | Sí | Autogenerado. |
 | nombre | Alfanumérico | 1–50 | Sí | Nombre del idioma. No puede repetirse. |
-| identificador de región | Alfanumérico (UUID) | 36 | Sí | Región que usa el lenguaje. |
+| regiones | Referencia a Región (varias) | — | No | Regiones donde se habla el lenguaje (relación muchos a muchos `LenguajeRegion`, ver abajo). |
 | codigo | Alfanumérico | 2–5 | Sí | Formato ISO 639-1 / 639-2 (es, en, fr, etc.). |
 | activo | Lógico | — | Sí | Indica si el idioma está disponible para traducción. Default `false`. |
 
@@ -206,11 +209,14 @@ iguales.
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
 | identificador | Alfanumérico (UUID) | 36 | Sí | Autogenerado. |
-| mensajeOriginal | Texto | 1–5000 | Sí | Contenido del mensaje original sin procesar. |
-| contenidoTraducido | Texto | 1–5000 | Sí | Contenido del mensaje traducido/procesado. |
+| mensajeOriginal | Referencia a MensajeOriginal | — | Sí | Mensaje del que sale esta traducción. |
+| contenidoTraducido | Texto (cifrado) | 1–5000 | Sí | Contenido del mensaje traducido; se guarda cifrado (AES-256-GCM). |
+| notaCultural | Texto | 0–2000 | No | Explicación del modismo adaptado, si lo hubo. |
+| aproximada | Lógico | — | Sí | Verdadero si quedaron palabras sin traducir. |
+| motor | Alfanumérico | 1–60 | Sí | Motor que tradujo (`qwen:...`, `claude:...` o `local`). |
 | fechaCreacion | Fecha | — | Sí | Autogenerado, no mayor a la actual. |
 | estadoEntrega | Alfanumérico | 1–15 | Sí | Valores: `Pendiente` (default), `Enviado`, `Entregado`, `Fallido`. |
-| lenguajeConversacion | Referencia a LenguajePorConversacion | — | Sí | Lenguaje en el que fue expresado el mensaje. |
+| lenguajeConversacion | Referencia a LenguajePorConversacion | — | Sí | Lenguaje al que se tradujo el mensaje. |
 
 ### Datos simulados (muestra)
 
@@ -238,8 +244,8 @@ iguales.
 
 - Mostrar las opciones por las que se puede enviar o entregar un mensaje (cuadro de texto o
   captura por voz) una vez configuradas las opciones de traducción.
-- Identificar el canal por el cual llegó el mensaje y establecerlo por defecto para el resto de
-  la conversación.
+- Identificar el canal por el cual llegó cada mensaje (cada mensaje lleva su propio canal: la persona
+  puede alternar entre hablar y escribir dentro de la misma conversación).
 - Entregar el mensaje traducido aplicando el canal configurado.
 
 ### Datos simulados
@@ -262,7 +268,7 @@ iguales.
 | Atributo | Tipo | Longitud | Obligatorio | Descripción |
 | --- | --- | --- | --- | --- |
 | identificador | Alfanumérico (UUID) | 36 | Sí | Autogenerado. |
-| nombre | Alfanumérico | 3–30 | Sí | Nombre de la entonación (Formal, Informal, Técnico, etc.). |
+| nombre | Alfanumérico | 3–30 | Sí | Nombre de la entonación. Catálogo inicial: Neutral, Amigable, Alegre, Preocupado, Enojado, Formal. |
 | activo | Booleano | — | Sí | Default `true`. Indica si está disponible para uso. |
 
 ### Responsabilidades
@@ -342,6 +348,27 @@ iguales.
 | Brasil |
 
 ---
+
+## LenguajeRegion (relación)
+
+Relación muchos a muchos entre Lenguaje y Región: una región puede hablar varios idiomas (Texas: inglés y español) y un idioma se habla en varias regiones. Permite validar Conversacion-RN-1 ("la región seleccionada debe ser válida para el lenguaje elegido").
+
+**Combinación única:** compuesta (lenguaje + región).
+
+## Tablas de soporte (no son objetos de dominio)
+
+El mentor indicó que los reportes son dinámicos y no hacen parte del modelo de dominio inicial. Estas tablas existen solo para que el sistema funcione y se documentan para que el MER coincida con la base de datos (`backend/src/db.js`):
+
+| Tabla | Para qué |
+| --- | --- |
+| `reporte` | Guarda el reporte de mala traducción (responsabilidad "Generar reporte de mala traducción" de Lenguaje): mensaje, motivo, sugerencia, estado. Combinación única: mensaje destino + usuario. |
+| `token_refresco` | Sesiones: hash del token de refresco, vencimiento y si fue revocado. |
+| `sesion_revocada` | Tokens de acceso invalidados al cerrar sesión (Usuario-RN-10). |
+| `recuperacion` | Código de recuperación de contraseña (hash, vencimiento de 15 minutos, usado) (Usuario-RN-8). |
+
+## Correspondencia con la base de datos
+
+Los nombres de las tablas siguen el modelo de dominio (lenguaje ubicuo, ADR-009): `usuario`, `conversacion`, `lenguaje`, `lenguaje_por_conversacion`, `mensaje_original`, `mensaje_destino`, `canal`, `entonacion`, `region`, `pais`, `lenguaje_region`. `MensajeOriginal.contenido` y `MensajeDestino.contenidoTraducido` se guardan cifrados (ver `requerimientos/matriz_sensibilidad_datos.md`).
 
 ## Nota metodológica sobre combinaciones únicas (ya aplicada como propuesta a todas las entidades)
 

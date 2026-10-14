@@ -36,7 +36,7 @@ Toda entidad de datos del sistema debe clasificarse según la Matriz de Sensibil
 
 | Aspecto | Estándar |
 | --- | --- |
-| Protocolo | JWT (JSON Web Token) firmado por proveedor de identidad |
+| Protocolo | JWT (JSON Web Token) firmado por el backend de TalkLate (o un proveedor de identidad si se adopta uno) |
 | Sesiones | Tokens con expiración (access corto, refresh más largo) |
 | Recuperación de contraseña | Código con tiempo de validez limitado (ver Usuario-RN-8 en `arquitectura/modelo_datos.md`) |
 
@@ -68,7 +68,7 @@ Toda entidad de datos del sistema debe clasificarse según la Matriz de Sensibil
 | Medida | Implementación |
 | --- | --- |
 | Validación de inputs | Según reglas de negocio definidas por entidad en `arquitectura/modelo_datos.md` |
-| SQL Injection | ORM — nunca SQL concatenado |
+| SQL Injection | Consultas parametrizadas u ORM — nunca SQL concatenado (TalkLate usa consultas parametrizadas de `node:sqlite`) |
 | Rate limiting | En la capa de API, especialmente sobre los endpoints de traducción (costo de cómputo/IA) |
 | CORS | Configuración centralizada, orígenes explícitos |
 | Dependency scanning | Automatizado en pipeline CI cuando exista |

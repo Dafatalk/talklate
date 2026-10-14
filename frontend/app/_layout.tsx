@@ -12,7 +12,7 @@ import useThemedNavigation from './hooks/useThemedNavigation';
 
 NativeWindStyleSheet.setOutput({ default: 'native' });
 
-const PANTALLAS_PUBLICAS = ['welcome', 'login', 'signup', 'forgot-password'];
+const PANTALLAS_PUBLICAS = ['welcome', 'login', 'signup', 'forgot-password', 'politica-datos'];
 
 // Si no hay sesion solo se ven las pantallas de entrada; con sesion se va a la app
 function AuthGate({ children }: { children: React.ReactNode }) {
@@ -23,7 +23,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (cargando) return;
     if (!usuario && !enPublica) router.replace('/screens/welcome');
-    else if (usuario && enPublica) router.replace('/(drawer)');
+    else if (usuario && enPublica && segmentos[1] !== 'politica-datos') router.replace('/(drawer)');
   }, [usuario, cargando, enPublica]);
 
   if (cargando) {

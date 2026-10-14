@@ -19,48 +19,45 @@
     },
     "F2": {
       "nombre": "Especificación de Requerimientos",
-      "estado": "desbloqueada",
-      "timestamp": "2026-08-15T19:00:00Z",
-      "bloqueo": null,
-      "notas": "2026-08-15: requerimientos/mapa_impacto.md ahora tiene los 9 entregables desglosados en características e historias de usuario (no solo 'Traductor de mensajes'), aplicando la metodología del mentor y fundamentando cada historia nueva en arquitectura/modelo_datos.md. requerimientos/req.md se amplió con los REQ correspondientes (HIST, IDIOMA, AUDIO, IA, CONV-005/006). Pendiente antes de dar F2 por completada: (1) que el equipo valide con el mentor las dos consolidaciones de entregables sugeridas en mapa_impacto.md (Captura de mensajes por voz y texto = Traductor de mensajes; redefinición de Gestión de conversaciones), (2) resolver las preguntas abiertas marcadas con ⚠️ (compartir conversaciones, editar perfil, personalizar audio, ampliar idiomas/reentrenar modelo), (3) crear la matriz de sensibilidad de datos, (4) definir roles/actores adicionales si aplica, (5) el cronograma de trabajo de las próximas semanas."
+      "estado": "completada",
+      "timestamp": "2026-10-14T00:00:00Z",
+      "notas": "Mapa de Impacto con objetivo e impactos SMART, 6 epicas, 26 HU con criterios de aceptacion, req.md alineado, matriz de sensibilidad de datos, priorizacion por valor, tallas, 3 sprints y plan de liberaciones. Pendiente: validacion final con el mentor (seguimiento/validar_en_reunion.md)."
     },
     "F3": {
       "nombre": "Arquitectura de Software & Base de Datos",
-      "estado": "bloqueada",
-      "timestamp": null,
-      "bloqueo": "Requiere completar: F2",
-      "notas": "arquitectura/modelo_datos.md ya contiene la transcripción completa del Modelo de Dominio Enriquecido (10 entidades, atributos, reglas de negocio RN-*, datos simulados) migrado desde el xlsx original, pero le faltan las 'combinaciones únicas' por entidad — gap señalado explícitamente por el mentor en la sesión del 2026-08-15 y aún no resuelto. arquitectura/tech_stack.md queda como TBD: el stack técnico de TalkLate (frontend móvil, backend, motor de traducción/IA) no se ha decidido todavía."
+      "estado": "completada",
+      "timestamp": "2026-10-14T00:00:00Z",
+      "notas": "Stack definido construyendo (autorizado por el mentor, acta 2026-10-14) y justificado en 11 ADR, 8 drivers y tech_stack.md. Modelo de dominio alineado con la base de datos y combinaciones unicas propuestas. Pendiente: validar ADR-008 y las combinaciones unicas con el mentor; MER de Julian."
     },
     "F4": {
       "nombre": "Diagramas C4 & Especificación de Componentes UI",
-      "estado": "bloqueada",
-      "timestamp": null,
-      "bloqueo": "Requiere completar: F3"
+      "estado": "completada",
+      "timestamp": "2026-10-14T00:00:00Z",
+      "notas": "Diagramas C4 de contexto y contenedores (arquitectura/diagramas/ y arquitectura/c4.md)."
     },
     "F5": {
       "nombre": "Prototipado UI / Alineación de Template UI",
-      "estado": "bloqueada",
-      "timestamp": null,
-      "bloqueo": "Requiere completar: F3",
-      "notas": "componentes/especificacion_vistas_ui.md ya contiene el Customer Journey Map (9 etapas) migrado desde el xlsx, como insumo UX. No hay mapeo a componentes de un template de UI concreto porque no se ha decidido el stack/template de frontend."
+      "estado": "completada",
+      "timestamp": "2026-10-14T00:00:00Z",
+      "notas": "Template Luna adaptado; Customer Journey Map mapeado a pantallas en componentes/especificacion_vistas_ui.md."
     },
     "F6": {
       "nombre": "Scaffolding & Configuración Inicial de Código",
-      "estado": "bloqueada",
-      "timestamp": null,
-      "bloqueo": "Requiere completar: F4, F5"
+      "estado": "completada",
+      "timestamp": "2026-10-14T00:00:00Z",
+      "notas": "Scaffolding de backend/ (Node + Express + SQLite) y frontend/ (Expo) hecho como prueba de concepto el 2026-10-14, con CI."
     },
     "F7": {
       "nombre": "Desarrollo Backend API & Base de Datos",
-      "estado": "bloqueada",
+      "estado": "desbloqueada",
       "timestamp": null,
-      "bloqueo": "Requiere completar: F6"
+      "notas": "En curso por sprints (19/10 al 06/11/2026): API v1 completa con pruebas; cada HU se cierra con su issue."
     },
     "F8": {
       "nombre": "Desarrollo Frontend Móvil",
-      "estado": "bloqueada",
+      "estado": "desbloqueada",
       "timestamp": null,
-      "bloqueo": "Requiere completar: F6"
+      "notas": "En curso por sprints: app con todas las pantallas; falta probar en celular fisico."
     },
     "F9": {
       "nombre": "Integración & Verificación E2E",

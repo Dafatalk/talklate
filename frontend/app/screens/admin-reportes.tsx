@@ -16,7 +16,7 @@ export default function AdminReportesScreen() {
   const [error, setError] = useState('');
 
   const cargar = useCallback(async () => {
-    try { setReportes((await api.reportes(estado)).reportes); setError(''); } catch (e: any) { setError(e.message); }
+    try { setReportes((await api.reportes(estado)).data); setError(''); } catch (e: any) { setError(e.message); }
   }, [estado]);
   useEffect(() => { cargar(); }, [cargar]);
 

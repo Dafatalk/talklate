@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { alSesionExpirada, api, fijarToken, Usuario } from '@/lib/api';
+import { alSesionExpirada, alSesionRenovada, api, fijarTokens, Sesion, Usuario } from '@/lib/api';
 
 type AuthCtx = {
   usuario: Usuario | null;
@@ -8,30 +8,33 @@ type AuthCtx = {
   iniciarSesion: (correo: string, password: string) => Promise<void>;
   registrarse: (datos: Parameters<typeof api.registro>[0]) => Promise<void>;
   cerrarSesion: () => Promise<void>;
+  eliminarCuenta: (password: string) => Promise<void>;
 };
 
 const Ctx = createContext<AuthCtx | undefined>(undefined);
-const CLAVE = 'talklate.token';
+const CLAVE = 'talklate.sesion';
+
+const guardar = (s: Sesion) => AsyncStorage.setItem(CLAVE, JSON.stringify({ token: s.token, token_refresco: s.token_refresco })).catch(() => {});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [cargando, setCargando] = useState(true);
 
   const limpiar = useCallback(async () => {
-    fijarToken(null);
+    fijarTokens(null);
     setUsuario(null);
     await AsyncStorage.removeItem(CLAVE).catch(() => {});
   }, []);
 
   useEffect(() => {
     alSesionExpirada(() => { limpiar(); });
+    alSesionRenovada((s) => { guardar(s); setUsuario(s.usuario); });
     (async () => {
       try {
-        const guardado = await AsyncStorage.getItem(CLAVE);
-        if (guardado) {
-          fijarToken(guardado);
-          const { usuario: u } = await api.yo();
-          setUsuario(u);
+        const guardada = await AsyncStorage.getItem(CLAVE);
+        if (guardada) {
+          fijarTokens(JSON.parse(guardada));
+          setUsuario(await api.yo()); // si el token de acceso vencio, el cliente lo renueva solo
         }
       } catch {
         await limpiar();
@@ -39,13 +42,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCargando(false);
       }
     })();
-    return () => alSesionExpirada(null);
+    return () => { alSesionExpirada(null); alSesionRenovada(null); };
   }, [limpiar]);
 
-  const entrar = async (r: { token: string; usuario: Usuario }) => {
-    fijarToken(r.token);
-    await AsyncStorage.setItem(CLAVE, r.token);
-    setUsuario(r.usuario);
+  const entrar = async (s: Sesion) => {
+    fijarTokens({ token: s.token, token_refresco: s.token_refresco });
+    await guardar(s);
+    setUsuario(s.usuario);
   };
 
   const value: AuthCtx = {
@@ -55,6 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     registrarse: async (datos) => entrar(await api.registro(datos)),
     cerrarSesion: async () => {
       try { await api.logout(); } catch { /* si ya expiro, igual se limpia */ }
+      await limpiar();
+    },
+    eliminarCuenta: async (password) => {
+      await api.eliminarCuenta(password);
       await limpiar();
     },
   };

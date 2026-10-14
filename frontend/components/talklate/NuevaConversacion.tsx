@@ -33,7 +33,7 @@ export default function NuevaConversacion() {
     setCreando(true);
     setError('');
     try {
-      const { conversacion } = await api.crearConversacion({
+      const conversacion = await api.crearConversacion({
         nombre: nombre.trim() || undefined,
         idioma_destino_id: destino,
         region_destino_id: region,

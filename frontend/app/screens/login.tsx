@@ -7,8 +7,8 @@ import ThemedText from '@/components/ThemedText';
 import ThemedScroller from '@/components/ThemeScroller';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { REGEX_CORREO } from '@/lib/reglas';
 
-const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();

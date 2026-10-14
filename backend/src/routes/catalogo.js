@@ -1,6 +1,7 @@
 const express = require('express');
 const { randomUUID } = require('node:crypto');
 const { mal, conflicto, noEncontrado } = require('../lib/errores');
+const log = require('../lib/log');
 const { requerirSesion, requerirAdmin } = require('../lib/auth');
 const V = require('../lib/validaciones');
 
@@ -23,13 +24,20 @@ function catalogo(db, { todos }) {
   };
 }
 
+function regionPorId(db, id) {
+  const r = db.prepare('SELECT r.id, r.nombre, p.id AS pais_id, p.nombre AS pais_nombre, p.codigo AS pais_codigo FROM region r JOIN pais p ON p.id = r.pais_id WHERE r.id = ?').get(id);
+  if (!r) return null;
+  const idiomas = db.prepare('SELECT l.id, l.nombre, l.codigo FROM lenguaje_region lr JOIN lenguaje l ON l.id = lr.lenguaje_id WHERE lr.region_id = ?').all(id);
+  return { id: r.id, nombre: r.nombre, pais: { id: r.pais_id, nombre: r.pais_nombre, codigo: r.pais_codigo }, idiomas };
+}
+
 function asegurarIdiomas(db, ids) {
   for (const id of ids) if (!db.prepare('SELECT 1 FROM lenguaje WHERE id = ?').get(id)) throw mal('Uno de los idiomas indicados no existe.');
 }
 
 module.exports = function catalogoRouter(db) {
   const r = express.Router();
-  r.use(requerirSesion(db));
+  r.use(['/catalogo', '/admin'], requerirSesion(db));
 
   // HU Consultar idiomas disponibles
   r.get('/catalogo', (req, res) => {
@@ -50,7 +58,8 @@ module.exports = function catalogoRouter(db) {
     const id = randomUUID();
     db.prepare('INSERT INTO lenguaje (id, nombre, codigo, activo) VALUES (?,?,?,?)').run(id, nombre, codigo, aBool(b.activo));
     for (const rid of b.regiones || []) db.prepare('INSERT OR IGNORE INTO lenguaje_region (lenguaje_id, region_id) VALUES (?,?)').run(id, rid);
-    res.status(201).json({ idioma: catalogo(db, { todos: true }).idiomas.find((i) => i.id === id) });
+    log.info('catalogo_idioma_creado', { usuario_id: req.usuario.id, lenguaje_id: id });
+    res.status(201).location(`/api/v1/admin/idiomas/${id}`).json(catalogo(db, { todos: true }).idiomas.find((i) => i.id === id));
   }));
 
   admin.patch('/idiomas/:id', ruta(async (req, res) => {
@@ -71,7 +80,8 @@ module.exports = function catalogoRouter(db) {
         db.prepare('INSERT OR IGNORE INTO lenguaje_region (lenguaje_id, region_id) VALUES (?,?)').run(idioma.id, rid);
       }
     }
-    res.json({ idioma: catalogo(db, { todos: true }).idiomas.find((i) => i.id === idioma.id) });
+    log.info('catalogo_idioma_modificado', { usuario_id: req.usuario.id, lenguaje_id: idioma.id, activo: b.activo });
+    res.json(catalogo(db, { todos: true }).idiomas.find((i) => i.id === idioma.id));
   }));
 
   admin.post('/regiones', ruta(async (req, res) => {
@@ -94,8 +104,21 @@ module.exports = function catalogoRouter(db) {
     const id = randomUUID();
     db.prepare('INSERT INTO region (id, nombre, pais_id) VALUES (?,?,?)').run(id, nombre, pais.id);
     for (const l of idiomas) db.prepare('INSERT OR IGNORE INTO lenguaje_region (lenguaje_id, region_id) VALUES (?,?)').run(l, id);
-    res.status(201).json({ region: { id, nombre, pais: paisNombre } });
+    log.info('catalogo_region_creada', { usuario_id: req.usuario.id, region_id: id });
+    res.status(201).location(`/api/v1/admin/regiones/${id}`).json(regionPorId(db, id));
   }));
+
+  admin.get('/idiomas/:id', (req, res, next) => {
+    const i = catalogo(db, { todos: true }).idiomas.find((x) => x.id === req.params.id);
+    if (!i) return next(noEncontrado('No encontramos ese idioma.'));
+    res.json(i);
+  });
+
+  admin.get('/regiones/:id', (req, res, next) => {
+    const r2 = regionPorId(db, req.params.id);
+    if (!r2) return next(noEncontrado('No encontramos esa region.'));
+    res.json(r2);
+  });
 
   r.use('/admin', admin);
   return r;

@@ -34,9 +34,17 @@ TalkLate es una aplicación móvil de **traducción en tiempo real con concienci
 culturales**: va más allá de la conversión literal palabra por palabra, considerando contexto,
 emociones, jerga e intención. Ver [`contexto.md`](contexto.md) para la visión completa.
 
-No hay todavía un stack técnico ni un template de UI obligatorio definidos — eso se decide en la
-fase F3 (actualmente bloqueada, ver estado de fases). Cuando se decida, este documento y
-`convenciones/README.md` deben actualizarse con las reglas de stack correspondientes.
+### Stack y estructura (decidido en F3, ver `arquitectura/tech_stack.md` y `arquitectura/decisiones.md`)
+
+| Carpeta | Contenido |
+| --- | --- |
+| `backend/` | API REST `/api/v1` en Node.js 22 + Express + SQLite; traduccion con Qwen local (Ollama), Claude Sonnet de respaldo y motor de reglas |
+| `frontend/` | App movil Expo (React Native) adaptada del template de UI **Luna** (`componentes/template/native-luna`) |
+| `requerimientos/` | Mapa de impacto, historias, criterios de aceptacion, requerimientos, matriz de sensibilidad, sprints y liberaciones |
+| `arquitectura/` | Modelo de datos, drivers, ADR, stack y diagramas C4 |
+| `seguimiento/` | Actas con el mentor, marco metodologico, Excel fuente y estado de artefactos |
+
+Reglas de stack: `convenciones/backend-node.md` y `convenciones/frontend-expo.md`. Flujo de trabajo: issue primero, rama `feature/{issue}-...`, commits convencionales y PR a `develop` (`convenciones/git-versionamiento.md`).
 
 ---
 

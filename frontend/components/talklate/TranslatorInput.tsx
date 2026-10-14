@@ -66,6 +66,9 @@ export default function TranslatorInput({ enviando, localeDictado, alEnviar, alA
           <ThemedText className="text-xs ml-1">{voz ? 'Modo voz' : 'Modo texto'}</ThemedText>
         </Pressable>
       </View>
+      {remitente === 'interlocutor' ? (
+        <ThemedText className="text-xs opacity-70 mb-2">Pasale el celular a la otra persona: puede hablar o escribir en su idioma, sin instalar la app ni crear cuenta.</ThemedText>
+      ) : null}
       <View style={{ ...shadowPresets.card }} className="flex-row items-end bg-light-secondary dark:bg-dark-secondary rounded-3xl px-4 py-2">
         <TextInput
           ref={entrada}

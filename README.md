@@ -15,7 +15,7 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 | `arquitectura/` | Stack técnico y modelo de datos (F3) |
 | `componentes/` | Especificación de vistas/UI (F4/F5) |
 | `convenciones/` | Convenciones institucionales heredadas (F0) |
-| `seguimiento/` | Bitácora de sesiones de mentoría/seguimiento del proyecto |
+| `seguimiento/` | Actas con el mentor, marco metodológico, Excel fuente (Mapa de Impacto), matrices y estado de artefactos |
 | `backend/` | API de TalkLate (Node + Express + SQLite) — ver `backend/README.md` |
 | `frontend/` | App móvil (Expo / React Native) adaptada del template Luna — ver `frontend/README.md` |
 | `softverse-mcp/` | Servidor MCP que trackea el estado de las fases |
@@ -32,6 +32,10 @@ cd frontend && npm install --legacy-peer-deps && npm run web
 
 Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!`. La traducción usa **Qwen local (Ollama)**, luego Claude Sonnet si hay `ANTHROPIC_API_KEY`, y si ninguno
 responde un motor de reglas (español ⇄ inglés). Para Qwen: `ollama pull qwen2.5:7b` (ver `backend/README.md`).
+
+## Cómo se trabaja
+
+Issue primero → rama `feature/{issue}-...` desde `develop` → commits convencionales con `(#N)` → PR a `develop` con `Closes #N` y revisión del otro integrante → CI en verde. Ver `convenciones/git-versionamiento.md` y `seguimiento/marco_metodologico.md`.
 
 ## Estado del proyecto
 

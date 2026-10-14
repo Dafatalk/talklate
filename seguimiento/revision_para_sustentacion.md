@@ -6,6 +6,29 @@ Objetivo: encontrar contradicciones que un jurado pueda usar para "clavar el cuc
 
 Severidad: **ALTA** (puede tumbar la sustentacion), **MEDIA** (pregunta incomoda), **BAJA** (detalle).
 
+## Estado de las correcciones (issue #1, rama `fix/1-revision-sustentacion`)
+
+| Punto | Estado | Donde |
+| --- | --- | --- |
+| 1.1 Git contra metodologia | Corregido desde ahora: issue #1, rama fix, commits convencionales, PR; issues por HU; spike documentado | `marco_metodologico.md`, issues de GitHub |
+| 1.2 Uso de IA | Declarado | `marco_metodologico.md` seccion 7 |
+| 1.3 Fases y "stack por decidir" | Corregido | `.softverse/estado_fases.json`, `AGENTS.md`, convenciones, vistas, acta `records/2026-10-14-reunion-presencial.md` |
+| 1.4 Dos versiones del mapa | Corregido: el `.md` sale del Excel | `requerimientos/mapa_impacto.md`, `req.md` |
+| 2.1 Impactos SMART | Corregido: objetivo SMART e indicador por impacto | Excel columna H |
+| 2.2 a 2.4 | Corregidos | Excel |
+| 2.5 Interlocutor | Corregido: impacto "sin instalar la app ni crear cuenta" y pista en la app | Excel, `TranslatorInput` |
+| 2.6 Cerrar sesion | Corregido: sprint 3 | Excel, `planificacion_sprints.md` |
+| 2.7 Traducir como HU | Para validar con Farid | `validar_en_reunion.md` |
+| 3.1 a 3.4 | Corregidos: alcance precisado y journey ajustado | `contexto.md`, `especificacion_vistas_ui.md` |
+| 4 Modelo contra base | Corregido en el `.md`; falta Excel del modelo y MER (Julian) | `modelo_datos.md` |
+| 5.1 a 5.4 Seguridad y datos | Corregidos | matriz, politica, backend |
+| 6.1 Idioma del codigo | Decidido: ADR-009 y regla actualizada | `decisiones.md` |
+| 6.2 API | Corregido | `backend/openapi.yaml` |
+| 6.3 Pruebas | Corregido: cobertura medida y CI | `npm run coverage`, `.github/workflows/ci.yml` |
+| 6.4 Otros | Corregidos | `.editorconfig`, `.gitattributes`, CSV sin BOM, C4 |
+| 7.1 a 7.3 ADR y drivers | Corregidos; falta medir con Qwen | `decisiones.md`, `drivers.md` |
+| 8 Planificacion | Corregido | `planificacion_sprints.md` |
+
 ---
 
 ## 1. Coherencia metodologica (lo mas peligroso)

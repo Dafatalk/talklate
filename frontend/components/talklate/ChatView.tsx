@@ -6,13 +6,12 @@ import ThemedText from '@/components/ThemedText';
 import Icon from '@/components/Icon';
 import { api, Configuracion, Mensaje, ResumenConversacion } from '@/lib/api';
 import { hablar, localeDe } from '@/lib/voz';
+import { etiquetaConfig, idiomaDeEntrega } from '@/lib/reglas';
 import { useConversaciones } from '@/app/contexts/ConversacionesContext';
 import MessageBubble from './MessageBubble';
 import TranslatorInput, { EnvioMensaje } from './TranslatorInput';
 import PromptModal from './PromptModal';
 
-const etiquetaConfig = (c: Configuracion) =>
-  `${c.origen ? c.origen.idioma : 'Idioma por detectar'} → ${c.destino.idioma}${c.destino.region ? ` (${c.destino.region})` : ''}`;
 
 // Pantalla del traductor: una conversacion con sus mensajes originales y traducidos
 export default function ChatView({ id }: { id: string }) {
@@ -31,9 +30,9 @@ export default function ChatView({ id }: { id: string }) {
   const cargar = useCallback(async () => {
     setCargando(true);
     try {
-      const r = await api.conversacion(id);
-      setConv(r.conversacion);
-      setMensajes(r.mensajes);
+      const { mensajes: lista, ...resumen } = await api.conversacion(id);
+      setConv(resumen);
+      setMensajes(lista);
       setAviso(null);
     } catch (e: any) {
       setAviso(e.message);
@@ -48,7 +47,7 @@ export default function ChatView({ id }: { id: string }) {
   // El audio se reproduce en el idioma/pais en que quedo la traduccion
   const reproducir = (m: Mensaje, config: Configuracion) => {
     if (!m.traduccion) return;
-    const hacia = m.remitente === 'usuario' ? config.destino : config.origen;
+    const hacia = idiomaDeEntrega(m.remitente, config);
     if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono);
   };
 
@@ -73,8 +72,7 @@ export default function ChatView({ id }: { id: string }) {
 
   const renombrar = async (nombre: string) => {
     try {
-      const r = await api.renombrar(id, nombre);
-      setConv(r.conversacion);
+      setConv(await api.renombrar(id, nombre));
       setRenombrando(false);
       setErrorNombre('');
       refrescar();

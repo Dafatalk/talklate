@@ -1,47 +1,40 @@
 # Que validar en la proxima reunion con Farid
 
-**Fecha de preparacion:** 2026-10-14. Ordenado de lo que mas bloquea a lo que menos.
+**Actualizado:** 2026-10-14, despues de corregir la revision (`revision_para_sustentacion.md`, issue #1). Ordenado de lo que mas bloquea a lo que menos.
 
-## 1. Mapa de impacto y epicas
-- [ ] Los 6 entregables como epicas, sin la palabra "modulo": Traduccion de mensajes, Gestion de conversaciones (incluye el historial), Cuenta de usuario, Participacion del interlocutor, Reportes, Administracion de idiomas y regiones.
-- [ ] "Consultar los idiomas disponibles" quedo en Administracion de idiomas y regiones (pertenece mas al catalogo), aunque se usa desde la conversacion. Confirmar.
-- [ ] Un impacto en varias epicas y una epica con varios impactos (filas 5, 6 y 7 van a Gestion de conversaciones; filas 4 y 9 a Traduccion). Confirmar que asi se lee bien.
-- [ ] Impacto del perfil (fila 8) reescrito, y fila 13 nueva para el Administrador que revisa reportes.
-- [ ] Problema y beneficio de cada impacto, en tercera persona.
+## 1. Mapa de impacto
+- [ ] Objetivo (Why) SMART: 10 personas de prueba, conversaciones de 10 mensajes o mas, menos del 20 % de traducciones reportadas, 3 segundos o menos por traduccion, al 06/11/2026.
+- [ ] Indicador SMART de cada impacto (columna H del Excel).
+- [ ] Impactos 2 y 3 diferenciados (empezar rapido / mantener el contexto), impacto del Administrador redactado como beneficio, impacto del Interlocutor "sin instalar la app ni crear cuenta".
+- [ ] Las 6 epicas, y que el impacto 2 se abra en dos epicas (Gestion de conversaciones y Administracion de idiomas y regiones) por la historia "Consultar los idiomas disponibles".
+- [ ] La IA ya no es actor (es parte del sistema).
 
-## 2. Historias de usuario
-- [ ] **"Traducir mi mensaje"** como historia (HU0003). Antes se hablo de que "procesar" era un detalle interno; en el audio dijo "ingresar, traducir y escuchar el mensaje". Confirmar.
-- [ ] La redaccion Como / Necesito poder / Para y que el "Para" apunte al impacto correcto.
-- [ ] Criterios de aceptacion (Dado / Cuando / Entonces) de las 25 historias, en la hoja Entregables y en `criterios_aceptacion.md`.
+## 2. Historias y planificacion
+- [ ] "Traducir mi mensaje" como historia (HU0003).
+- [ ] HU0026 nueva: "Eliminar mi cuenta" (Ley 1581, derecho al olvido).
+- [ ] Prioridad por valor y la excepcion: "Cerrar sesion" va con "Iniciar sesion" en el sprint 3.
+- [ ] Tallas (XS 1 h a XXL 12 h), capacidad de 30 horas, 3 sprints del 19/10 al 06/11/2026 y plan de liberaciones.
+- [ ] Criterios de aceptacion y definicion de hecho (en cada issue de GitHub).
 
-## 3. Priorizacion y sprints
-- [ ] Prioridad por valor (traducir primero; registro y cerrar sesion al final) y la frase para defenderla: "se priorizo por valor para el negocio, no por dependencia".
-- [ ] Tabla de tallas a horas: XS 1, S 2, M 4, L 6, XL 8, XXL 12.
-- [ ] Capacidad: 2 personas por 4 horas al dia por 5 dias = 40 horas, usable 75 % = 30. Confirmar que el sprint dura una semana.
-- [ ] Resultado: 90 horas en 3 sprints. Plan de liberaciones: el sprint 1 empieza el lunes 19/10/2026 y cada sprint termina con una liberacion (`plan_liberaciones.md`).
+## 3. Metodologia
+- [ ] La prueba de concepto del 14/10 (antes del sprint 1) como spike autorizado por el, y el flujo issue -> rama -> PR desde ahora (`marco_metodologico.md`).
+- [ ] La declaracion del uso de IA en el Marco metodologico.
+- [ ] Acta de la reunion presencial (`records/2026-10-14-reunion-presencial.md`): confirmar fecha y contenido.
 
-## 4. Modelo de dominio (ADR-008)
-- [ ] Un idioma con varias regiones y una region con varios idiomas (el modelo tenia una sola region por lenguaje).
-- [ ] Tabla `reporte` como apoyo, fuera del modelo de dominio.
-- [ ] Combinaciones unicas propuestas en `arquitectura/modelo_datos.md`, en especial la duda de Lenguaje (nombre solo o nombre mas region).
-- [ ] El MER lo hace Julian: confirmar que coincide con el esquema de `backend/src/db.js`.
+## 4. Modelo de dominio y arquitectura
+- [ ] ADR-008: Lenguaje - Region muchos a muchos y tablas de soporte (reporte, sesiones, recuperacion).
+- [ ] Combinaciones unicas propuestas en `arquitectura/modelo_datos.md`.
+- [ ] ADR-009: identificadores del dominio en espanol (cambia la regla 1 de las convenciones).
+- [ ] Motor: Qwen local primero, Claude Sonnet de respaldo y reglas al final (Circuit Breaker). Que modelo Qwen usar.
+- [ ] Drivers: medir con Qwen antes de la sustentacion (`npm run medir`).
+- [ ] Diagramas C4 de contexto y contenedores.
 
-## 5. Alcance y roles
-- [ ] El Interlocutor no usa la app: en la app es "otra persona" que responde desde el mismo dispositivo.
-- [ ] El Administrador: hoy se crea por configuracion (`dafa123.daf@gmail.com`), no hay registro de administradores.
-- [ ] Fuera del MVP (siguen como preguntas abiertas): compartir o exportar conversaciones, editar perfil, personalizar la voz, ampliar idiomas y reentrenar el modelo.
-
-## 6. Arquitectura
-- [ ] Drivers y sus umbrales (por ejemplo traducir en 3 segundos o menos) en `arquitectura/drivers.md`.
-- [ ] Los 8 ADR: primero construimos y despues justificamos. Completar con las alternativas que de verdad se evaluaron.
-- [ ] Motor de traduccion: Qwen local (Ollama) primero, Claude Sonnet de respaldo y motor de reglas al final. Confirmar que le parece bien y que modelo Qwen usar; falta medir latencia y calidad con jerga.
-- [ ] Voz: hoy el dictado es del navegador o del teclado del celular; no hay reconocimiento nativo ni transcripcion en servidor. Confirmar que sirve para el alcance.
-
-## 7. Para la sustentacion
-- [ ] Coherencia entre artefactos y Marco metodologico (lo que se diga debe estar escrito en los entregables).
-- [ ] Evidencia de los sprints (grabaciones de reuniones, historias comprometidas y cumplidas).
-- [ ] Pendientes de artefactos: matriz de sensibilidad de datos, cronograma, diagramas (Archify), plan de despliegue.
+## 5. Alcance
+- [ ] "Tiempo real" = por turno, y acento reconocido por vocabulario (no por sonido) en el MVP.
+- [ ] Fuera del MVP: compartir o exportar, editar perfil, personalizar la voz, reentrenar el modelo.
 
 ## Antes de la reunion (tarea del equipo)
-- [ ] Probar la app en Expo Go con el celular y anotar lo que falle (voz, conexion con el backend, pantallas).
-- [ ] Revisar el Excel `Mapa de Impacto.xlsx` abierto en Excel: formulas de Entregables y de Planificacion.
+- [ ] Probar la app en Expo Go con el celular.
+- [ ] Correr `npm run medir` con Qwen y guardar el resultado en `arquitectura/medicion_traduccion.md`.
+- [ ] Revisar el PR del issue #1 y hacer merge a `develop` (revision cruzada).
+- [ ] Julian: actualizar el MER y el Excel del modelo enriquecido con ADR-008.

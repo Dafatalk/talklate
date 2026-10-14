@@ -1,5 +1,5 @@
 // Reglas de negocio de arquitectura/modelo_datos.md (Usuario-RN-*, Conversacion-RN-*)
-const { mal } = require('./errores');
+const { mal, reglaNegocio } = require('./errores');
 
 const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PALABRAS_OFENSIVAS = ['idiota', 'estupido', 'imbecil', 'puta', 'mierda', 'stupid', 'idiot', 'bastard', 'fuck', 'shit'];
@@ -37,7 +37,7 @@ function validarFechaNacimiento(fecha, hoy = new Date()) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(f)) throw mal('La fecha de nacimiento debe tener el formato AAAA-MM-DD.');
   const edad = calcularEdad(f, hoy);
   if (edad === null || new Date(f + 'T00:00:00') > hoy) throw mal('La fecha de nacimiento no es valida.');
-  if (edad < 13) throw mal('Lo sentimos, debes tener al menos 13 anos para crear una cuenta.');
+  if (edad < 13) throw reglaNegocio('Lo sentimos, debes tener al menos 13 anos para crear una cuenta.');
   return f;
 }
 

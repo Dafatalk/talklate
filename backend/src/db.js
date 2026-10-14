@@ -43,7 +43,17 @@ CREATE TABLE IF NOT EXISTS usuario (
   password_hash TEXT NOT NULL,
   fecha_nacimiento TEXT NOT NULL,
   rol TEXT NOT NULL DEFAULT 'cliente' CHECK (rol IN ('cliente','admin')),
+  consentimiento_datos TEXT, -- fecha en que acepto la politica de tratamiento de datos (Ley 1581 de 2012)
   creado TEXT NOT NULL
+);
+
+-- Tokens de refresco (se guarda solo su hash). Se rotan en cada uso y se revocan al cerrar sesion.
+CREATE TABLE IF NOT EXISTS token_refresco (
+  id TEXT PRIMARY KEY,
+  usuario_id TEXT NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
+  hash TEXT NOT NULL UNIQUE,
+  expira INTEGER NOT NULL,
+  revocado INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS sesion_revocada (
@@ -53,7 +63,7 @@ CREATE TABLE IF NOT EXISTS sesion_revocada (
 
 CREATE TABLE IF NOT EXISTS recuperacion (
   id TEXT PRIMARY KEY,
-  usuario_id TEXT NOT NULL REFERENCES usuario(id),
+  usuario_id TEXT NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
   codigo_hash TEXT NOT NULL,
   expira INTEGER NOT NULL,
   usado INTEGER NOT NULL DEFAULT 0
@@ -145,8 +155,15 @@ function abrir(ruta = process.env.TALKLATE_DB || path.join(__dirname, '..', 'dat
   if (ruta !== ':memory:') fs.mkdirSync(path.dirname(ruta), { recursive: true });
   const db = new DatabaseSync(ruta);
   db.exec(ESQUEMA);
+  migrar(db);
   sembrar(db);
   return db;
+}
+
+// Ajustes para bases creadas con una version anterior del esquema
+function migrar(db) {
+  const columnas = db.prepare('PRAGMA table_info(usuario)').all().map((c) => c.name);
+  if (!columnas.includes('consentimiento_datos')) db.exec('ALTER TABLE usuario ADD COLUMN consentimiento_datos TEXT');
 }
 
 function sembrar(db) {
@@ -176,8 +193,8 @@ function sembrar(db) {
   const existe = db.prepare('SELECT id FROM usuario WHERE correo = ?').get(correo);
   if (!existe) {
     db.prepare(
-      'INSERT INTO usuario (id, nombre, apellido, correo, password_hash, fecha_nacimiento, rol, creado) VALUES (?,?,?,?,?,?,?,?)'
-    ).run(randomUUID(), 'Admin', 'TalkLate', correo, bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'Admin123!', 10), '1990-01-01', 'admin', new Date().toISOString());
+      'INSERT INTO usuario (id, nombre, apellido, correo, password_hash, fecha_nacimiento, rol, consentimiento_datos, creado) VALUES (?,?,?,?,?,?,?,?,?)'
+    ).run(randomUUID(), 'Admin', 'TalkLate', correo, bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'Admin123!', 10), '1990-01-01', 'admin', new Date().toISOString(), new Date().toISOString());
   }
 }
 

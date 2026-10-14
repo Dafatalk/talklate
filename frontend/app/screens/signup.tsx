@@ -5,51 +5,34 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Input from '@/components/forms/Input';
 import ThemedText from '@/components/ThemedText';
 import ThemedScroller from '@/components/ThemeScroller';
+import Icon from '@/components/Icon';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/app/contexts/AuthContext';
-
-const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-// Mismas reglas del servidor (Usuario-RN-2 a RN-4) para avisar antes de enviar
-function edad(fecha: string) {
-  const f = new Date(fecha + 'T00:00:00');
-  const hoy = new Date();
-  let e = hoy.getFullYear() - f.getFullYear();
-  if (hoy.getMonth() < f.getMonth() || (hoy.getMonth() === f.getMonth() && hoy.getDate() < f.getDate())) e -= 1;
-  return e;
-}
+import { validarRegistro } from '@/lib/reglas';
 
 export default function SignupScreen() {
   const insets = useSafeAreaInsets();
   const { registrarse } = useAuth();
-  const [f, setF] = useState({ nombre: '', apellido: '', correo: '', fecha: '', password: '' });
+  const [f, setF] = useState({ nombre: '', apellido: '', correo: '', fecha: '', password: '', acepta: false });
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
-  const poner = (k: keyof typeof f) => (v: string) => setF((x) => ({ ...x, [k]: v }));
-
-  const validar = () => {
-    const e: Record<string, string> = {};
-    if (!f.nombre.trim()) e.nombre = 'Ingresa tu nombre';
-    if (!f.apellido.trim()) e.apellido = 'Ingresa tu apellido';
-    if (!REGEX_CORREO.test(f.correo.trim())) e.correo = 'El formato del correo es invalido';
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(f.fecha) || Number.isNaN(Date.parse(f.fecha))) e.fecha = 'Usa el formato AAAA-MM-DD';
-    else if (edad(f.fecha) < 13) e.fecha = 'Debes tener al menos 13 anos para crear una cuenta';
-    if (f.password.length < 8 || !/[A-Z]/.test(f.password) || !/[0-9]/.test(f.password) || !/[^A-Za-z0-9]/.test(f.password)) {
-      e.password = 'Minimo 8 caracteres, una mayuscula, un numero y un simbolo';
-    }
-    setErrores(e);
-    return Object.keys(e).length === 0;
-  };
+  const poner = (k: 'nombre' | 'apellido' | 'correo' | 'fecha' | 'password') => (v: string) => setF((x) => ({ ...x, [k]: v }));
 
   const crear = async () => {
-    if (!validar()) return;
+    // Mismas reglas del servidor (Usuario-RN-2 a RN-4) y consentimiento (Ley 1581 de 2012) para avisar antes de enviar
+    const e = validarRegistro(f);
+    setErrores(e);
+    if (Object.keys(e).length) return;
     setCargando(true);
     setError('');
     try {
-      await registrarse({ nombre: f.nombre.trim(), apellido: f.apellido.trim(), correo: f.correo.trim().toLowerCase(), password: f.password, fecha_nacimiento: f.fecha });
-    } catch (e: any) {
-      setError(e.message);
+      await registrarse({
+        nombre: f.nombre.trim(), apellido: f.apellido.trim(), correo: f.correo.trim().toLowerCase(),
+        password: f.password, fecha_nacimiento: f.fecha, acepta_tratamiento_datos: f.acepta,
+      });
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setCargando(false);
     }
@@ -67,8 +50,20 @@ export default function SignupScreen() {
       <Input label="Fecha de nacimiento (AAAA-MM-DD)" variant="underlined" value={f.fecha} onChangeText={poner('fecha')} error={errores.fecha} autoCapitalize="none" keyboardType="numbers-and-punctuation" />
       <Input label="Contrasena" variant="underlined" value={f.password} onChangeText={poner('password')} error={errores.password} isPassword autoCapitalize="none" />
 
-      {error ? <ThemedText className="text-red-500 mb-3">{error}</ThemedText> : null}
-      <Button title="Crear cuenta" onPress={crear} loading={cargando} size="large" className="mt-4 mb-6" />
+      <Pressable onPress={() => setF((x) => ({ ...x, acepta: !x.acepta }))} className="flex-row items-start mt-2" accessibilityRole="checkbox" accessibilityState={{ checked: f.acepta }}>
+        <View className={`w-5 h-5 rounded border mr-3 mt-0.5 items-center justify-center ${f.acepta ? 'bg-highlight border-highlight' : 'border-neutral-400'}`}>
+          {f.acepta ? <Icon name="Check" size={14} color="#fff" /> : null}
+        </View>
+        <ThemedText className="flex-1 text-sm">
+          Acepto la{' '}
+          <Link href="/screens/politica-datos"><ThemedText className="text-sm underline">politica de tratamiento de datos</ThemedText></Link>
+          {' '}de TalkLate (Ley 1581 de 2012).
+        </ThemedText>
+      </Pressable>
+      {errores.acepta ? <ThemedText className="text-red-500 text-sm mt-1">{errores.acepta}</ThemedText> : null}
+
+      {error ? <ThemedText className="text-red-500 mt-3">{error}</ThemedText> : null}
+      <Button title="Crear cuenta" onPress={crear} loading={cargando} size="large" className="mt-6 mb-6" />
       <View className="flex-row justify-center">
         <ThemedText className="text-light-subtext dark:text-dark-subtext">Ya tienes cuenta? </ThemedText>
         <Link href="/screens/login" asChild>
