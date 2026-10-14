@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import Header from '@/components/Header';
@@ -10,6 +10,7 @@ import Icon, { IconName } from '@/components/Icon';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { shadowPresets } from '@/utils/useShadow';
+import PromptModal from '@/components/talklate/PromptModal';
 
 const Fila = ({ icono, texto, onPress }: { icono: IconName; texto: string; onPress: () => void }) => (
   <Pressable onPress={onPress} className="flex-row items-center px-5 py-4 border-b border-neutral-200/60 dark:border-neutral-700/60">
@@ -20,8 +21,15 @@ const Fila = ({ icono, texto, onPress }: { icono: IconName; texto: string; onPre
 );
 
 export default function PerfilScreen() {
-  const { usuario, cerrarSesion } = useAuth();
+  const { usuario, cerrarSesion, eliminarCuenta } = useAuth();
+  const [eliminando, setEliminando] = useState(false);
+  const [error, setError] = useState('');
   if (!usuario) return null;
+
+  // HU Eliminar mi cuenta: derecho al olvido (Ley 1581 de 2012)
+  const confirmarEliminar = async (password: string) => {
+    try { await eliminarCuenta(password); } catch (e: any) { setError(e.message); }
+  };
   return (
     <View className="flex-1 bg-light-primary dark:bg-dark-primary">
       <Header showBackButton title="Mi perfil" />
@@ -36,6 +44,7 @@ export default function PerfilScreen() {
         </View>
         <View style={shadowPresets.medium} className="bg-light-secondary dark:bg-dark-secondary/50 rounded-2xl overflow-hidden mb-6">
           <Fila icono="History" texto="Historial de conversaciones" onPress={() => router.push('/screens/historial')} />
+          <Fila icono="ShieldCheck" texto="Tratamiento de datos" onPress={() => router.push('/screens/politica-datos')} />
           {usuario.rol === 'admin' ? <Fila icono="Globe" texto="Idiomas y regiones" onPress={() => router.push('/screens/admin-idiomas')} /> : null}
           {usuario.rol === 'admin' ? <Fila icono="Flag" texto="Reportes de calidad" onPress={() => router.push('/screens/admin-reportes')} /> : null}
           <View className="flex-row items-center px-5 py-4">
@@ -45,7 +54,20 @@ export default function PerfilScreen() {
           </View>
         </View>
         <Button title="Cerrar sesion" variant="outline" size="large" iconStart="LogOut" onPress={cerrarSesion} />
+        <Button title="Eliminar mi cuenta" variant="ghost" className="mt-4" textClassName="!text-red-500" onPress={() => { setError(''); setEliminando(true); }} />
       </ThemedScroller>
+      <PromptModal
+        visible={eliminando}
+        titulo="Eliminar mi cuenta"
+        mensaje="Se borraran tu cuenta, tus conversaciones y tus reportes. Esto no se puede deshacer. Escribe tu contrasena para confirmar."
+        placeholder="Contrasena"
+        peligro
+        secreto
+        confirmar="Eliminar"
+        error={error}
+        onConfirm={confirmarEliminar}
+        onCancel={() => setEliminando(false)}
+      />
     </View>
   );
 }

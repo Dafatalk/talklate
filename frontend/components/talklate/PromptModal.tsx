@@ -14,13 +14,14 @@ type Props = {
   conCampo?: boolean;
   multilinea?: boolean;
   peligro?: boolean;
+  secreto?: boolean;
   error?: string;
   onConfirm: (valor: string) => void;
   onCancel: () => void;
 };
 
 // Dialogo simple: pide un texto (renombrar, motivo de un reporte) o solo confirma una accion (eliminar)
-export default function PromptModal({ visible, titulo, mensaje, valorInicial = '', placeholder, confirmar = 'Aceptar', conCampo = true, multilinea, peligro, error, onConfirm, onCancel }: Props) {
+export default function PromptModal({ visible, titulo, mensaje, valorInicial = '', placeholder, confirmar = 'Aceptar', conCampo = true, multilinea, peligro, secreto, error, onConfirm, onCancel }: Props) {
   const colors = useThemeColors();
   const [valor, setValor] = useState(valorInicial);
   useEffect(() => { if (visible) setValor(valorInicial); }, [visible, valorInicial]);
@@ -38,6 +39,8 @@ export default function PromptModal({ visible, titulo, mensaje, valorInicial = '
               placeholder={placeholder}
               placeholderTextColor={colors.placeholder}
               multiline={multilinea}
+              secureTextEntry={secreto}
+              autoCapitalize={secreto ? 'none' : undefined}
               autoFocus
               style={{ color: colors.text, minHeight: multilinea ? 90 : 44, textAlignVertical: multilinea ? 'top' : 'center' }}
               className="border border-neutral-300 dark:border-neutral-600 rounded-xl px-3 py-2 mb-2"

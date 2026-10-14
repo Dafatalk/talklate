@@ -9,12 +9,13 @@ del chatbot por las de TalkLate.
 | Ruta | Para que sirve | HU |
 | --- | --- | --- |
 | `screens/welcome` | Bienvenida | - |
-| `screens/signup` | Registro (nombre, apellido, correo, fecha de nacimiento, contrasena) | Registrarme |
+| `screens/signup` | Registro (nombre, apellido, correo, fecha de nacimiento, contrasena y aceptacion de la politica de datos) | Registrarme |
+| `screens/politica-datos` | Politica de tratamiento de datos (Ley 1581 de 2012) | Registrarme |
 | `screens/login` | Iniciar sesion | Iniciar sesion |
 | `screens/forgot-password` | Codigo de recuperacion y nueva contrasena | Recuperar mi contrasena |
 | `(drawer)/index` | Sin `id`: nueva conversacion (idioma y region destino). Con `id`: traductor | Crear / configurar conversacion, ingresar, traducir, escuchar, recibir por el mismo canal, interlocutor, reportar |
 | `screens/historial` | Buscar, abrir, renombrar y eliminar conversaciones | Historial |
-| `screens/profile` | Datos del usuario, tema y cerrar sesion | Cerrar sesion |
+| `screens/profile` | Datos del usuario, tema, cerrar sesion y eliminar la cuenta | Cerrar sesion, Eliminar mi cuenta |
 | `screens/admin-idiomas` | Activar idiomas y agregar idiomas y regiones (solo administrador) | Administrar idiomas y regiones |
 | `screens/admin-reportes` | Revisar reportes de mala traduccion (solo administrador) | Revisar reportes |
 
@@ -32,9 +33,18 @@ npm start          # Expo: escanea el QR con Expo Go (celular y computador en la
 ```
 
 La app encuentra el backend sola: en web usa `http://<host>:3000/api`; en Expo Go usa la IP del computador
-que corre Expo. Si necesitas otra direccion: `EXPO_PUBLIC_API_URL=http://192.168.1.10:3000/api npm start`.
+que corre Expo. Si necesitas otra direccion: `EXPO_PUBLIC_API_URL=http://192.168.1.10:3000/api/v1 npm start`.
+
+La sesion usa un token de acceso corto y un token de refresco: la app renueva el acceso sola, sin volver a pedir
+la contrasena. Para probar la version web desde otra direccion que no sea `localhost:8081`, agrega esa direccion a
+`CORS_ORIGENES` en el backend.
 
 Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!` (se crea al arrancar el backend).
+
+## La otra persona (Interlocutor)
+
+No instala la app ni crea cuenta. El usuario toca **Otra persona** y le pasa el celular: la otra persona habla o
+escribe en su idioma y su respuesta se traduce al idioma del usuario.
 
 ## Voz
 
@@ -47,6 +57,7 @@ Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!` (se crea 
 ## Verificacion
 
 ```bash
+npm test              # reglas de la app (validaciones del registro, idioma de entrega)
 npm run typecheck     # TypeScript
 npm run export:web    # compila la app para web (sirve para comprobar que todo empaqueta)
 ```

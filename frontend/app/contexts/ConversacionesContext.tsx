@@ -15,7 +15,7 @@ export function ConversacionesProvider({ children }: { children: React.ReactNode
     if (!usuario) { setLista([]); return; }
     setCargando(true);
     try {
-      setLista((await api.conversaciones()).conversaciones);
+      setLista((await api.conversaciones()).data);
     } catch {
       /* el menu sigue mostrando lo ultimo que se cargo */
     } finally {
