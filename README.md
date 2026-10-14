@@ -16,7 +16,22 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 | `componentes/` | Especificación de vistas/UI (F4/F5) |
 | `convenciones/` | Convenciones institucionales heredadas (F0) |
 | `seguimiento/` | Bitácora de sesiones de mentoría/seguimiento del proyecto |
+| `backend/` | API de TalkLate (Node + Express + SQLite) — ver `backend/README.md` |
+| `frontend/` | App móvil (Expo / React Native) adaptada del template Luna — ver `frontend/README.md` |
 | `softverse-mcp/` | Servidor MCP que trackea el estado de las fases |
+
+## Probar la aplicación
+
+```bash
+# Terminal 1: API (Node 22.5 o superior)
+cd backend && npm install && npm start
+
+# Terminal 2: app (navegador, o escanea el QR con Expo Go)
+cd frontend && npm install --legacy-peer-deps && npm run web
+```
+
+Usuario administrador de prueba: `admin@talklate.app` / `Admin123!`. Sin `ANTHROPIC_API_KEY` el backend usa
+un motor de traducción local de demostración (español ⇄ inglés).
 
 ## Estado del proyecto
 

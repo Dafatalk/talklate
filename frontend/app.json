@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "newArchEnabled": true,
+    "name": "TalkLate",
+    "slug": "talklate",
+    "version": "1.0.0",
+    "scheme": "talklate",
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "softwareKeyboardLayoutMode": "pan",
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "enableOnBackInvokedCallback": false
+      },
+      "navigationBarColor": "transparent",
+      "navigationBarHidden": false
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
