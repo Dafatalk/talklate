@@ -4,13 +4,13 @@ Salen de la hoja Entregables de `Mapa de Impacto.xlsx`. Cada entregable es una e
 
 ## Traduccion de mensajes
 
-**HU0001** - Como Cliente Traductor, necesito poder ingresar mi mensaje hablando, para traducir un mensaje de un idioma origen a un idioma destino en tiempo real, para interactuar facil y rapidamente con personas que hablan otro idioma conservando el contexto cultural, el tono y los modismos.
+**HU0001** - Como Cliente Traductor, necesito poder ingresar mi mensaje hablando, para interactuar facil y rapidamente con personas que hablan otro idioma, traduciendo cada mensaje en tiempo real y conservando el contexto cultural, el tono y los modismos.
 Prioridad 3 · Talla L (6 h) · Sprint 1 · Valor: Es la forma natural de usar el producto: hablar y ser entendido sin escribir.
 
-**HU0002** - Como Cliente Traductor, necesito poder ingresar mi mensaje escribiendo, para traducir un mensaje de un idioma origen a un idioma destino en tiempo real, para interactuar facil y rapidamente con personas que hablan otro idioma conservando el contexto cultural, el tono y los modismos.
+**HU0002** - Como Cliente Traductor, necesito poder ingresar mi mensaje escribiendo, para interactuar facil y rapidamente con personas que hablan otro idioma, traduciendo cada mensaje en tiempo real y conservando el contexto cultural, el tono y los modismos.
 Prioridad 2 · Talla S (2 h) · Sprint 1 · Valor: Es la entrada mas simple y la que permite usar la traduccion desde el primer dia.
 
-**HU0003** - Como Cliente Traductor, necesito poder traducir mi mensaje al idioma destino en tiempo real, para traducir un mensaje de un idioma origen a un idioma destino en tiempo real, para interactuar facil y rapidamente con personas que hablan otro idioma conservando el contexto cultural, el tono y los modismos.
+**HU0003** - Como Cliente Traductor, necesito poder traducir mi mensaje al idioma destino en tiempo real, para interactuar facil y rapidamente con personas que hablan otro idioma, traduciendo cada mensaje en tiempo real y conservando el contexto cultural, el tono y los modismos.
 Prioridad 1 · Talla XXL (12 h) · Sprint 1 · Valor: Es el corazon del producto: sin esto TalkLate no entrega su valor diferencial.
 
 **HU0004** - Como Cliente Traductor, necesito poder escuchar el mensaje traducido, para sostener una conversacion natural, hablando y escuchando como lo haria en su propio idioma.
@@ -27,13 +27,13 @@ Prioridad 6 · Talla M (4 h) · Sprint 1 · Valor: Define a que persona y lugar 
 **HU0007** - Como Cliente Traductor, necesito poder reconocer el idioma origen, para empezar a conversar en menos de un minuto, configurando idioma y region destino una sola vez y sin tener que indicar el idioma propio.
 Prioridad 7 · Talla L (6 h) · Sprint 2 · Valor: Evita configurar a mano el idioma cada vez y acelera la conversacion.
 
-**HU0008** - Como Cliente Traductor, necesito poder crear una conversacion, para mantener el contexto de toda la charla, para que cada respuesta se traduzca dentro del mismo hilo sin reconfigurar nada.
+**HU0008** - Como Cliente Traductor, necesito poder crear una conversacion, para mantener el contexto de toda la charla, de modo que cada respuesta se traduzca dentro del mismo hilo sin reconfigurar nada.
 Prioridad 8 · Talla S (2 h) · Sprint 2 · Valor: Agrupa los mensajes de una misma charla para no perder el contexto.
 
-**HU0009** - Como Cliente Traductor, necesito poder configurar los parametros una sola vez, para mantener el contexto de toda la charla, para que cada respuesta se traduzca dentro del mismo hilo sin reconfigurar nada.
+**HU0009** - Como Cliente Traductor, necesito poder configurar los parametros una sola vez, para mantener el contexto de toda la charla, de modo que cada respuesta se traduzca dentro del mismo hilo sin reconfigurar nada.
 Prioridad 9 · Talla S (2 h) · Sprint 2 · Valor: Ahorra repetir la configuracion en cada mensaje.
 
-**HU0010** - Como Cliente Traductor, necesito poder mantener el hilo continuo, para mantener el contexto de toda la charla, para que cada respuesta se traduzca dentro del mismo hilo sin reconfigurar nada.
+**HU0010** - Como Cliente Traductor, necesito poder mantener el hilo continuo, para mantener el contexto de toda la charla, de modo que cada respuesta se traduzca dentro del mismo hilo sin reconfigurar nada.
 Prioridad 10 · Talla M (4 h) · Sprint 2 · Valor: Hace posible un dialogo fluido, que es lo que busca el usuario.
 
 **HU0011** - Como Cliente Traductor, necesito poder consultar mi historial, para aprender y ganar confianza en el otro idioma apoyandose en conversaciones pasadas.
@@ -50,19 +50,19 @@ Prioridad 20 · Talla XS (1 h) · Sprint 2 · Valor: Da control sobre los datos 
 
 ## Cuenta de usuario
 
-**HU0015** - Como Cliente Traductor, necesito poder registrarme en la aplicacion, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
+**HU0015** - Como Cliente Traductor, necesito poder registrarme en la aplicacion, para tener las conversaciones y la configuracion guardadas en una cuenta segura que solo el usuario puede ver.
 Prioridad 16 · Talla L (6 h) · Sprint 3 · Valor: Guarda las conversaciones del usuario y protege sus datos; el valor central no depende de esto.
 
-**HU0016** - Como Cliente Traductor, necesito poder iniciar sesion, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
+**HU0016** - Como Cliente Traductor, necesito poder iniciar sesion, para tener las conversaciones y la configuracion guardadas en una cuenta segura que solo el usuario puede ver.
 Prioridad 17 · Talla M (4 h) · Sprint 3 · Valor: Da acceso seguro a lo guardado.
 
-**HU0017** - Como Cliente Traductor, necesito poder recuperar mi contrasena, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
+**HU0017** - Como Cliente Traductor, necesito poder recuperar mi contrasena, para tener las conversaciones y la configuracion guardadas en una cuenta segura que solo el usuario puede ver.
 Prioridad 21 · Talla L (6 h) · Sprint 3 · Valor: Evita perder la cuenta; es de apoyo.
 
-**HU0018** - Como Cliente Traductor, necesito poder cerrar sesion, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
+**HU0018** - Como Cliente Traductor, necesito poder cerrar sesion, para tener las conversaciones y la configuracion guardadas en una cuenta segura que solo el usuario puede ver.
 Prioridad 22 · Talla XS (1 h) · Sprint 3 · Valor: Protege la cuenta en un dispositivo compartido; solo tiene sentido despues de iniciar sesion, por eso va con ella en el sprint 3.
 
-**HU0026** - Como Cliente Traductor, necesito poder eliminar mi cuenta, para acceder a la cuenta de forma segura, para que las conversaciones y la configuracion queden guardadas y solo el usuario pueda verlas.
+**HU0026** - Como Cliente Traductor, necesito poder eliminar mi cuenta, para tener las conversaciones y la configuracion guardadas en una cuenta segura que solo el usuario puede ver.
 Prioridad 26 · Talla XS (1 h) · Sprint 3 · Valor: Cumple el derecho al olvido (Ley 1581 de 2012): la persona controla sus datos.
 
 ## Participacion del interlocutor
@@ -78,7 +78,7 @@ Prioridad 12 · Talla M (4 h) · Sprint 2 · Valor: Cierra el dialogo en ambos s
 **HU0021** - Como Cliente Traductor, necesito poder reportar una mala traduccion, para contribuir a mejorar la calidad del servicio senalando las traducciones que no fueron correctas o naturales.
 Prioridad 18 · Talla M (4 h) · Sprint 3 · Valor: Alimenta la mejora de calidad con casos reales.
 
-**HU0022** - Como Administrador, necesito poder revisar los reportes de mala traduccion, para revisar los reportes de mala traduccion que envian los clientes, para decidir que mejoras priorizar en el servicio.
+**HU0022** - Como Administrador, necesito poder revisar los reportes de mala traduccion, para decidir que mejoras priorizar en el servicio a partir de los reportes de mala traduccion que envian los clientes.
 Prioridad 23 · Talla M (4 h) · Sprint 3 · Valor: Permite priorizar que mejorar primero.
 
 ## Administracion de idiomas y regiones
