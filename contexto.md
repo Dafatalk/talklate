@@ -49,6 +49,18 @@ multilingüe.
 3. Historial y gestión de conversaciones traducidas, reutilizable como recurso de aprendizaje.
 4. Un modelo de IA que evoluciona con el tiempo: nuevos idiomas, acentos y capacidades, sin sacrificar calidad ni naturalidad.
 
+## Alcance del MVP y precisiones (para no prometer de mas)
+
+- **Tiempo real** significa traduccion **por turno**: cada mensaje se traduce y se entrega en pocos segundos (objetivo: 3 segundos o menos por mensaje de texto, ver `arquitectura/drivers.md`, DRV-01). No es traduccion simultanea mientras la persona habla.
+- **Acentos y variaciones regionales:** en el MVP la region de origen se reconoce por el **vocabulario** (por ejemplo "parce", "wey", "che") y el motor adapta los modismos a la region de destino. Reconocer el acento por el **sonido** de la voz es evolucion futura.
+- **Emociones y tono:** se estima el tono del mensaje (neutral, amigable, alegre, preocupado, enojado, formal) a partir del texto y se aplica a la traduccion y a la voz.
+- **Idiomas:** espanol e ingles activos al inicio; frances y portugues existen en el catalogo pero inactivos (vision evolutiva).
+- **Motor de IA:** Qwen corre en el **servidor** de TalkLate (no en el celular); Claude Sonnet es el respaldo.
+
+## Objetivo medible
+
+Ver el "Why" SMART en `requerimientos/mapa_impacto.md`: al cierre de la liberacion 3 (06/11/2026), 10 personas de prueba sostienen conversaciones de 10 mensajes o mas con alguien que habla otro idioma, con menos del 20 % de traducciones reportadas como malas y 3 segundos o menos por traduccion.
+
 ## Riesgos y preguntas abiertas (capturadas durante la definición de la visión)
 
 - ¿Es la necesidad real "comunicarse", o hay un matiz más profundo entre comunicarse formalmente vs. auténticamente? (pregunta original del equipo al definir la necesidad del cliente)

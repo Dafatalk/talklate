@@ -72,6 +72,7 @@ Cada criterio se puede comprobar en la app o en las pruebas de `backend/test`. E
 2. La contrasena debe tener 8 o mas caracteres, una mayuscula, un numero y un simbolo; el correo debe tener formato valido.
 3. Debo tener 13 anos o mas; si no, veo 'debes tener al menos 13 anos'.
 4. Si el correo ya esta registrado, veo un aviso para iniciar sesion.
+5. Debo aceptar la politica de tratamiento de datos (Ley 1581 de 2012); si no, no se crea la cuenta.
 
 ### HU0016 Iniciar sesion
 1. Con correo y contrasena correctos entro a la app; con datos incorrectos veo 'Usuario o contrasena incorrectos'.
@@ -88,11 +89,16 @@ Cada criterio se puede comprobar en la app o en las pruebas de `backend/test`. E
 1. Cuando cierro sesion, entonces vuelvo a la pantalla de bienvenida.
 2. El acceso anterior deja de funcionar aunque alguien lo conserve.
 
+### HU0026 Eliminar mi cuenta
+1. Dado que estoy en mi perfil, cuando elijo eliminar mi cuenta, entonces la app me pide mi contrasena y me avisa que no se puede deshacer.
+2. Al confirmar, se borran mi cuenta, mis conversaciones, mis mensajes y mis reportes, y vuelvo a la pantalla de bienvenida.
+3. Con una contrasena incorrecta la cuenta no se elimina.
+
 ## Participacion del interlocutor
 
 ### HU0019 Recibir el mensaje traducido
-1. Dado que la otra persona responde (se escribe como 'Otra persona'), entonces su mensaje se traduce a mi idioma y se muestra a la izquierda, junto a su original.
-2. La otra persona no necesita instalar la app ni tener cuenta.
+1. Dado que la otra persona responde (se elige 'Otra persona' y se le pasa el celular), entonces su mensaje se traduce a mi idioma y se muestra a la izquierda, junto a su original.
+2. La otra persona no necesita instalar la app ni crear una cuenta.
 
 ### HU0020 Responder en mi idioma
 1. Cuando la otra persona escribe en su propio idioma, entonces su respuesta se traduce al idioma de la conversacion.

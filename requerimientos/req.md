@@ -1,106 +1,91 @@
-# Requerimientos Funcionales — TalkLate
+# Requerimientos - TalkLate
 
-**Fase 2 · Especificación de Requerimientos**
+**Fase 2 - Especificacion de Requerimientos**
 
-**Estado:** borrador, pero ya cubre todos los entregables del Mapa de Impacto
-(`requerimientos/mapa_impacto.md`), que ahora está completo a nivel de características e
-historias de usuario. No se inventan requerimientos más allá de lo que el Mapa de Impacto y el
-Modelo de Dominio Enriquecido (`arquitectura/modelo_datos.md`) ya sustentan — donde una historia
-de usuario quedó marcada como "pregunta abierta" en el mapa de impacto, aquí tampoco se convierte
-en requerimiento todavía.
-
----
+**Estado:** alineado con el Mapa de Impacto (`seguimiento/mapa_impacto/Mapa de Impacto.xlsx`) y las historias de usuario. Cada requerimiento funcional sale de una historia (trazabilidad REQ -> HU -> impacto) y cita la regla de negocio de `arquitectura/modelo_datos.md` que aplica. Los criterios de aceptacion estan en `criterios_aceptacion.md`.
 
 ## Actores
 
-| Actor | Descripción |
+| Actor | Descripcion |
 | --- | --- |
-| Cliente Traductor | Usuario final de la aplicación móvil que necesita comunicarse en un idioma que no domina. |
-| Inteligencia Artificial | El motor/modelo que detecta acento, tono, y genera y mejora las traducciones. No es un actor humano, pero el Mapa de Impacto lo modela como actor porque sus capacidades generan impactos propios (ver `mapa_impacto.md`). |
+| Cliente Traductor | Dueno del dispositivo; usa la app para comunicarse en un idioma que no domina. |
+| Interlocutor | La otra persona de la conversacion; no instala la app ni crea cuenta. |
+| Administrador | Mantiene el catalogo de idiomas y regiones y revisa los reportes de calidad. |
 
-## Requerimientos funcionales — módulo Traductor de mensajes
+## Requerimientos funcionales
 
-| ID | Requerimiento | Fuente |
-| --- | --- | --- |
-| REQ-TRAD-001 | El sistema debe permitir al Cliente Traductor ingresar un mensaje por voz (micrófono). | Mapa de Impacto — "Recibir entrada de mensaje" |
-| REQ-TRAD-002 | El sistema debe permitir al Cliente Traductor ingresar un mensaje por texto escrito. | Mapa de Impacto — "Recibir entrada de mensaje" |
-| REQ-TRAD-003 | El sistema debe traducir el mensaje de un idioma origen a un idioma destino en tiempo real, preservando el contexto cultural. | Mapa de Impacto — impacto del entregable Traductor de mensajes |
-| REQ-TRAD-004 | El sistema debe entregar el mensaje traducido usando el mismo canal por el que fue recibido el mensaje original (voz → audio, texto → texto). | `arquitectura/modelo_datos.md` — Conversación, responsabilidad "Traducir Mensaje" |
+### Traduccion de mensajes
 
-## Requerimientos funcionales — Usuario (derivados del Modelo de Dominio Enriquecido)
+| ID | Requerimiento | HU | Regla o fuente |
+| --- | --- | --- | --- |
+| REQ-TRAD-001 | El sistema debe permitir ingresar un mensaje por voz; el mensaje se marca con el canal Voz. | HU0001 Ingresar mi mensaje hablando | Canal |
+| REQ-TRAD-002 | El sistema debe permitir ingresar un mensaje escrito de 1 a 5000 caracteres, no vacio. | HU0002 Ingresar mi mensaje escribiendo | MensajeOriginal |
+| REQ-TRAD-003 | El sistema debe traducir cada mensaje al idioma y region destino conservando tono, intencion y modismos (equivalente cultural, no literal), con nota cultural cuando adapte un modismo y marca de aproximada si quedan palabras sin traducir. | HU0003 Traducir mi mensaje al idioma destino en tiempo real | Conversacion: Traducir Mensaje; Region: aplicar matices |
+| REQ-TRAD-004 | El sistema debe reproducir la traduccion en audio con la voz del idioma y pais destino, ajustando tono y velocidad segun la entonacion. | HU0004 Escuchar el mensaje traducido | Entonacion |
+| REQ-TRAD-005 | El sistema debe entregar la traduccion por el mismo canal del mensaje original: audio (y texto) si fue por voz, texto si fue escrito. | HU0005 Recibir la traduccion por el mismo canal que use | Canal: Entregar mensaje traducido |
 
-| ID | Requerimiento | Regla de negocio asociada |
-| --- | --- | --- |
-| REQ-USR-001 | El sistema debe permitir registrar un nuevo usuario con nombre, apellido, correo y fecha de nacimiento. | Usuario-RN-1 a RN-4 |
-| REQ-USR-002 | El sistema debe rechazar el registro si el correo ya está asociado a una cuenta activa. | Usuario-RN-1 |
-| REQ-USR-003 | El sistema debe exigir que el usuario tenga al menos 13 años para registrarse. | Usuario-RN-2 |
-| REQ-USR-004 | El sistema debe validar formato de correo y complejidad mínima de contraseña (8+ caracteres, mayúscula, número, carácter especial). | Usuario-RN-3, RN-4 |
-| REQ-USR-005 | El sistema debe permitir iniciar sesión validando correo y contraseña. | Usuario-RN-5 |
-| REQ-USR-006 | El sistema debe permitir recuperar contraseña mediante un código enviado al correo, válido por tiempo limitado. | Usuario-RN-6 a RN-9 |
-| REQ-USR-007 | El sistema debe permitir cerrar sesión invalidando el token de autenticación activo. | Usuario-RN-10 |
+### Gestion de conversaciones
 
-## Requerimientos funcionales — Conversación (derivados del Modelo de Dominio Enriquecido)
+| ID | Requerimiento | HU | Regla o fuente |
+| --- | --- | --- | --- |
+| REQ-CONV-001 | El sistema debe exigir idioma y region destino, y la region debe ser valida para ese idioma. | HU0006 Seleccionar el idioma y la region destino | Conversacion-RN-1 |
+| REQ-CONV-002 | El sistema debe reconocer el idioma de origen con el primer mensaje si no se eligio, y no cambiarlo en esa conversacion. | HU0007 Reconocer el idioma origen | Conversacion-RN-2 |
+| REQ-CONV-003 | El sistema debe crear conversaciones con nombre por defecto "Nueva Conversacion" y validar que el par de idiomas este soportado. | HU0008 Crear una conversacion | Conversacion-RN-3 |
+| REQ-CONV-004 | El sistema debe conservar la configuracion de idiomas de la conversacion para todos sus mensajes. | HU0009 Configurar los parametros una sola vez | Conversacion: Configurar Parametros |
+| REQ-CONV-005 | El sistema debe guardar cada mensaje original y su traduccion en el hilo de la conversacion, en orden. | HU0010 Mantener el hilo continuo | LenguajePorConversacion |
+| REQ-CONV-006 | El sistema debe listar solo las conversaciones del usuario, paginadas y ordenadas por actividad reciente. | HU0011 Consultar mi historial | Conversacion: Consultar historial |
+| REQ-CONV-007 | El sistema debe mostrar los mensajes originales y traducidos de una conversacion del usuario, y negar el acceso a las de otra persona. | HU0012 Abrir una conversacion anterior | Conversacion: Consultar |
+| REQ-CONV-008 | El sistema debe permitir renombrar con 3 a 80 caracteres, sin caracteres especiales ni palabras ofensivas, sin cambiar el identificador. | HU0013 Renombrar una conversacion | Conversacion-RN-4, RN-5 |
+| REQ-CONV-009 | El sistema debe eliminar la conversacion con sus mensajes y reportes, previa confirmacion. | HU0014 Eliminar una conversacion | Conversacion: Eliminar |
 
-| ID | Requerimiento | Regla de negocio asociada |
-| --- | --- | --- |
-| REQ-CONV-001 | El sistema debe permitir configurar idioma y región destino antes de iniciar la traducción (obligatorio); el origen es opcional y se detecta automáticamente si no se define. | Conversacion-RN-1, RN-2 |
-| REQ-CONV-002 | El sistema debe validar que el par de idiomas origen-destino esté soportado antes de iniciar la conversación. | Conversacion-RN-3 |
-| REQ-CONV-003 | El sistema debe validar el formato del archivo de audio recibido (mp3, wav, m4a) y su duración. | Conversacion-RN-4 (ver detalle en `arquitectura/modelo_datos.md`) |
-| REQ-CONV-004 | El sistema debe permitir consultar el historial de mensajes de una conversación. | Responsabilidad "Consultar historial de conversaciones" |
-| REQ-CONV-005 | El sistema debe permitir crear una nueva conversación como contenedor de mensajes, configurando idioma y región destino una sola vez para toda la conversación. | Mapa de Impacto — entregable "Gestión de conversaciones" (redefinido), Conversación-RN-1 |
-| REQ-CONV-006 | El sistema debe permitir renombrar y eliminar una conversación existente. | `arquitectura/modelo_datos.md` — responsabilidades "Modificar Conversación" / "Eliminar Conversación" |
+### Cuenta de usuario
 
-## Requerimientos funcionales — Historial de conversaciones
+| ID | Requerimiento | HU | Regla o fuente |
+| --- | --- | --- | --- |
+| REQ-USR-001 | El sistema debe registrar usuarios con nombre, apellido, correo unico, contrasena segura, fecha de nacimiento (13 anos o mas) y aceptacion de la politica de tratamiento de datos. | HU0015 Registrarme en la aplicacion | Usuario-RN-1 a RN-4; Ley 1581 |
+| REQ-USR-002 | El sistema debe iniciar sesion con correo y contrasena, bloquear temporalmente tras intentos fallidos y mantener la sesion con un token de refresco. | HU0016 Iniciar sesion | Usuario-RN-5 |
+| REQ-USR-003 | El sistema debe enviar un codigo de 6 digitos valido por 15 minutos y de un solo uso para definir una nueva contrasena segura. | HU0017 Recuperar mi contrasena | Usuario-RN-6 a RN-9 |
+| REQ-USR-004 | El sistema debe invalidar el token de acceso y el de refresco al cerrar sesion. | HU0018 Cerrar sesion | Usuario-RN-10 |
+| REQ-USR-005 | El sistema debe eliminar la cuenta y todos sus datos cuando el usuario lo pida y confirme con su contrasena. | HU0026 Eliminar mi cuenta | Ley 1581 (derecho al olvido) |
 
-| ID | Requerimiento | Fuente |
-| --- | --- | --- |
-| REQ-HIST-001 | El sistema debe permitir al Cliente Traductor consultar la lista de sus conversaciones anteriores. | Mapa de Impacto — entregable "Historial y gestión de conversaciones traducidas" |
-| REQ-HIST-002 | El sistema debe permitir al Cliente Traductor abrir una conversación anterior y ver sus mensajes originales y traducidos. | Mapa de Impacto — misma fuente |
+### Participacion del interlocutor
 
-## Requerimientos funcionales — Configuración de idiomas
+| ID | Requerimiento | HU | Regla o fuente |
+| --- | --- | --- | --- |
+| REQ-INT-001 | El sistema debe mostrar y reproducir la traduccion para la otra persona sin pedirle cuenta ni instalar la app. | HU0019 Recibir el mensaje traducido | Impacto del Interlocutor |
+| REQ-INT-002 | El sistema debe traducir la respuesta de la otra persona al idioma del usuario dentro de la misma conversacion. | HU0020 Responder en mi idioma | Conversacion-RN-2 |
 
-| ID | Requerimiento | Fuente |
-| --- | --- | --- |
-| REQ-IDIOMA-001 | El sistema debe permitir al Cliente Traductor seleccionar el idioma y la región destino antes de traducir. | Mapa de Impacto — entregable "Configuración de idiomas origen–destino"; Conversacion-RN-1 |
-| REQ-IDIOMA-002 | El sistema debe detectar automáticamente el idioma origen a partir del primer mensaje de voz del usuario, si no fue configurado manualmente. | Conversacion-RN-2 |
-| REQ-IDIOMA-003 | El sistema debe permitir consultar la lista de idiomas y regiones disponibles para traducción. | Lenguaje — "Listar lenguajes disponibles"; Región — "Listar regiones disponibles" |
+### Reportes
 
-## Requerimientos funcionales — Reproducción de audio traducido
+| ID | Requerimiento | HU | Regla o fuente |
+| --- | --- | --- | --- |
+| REQ-REP-001 | El sistema debe permitir reportar una traduccion propia una sola vez, con un motivo de 3 a 500 caracteres. | HU0021 Reportar una mala traduccion | Lenguaje: Generar reporte |
+| REQ-REP-002 | El sistema debe permitir al administrador listar, filtrar y marcar reportes como revisados o descartados. | HU0022 Revisar los reportes de mala traduccion | Rol administrador |
 
-| ID | Requerimiento | Fuente |
-| --- | --- | --- |
-| REQ-AUDIO-001 | El sistema debe permitir reproducir el mensaje traducido como audio claro y natural. | Mapa de Impacto — entregable "Reproducción y personalización de audio traducido" |
-| REQ-AUDIO-002 | El sistema debe entregar el mensaje traducido por el mismo canal con el que fue enviado el mensaje original. | Canal — "Entregar mensaje traducido" |
+### Administracion de idiomas y regiones
 
-## Requerimientos funcionales — Capacidades de Inteligencia Artificial
+| ID | Requerimiento | HU | Regla o fuente |
+| --- | --- | --- | --- |
+| REQ-IDIOMA-001 | El sistema debe mostrar solo los idiomas activos con sus regiones. | HU0023 Consultar los idiomas disponibles | Lenguaje: Listar; Region: Listar |
+| REQ-IDIOMA-002 | El sistema debe permitir al administrador agregar idiomas (nombre y codigo unicos) y regiones (unicas dentro del pais). | HU0024 Agregar un idioma o una region | Combinaciones unicas |
+| REQ-IDIOMA-003 | El sistema debe permitir al administrador activar o desactivar idiomas sin afectar las conversaciones existentes. | HU0025 Activar o desactivar un idioma o una region | Lenguaje.activo |
 
-| ID | Requerimiento | Fuente |
-| --- | --- | --- |
-| REQ-IA-001 | El sistema debe identificar el tono/entonación de un mensaje origen recibido. | Entonación — "Identificar el tono y matices de un mensaje" |
-| REQ-IA-002 | El sistema debe aplicar el tono identificado en el mensaje original al mensaje destino generado. | Entonación — "Aplicar el tono y matiz de un mensaje original a un mensaje destino" |
-| REQ-IA-003 | El sistema debe identificar automáticamente la región de origen del mensaje que se va a traducir. | Región — "Identificar región origen" |
-| REQ-IA-004 | El sistema debe detectar modismos y jerga cultural en el mensaje original y traducirlos por su equivalente cultural en el idioma/región destino, en vez de traducirlos literalmente. | Mapa de Impacto — entregable "Traducción contextual con preservación de jergas y matices culturales"; Conversación — "Traducir Mensaje" |
-| REQ-IA-005 | El sistema debe permitir al Cliente Traductor reportar una traducción de mala calidad. | Lenguaje — "Generar reporte de mala traducción" |
+## Requerimientos no funcionales
 
-## Requerimientos no funcionales (borrador, a validar)
+| ID | Requerimiento | Driver | Como se verifica |
+| --- | --- | --- | --- |
+| RNF-001 | "Tiempo real" significa traduccion **por turno**: cada mensaje de texto se traduce en 3 segundos o menos (p95); uno de voz en 5 segundos o menos. | DRV-01 | `npm run medir` en `backend/` y el evento `traduccion` (duracion_ms) del log |
+| RNF-002 | El 80 % de los modismos del glosario de prueba se traducen con su equivalente cultural. | DRV-02 | `npm run medir` |
+| RNF-003 | Los datos personales (correo, fecha de nacimiento, mensajes) se tratan segun `matriz_sensibilidad_datos.md`: mensajes cifrados en reposo, acceso solo del dueno, logs sin datos personales, consentimiento y eliminacion de cuenta. | DRV-03 | Pruebas de `backend/test/api.test.js` y `seguridad.test.js` |
+| RNF-004 | Se agregan idiomas y regiones sin cambiar codigo. | DRV-04 | Prueba del administrador |
+| RNF-005 | Si el motor de IA falla, el servicio sigue con un motor de reglas reducido. | DRV-05 | `backend/test/motores.test.js` |
+| RNF-006 | Limites de uso: 30 mensajes por minuto por usuario, 8 intentos de login fallidos, 5 solicitudes de recuperacion cada 15 minutos. | DRV-06 | Pruebas de seguridad |
+| RNF-007 | Una sola base de codigo para iOS, Android y web. | DRV-07 | Compilacion web y Expo Go |
+| RNF-008 | Cobertura de pruebas de 80 % o mas en la logica de negocio. | DRV-08 | `npm run coverage` en `backend/` |
+| RNF-009 | La API sigue `convenciones/api-rest.md` y esta documentada en OpenAPI. | - | `backend/openapi.yaml` y `/api/v1/docs` |
 
-| ID | Requerimiento |
-| --- | --- |
-| RNF-001 | Los mensajes originales y traducidos (dato sensible/PII) deben protegerse según `convenciones/seguridad.md`. |
-| RNF-002 | La traducción debe sentirse "en tiempo real" para el usuario — falta definir un umbral de latencia concreto (pendiente de decisión técnica en F3). |
+## Fuera del alcance del MVP (decision registrada)
 
-## Pendiente
-
-- Confirmar con el mentor las dos consolidaciones de entregables sugeridas en
-  `mapa_impacto.md` (Captura de mensajes por voz y texto ↔ Traductor de mensajes; redefinición de
-  "Gestión de conversaciones") — si el equipo decide no consolidarlas, los REQ-CONV-005/006 deben
-  revisarse.
-- Convertir en requerimientos las "preguntas abiertas" del mapa de impacto una vez resueltas:
-  compartir/exportar conversaciones, editar datos de perfil, personalizar la voz del audio
-  traducido, ampliar idiomas/acentos y reentrenar el modelo de IA. Deliberadamente no se
-  convirtieron en REQ todavía porque no tienen sustento en el modelo de dominio actual.
-- Crear la Matriz de Sensibilidad de Datos (`matriz_sensibilidad_datos.md`, aún no creada) que
-  formalice la clasificación mencionada en `convenciones/seguridad.md` para cada entidad del
-  modelo de dominio.
-- Definir requerimientos no funcionales adicionales (disponibilidad, escalabilidad, límites de
-  uso del motor de IA) una vez se decida el stack técnico en F3.
+- Compartir o exportar conversaciones, editar los datos del perfil y personalizar la voz: no tienen regla en el modelo de dominio; quedan para una version futura.
+- Detectar el acento por el audio: hoy la region de origen se reconoce por el vocabulario (ver `contexto.md`).
+- Reentrenar el modelo de IA con los reportes: los reportes se guardan y se revisan; el reentrenamiento es evolucion futura.

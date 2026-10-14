@@ -1,13 +1,14 @@
 # Planificacion por sprints - TalkLate
 
-Metodologia pedida por el mentor (2026-10): priorizar las historias por **valor** (no por dependencia), tallarlas con tallas de ropa, asignarles horas y llenar sprints de duracion fija.
+Metodologia pedida por el mentor: priorizar las historias por **valor** (no por dependencia), tallarlas con tallas de ropa, asignarles horas y llenar sprints de duracion fija.
 
 ## Supuestos
 
 - Sprint de 5 dias. 2 personas por 4 horas al dia = 40 horas brutas por sprint.
 - Se usa el 75 % (30 horas): el resto es planeacion, dailies, refinamiento y retrospectiva.
-- Talla a horas: XS = 1, S = 2, M = 4, L = 6, XL = 8, XXL = 12.
+- Talla a horas (una persona desarrolla la historia): XS = 1, S = 2, M = 4, L = 6, XL = 8, XXL = 12.
 - Se llena cada sprint de mayor a menor valor hasta cerca de 30 horas y se acomoda una historia pequena de mas abajo si sobra espacio.
+- Excepcion razonada: **Cerrar sesion** va con **Iniciar sesion** en el sprint 3, porque cerrar sesion no genera valor si todavia no se puede iniciar sesion.
 
 ## Historias por prioridad
 
@@ -32,25 +33,29 @@ Metodologia pedida por el mentor (2026-10): priorizar las historias por **valor*
 | 17 | HU0016 Iniciar sesion | Cuenta de usuario | M | 4 | 3 | Da acceso seguro a lo guardado. |
 | 18 | HU0021 Reportar una mala traduccion | Reportes | M | 4 | 3 | Alimenta la mejora de calidad con casos reales. |
 | 19 | HU0013 Renombrar una conversacion | Gestion de conversaciones | XS | 1 | 2 | Ayuda a ubicar conversaciones, pero no cambia el valor central. |
-| 20 | HU0014 Eliminar una conversacion | Gestion de conversaciones | S | 2 | 3 | Da control sobre los datos propios; es de apoyo. |
+| 20 | HU0014 Eliminar una conversacion | Gestion de conversaciones | XS | 1 | 2 | Da control sobre los datos propios; es de apoyo. |
 | 21 | HU0017 Recuperar mi contrasena | Cuenta de usuario | L | 6 | 3 | Evita perder la cuenta; es de apoyo. |
-| 22 | HU0018 Cerrar sesion | Cuenta de usuario | XS | 1 | 2 | Protege la cuenta en un dispositivo compartido; es de apoyo. |
+| 22 | HU0018 Cerrar sesion | Cuenta de usuario | XS | 1 | 3 | Protege la cuenta en un dispositivo compartido; solo tiene sentido despues de iniciar sesion, por eso va con ella en el sprint 3. |
 | 23 | HU0022 Revisar los reportes de mala traduccion | Reportes | M | 4 | 3 | Permite priorizar que mejorar primero. |
 | 24 | HU0024 Agregar un idioma o una region | Administracion de idiomas y regiones | M | 4 | 3 | Hace crecer el servicio a mas personas. |
 | 25 | HU0025 Activar o desactivar un idioma o una region | Administracion de idiomas y regiones | XS | 1 | 2 | Controla que idiomas se ofrecen con calidad suficiente. |
+| 26 | HU0026 Eliminar mi cuenta | Cuenta de usuario | XS | 1 | 3 | Cumple el derecho al olvido (Ley 1581 de 2012): la persona controla sus datos. |
 
 ## Sprints
 
-| Sprint | Horas | Historias |
-| --- | --- | --- |
-| 1 | 30 | HU0001, HU0002, HU0003, HU0004, HU0005, HU0006 |
-| 2 | 30 | HU0007, HU0008, HU0009, HU0010, HU0011, HU0012, HU0013, HU0018, HU0019, HU0020, HU0023, HU0025 |
-| 3 | 30 | HU0014, HU0015, HU0016, HU0017, HU0021, HU0022, HU0024 |
+| Sprint | Fechas | Horas | Historias |
+| --- | --- | --- | --- |
+| 1 | 19 al 23 de octubre de 2026 | 30 | HU0003, HU0002, HU0001, HU0004, HU0005, HU0006 |
+| 2 | 26 al 30 de octubre de 2026 | 30 | HU0007, HU0008, HU0009, HU0010, HU0019, HU0020, HU0023, HU0011, HU0012, HU0013, HU0014, HU0025 |
+| 3 | 2 al 6 de noviembre de 2026 | 30 | HU0015, HU0016, HU0021, HU0017, HU0018, HU0022, HU0024, HU0026 |
 
 Total: 90 horas en 3 sprints (3 semanas).
 
+## Relacion con la prueba de concepto del 14/10/2026
+
+Antes del sprint 1 se hizo una **prueba de concepto (spike)** autorizada por el mentor ("primero construir y luego justificar"): una version funcional de la app para validar el stack y el motor de traduccion (ver `seguimiento/marco_metodologico.md`). Los sprints toman cada historia desde ese punto: revisar y completar el codigo, probarlo en celular, cumplir sus criterios de aceptacion, sus pruebas y la documentacion. Cada historia se trabaja con su issue de GitHub, su rama y su pull request.
+
 ## Para la sustentacion
 
-- Por que se priorizo traducir primero: porque es el valor del producto, no porque lo demas dependa de eso. Registro de usuario y cierre de sesion son de apoyo y van al final.
-- Esta estimacion es metodologica: el plan de liberaciones se arma con estos sprints. Las horas reales de cada semana pueden variar.
-- El codigo ya existe en `backend/` y `frontend/`; el plan sirve para ordenar lo que falta pulir y probar.
+- Por que traducir va primero: porque es el valor del producto, no porque lo demas dependa de eso. Registro y cierre de sesion son de apoyo.
+- La estimacion es metodologica: el plan de liberaciones sale de estos sprints; las horas reales de cada semana pueden variar.
