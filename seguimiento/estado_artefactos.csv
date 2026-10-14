@@ -1,39 +1,39 @@
-﻿Etapa,Sub etapa,Artefacto,¿Aplica?,Estado,Fecha inicio,Fecha fin,Observaciones
+Etapa,Sub etapa,Artefacto,¿Aplica?,Estado,Fecha inicio,Fecha fin,Observaciones
 Diseño estratégico,Diseño estratégico,Visión,SI,Terminado,2026-08-15,2026-08-15,Visión.xlsx y contexto.md; el equipo la confirmo como completa con el mentor.
-Diseño estratégico,Diseño estratégico,Mapa de impacto,SI,Terminado,2026-08-15,2026-10-14,10 impactos con problema y beneficio en tercera persona; entregables como epicas sin la palabra modulo. Falta que Farid lo valide.
+Diseño estratégico,Diseño estratégico,Mapa de impacto,SI,Terminado,2026-08-15,2026-10-14,"Objetivo e impactos SMART con indicador, problema y beneficio; 6 epicas. Falta validacion final de Farid."
 Diseño estratégico,Diseño estratégico,Project Canvas,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Modelo de procesos del negocio,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Modelo de dominio anémico,SI,Terminado,2026-08-15,,Modelo de Dominio.drawio en seguimiento/follow-up/modelo_dominio. Falta confirmar con el mentor.
-Diseño estratégico,Diseño estratégico,Modelo de dominio enriquecido,SI,En progreso,2026-08-15,,Combinaciones unicas propuestas para las 10 entidades en arquitectura/modelo_datos.md. Falta que Farid las valide y pasarlas al xlsx (Julian).
+Diseño estratégico,Diseño estratégico,Modelo de dominio enriquecido,SI,En progreso,2026-08-15,,arquitectura/modelo_datos.md alineado con la base de datos y combinaciones unicas propuestas. Falta validarlas con Farid y actualizar el Excel y el MER (Julian).
 Diseño estratégico,Diseño estratégico,Requisitos de información,SI,No planeado,,,
-Diseño estratégico,Diseño estratégico,Colaboraciones y responsabilidades,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Colaboraciones y responsabilidades.xlsx. Falta validar con Farid si Reporte es una entidad.
+Diseño estratégico,Diseño estratégico,Colaboraciones y responsabilidades,SI,Terminado,2026-10-04,2026-10-14,Actualizada con eliminar cuenta y LenguajeRegion.
 Diseño estratégico,Diseño estratégico,Event Storming,SI,No planeado,,,
-Diseño estratégico,Diseño estratégico,Mapa de historias de usuario,SI,En progreso,2026-10-02,,Epicas con sus historias en la hoja Entregables y una hoja por epica. Falta presentarlo como mapa.
-Diseño estratégico,Diseño estratégico,Matriz de roles por operaciones,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Matriz de roles por operaciones.xlsx. Queda pendiente definir si el Administrador inicia sesion igual que los demas.
-Diseño estratégico,Diseño estratégico,Matriz de comandos por impacto,SI,Terminado,2026-10-04,2026-10-04,seguimiento/matrices/Matriz de comandos por impacto.xlsx.
-Diseño estratégico,Diseño estratégico,Mapa de viaje del cliente,SI,Terminado,2026-08-15,,Customer Journey Map de 9 etapas en componentes/especificacion_vistas_ui.md.
-Diseño estratégico,Diseño estratégico,Plan de liberaciones del producto,SI,Terminado,2026-10-14,2026-10-14,"3 liberaciones, una por sprint; el sprint 1 empieza el lunes 19/10/2026 (requerimientos/plan_liberaciones.md y hoja Plan de liberaciones). Falta validar con Farid."
-Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,En progreso,2026-10-02,,"HU0001 a HU0025 en 6 epicas, con prioridad por valor, talla, horas, sprint y criterios de aceptacion. Falta validar con Farid."
+Diseño estratégico,Diseño estratégico,Mapa de historias de usuario,SI,Terminado,2026-10-02,2026-10-14,Epicas con sus historias (hoja Entregables y una hoja por epica) e issues de GitHub por historia.
+Diseño estratégico,Diseño estratégico,Matriz de roles por operaciones,SI,Terminado,2026-10-04,2026-10-14,Actualizada con eliminar cuenta y el rol del Administrador.
+Diseño estratégico,Diseño estratégico,Matriz de comandos por impacto,SI,Terminado,2026-10-04,2026-10-14,Actualizada con los impactos SMART y Reporte como tabla de soporte.
+Diseño estratégico,Diseño estratégico,Mapa de viaje del cliente,SI,Terminado,2026-08-15,2026-10-14,Etapas mapeadas a pantallas y diferencias con lo construido en componentes/especificacion_vistas_ui.md.
+Diseño estratégico,Diseño estratégico,Plan de liberaciones del producto,SI,Terminado,2026-10-14,2026-10-14,3 liberaciones (19/10 al 06/11/2026) con indicadores SMART por liberacion.
+Diseño estratégico,Diseño estratégico,Historias de usuario/Especificación funcional,SI,Terminado,2026-10-02,2026-10-14,"26 HU con prioridad por valor, talla, horas, sprint y criterios de aceptacion; req.md con trazabilidad REQ-HU."
 Diseño estratégico,Diseño estratégico,Flujo de transacciones en diagramas de actividades,SI,No planeado,,,
 Diseño estratégico,Diseño estratégico,Flujo de estados en diagramas de estado,SI,No planeado,,,
-Diseño táctico,Diseño arquitectónico,Drivers arquitectónicos,SI,En progreso,2026-10-14,,arquitectura/drivers.md con 8 drivers y objetivos por validar.
-Diseño táctico,Diseño arquitectónico,Spikes/Pruebas de concepto,SI,No planeado,,,
-Diseño táctico,Diseño arquitectónico,Alternativas de solución,SI,En progreso,2026-10-14,,Alternativas dentro de cada ADR; falta documentarlas como artefacto aparte.
-Diseño táctico,Diseño arquitectónico,Arquitectura de referencia,SI,No planeado,,,
+Diseño táctico,Diseño arquitectónico,Drivers arquitectónicos,SI,Terminado,2026-10-14,2026-10-14,8 drivers con objetivo y evidencia; falta medir DRV-01 y DRV-02 con Qwen (npm run medir).
+Diseño táctico,Diseño arquitectónico,Spikes/Pruebas de concepto,SI,Terminado,2026-10-14,2026-10-14,Prueba de concepto funcional del 14/10/2026 autorizada por el mentor (seguimiento/marco_metodologico.md).
+Diseño táctico,Diseño arquitectónico,Alternativas de solución,SI,Terminado,2026-10-14,2026-10-14,Alternativas comparadas al justificar en cada ADR y patrones del catalogo usados y descartados.
+Diseño táctico,Diseño arquitectónico,Arquitectura de referencia,SI,Terminado,2026-10-14,2026-10-14,Diagramas C4 de contexto y contenedores (arquitectura/c4.md y arquitectura/diagramas/).
 Diseño táctico,Diseño arquitectónico,Arquetipo de solución,SI,No planeado,,,
-Diseño táctico,Diseño arquitectónico,Plataforma tecnológica/Stack tecnológico,SI,En progreso,2026-10-14,,arquitectura/tech_stack.md y 8 ADR (Qwen local con Claude Sonnet de respaldo). Falta completar la justificacion.
+Diseño táctico,Diseño arquitectónico,Plataforma tecnológica/Stack tecnológico,SI,Terminado,2026-10-14,2026-10-14,arquitectura/tech_stack.md y 11 ADR aceptadas (ADR-008 por validar con Farid).
 Diseño táctico,Diseño detallado,Diagrama de clases,SI,No planeado,,,
-Diseño táctico,Diseño detallado,Diagrama de componentes,SI,No planeado,,,
+Diseño táctico,Diseño detallado,Diagrama de componentes,SI,En progreso,2026-10-14,,Modulos del backend descritos en el diagrama de contenedores y en convenciones/backend-node.md.
 Diseño táctico,Diseño detallado,Diagrama de paquetes,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Diagrama de secuencia,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Diagrama de despliegue,SI,No planeado,,,
-Diseño táctico,Diseño detallado,Modelo de fuente de información,SI,En progreso,2026-10-14,,Esquema SQLite en backend/src/db.js. El MER lo hace Julian.
+Diseño táctico,Diseño detallado,Modelo de fuente de información,SI,En progreso,2026-10-14,,"Esquema SQLite en backend/src/db.js, documentado en modelo_datos.md. El MER lo hace Julian."
 Diseño táctico,Línea base,Línea base del producto,SI,No planeado,,,
-Construcción,Repositorio,Repositorio de control de versiones,SI,Terminado,2026-08-15,,GitHub dafatalk/talklate con main y develop.
-Construcción,Calidad de código,Pruebas unitarias,SI,En progreso,2026-10-14,,19 pruebas en backend/test. Faltan pruebas del frontend.
+Construcción,Repositorio,Repositorio de control de versiones,SI,Terminado,2026-08-15,2026-10-14,"GitHub con main y develop; issue primero, ramas feature/fix y PR desde el issue #1."
+Construcción,Calidad de código,Pruebas unitarias,SI,En progreso,2026-10-14,,28 pruebas del backend y 4 del frontend; crecen con cada HU.
 Construcción,Calidad de código,Análisis de calidad de código y deuda técnica,SI,No planeado,,,
-Construcción,Calidad de código,Cobertura de código,SI,No planeado,,,
-Construcción,DEVOPS,Integración continua,SI,No planeado,,,
+Construcción,Calidad de código,Cobertura de código,SI,En progreso,2026-10-14,,Backend con cerca de 98 % de lineas (minimo 80 % en CI).
+Construcción,DEVOPS,Integración continua,SI,Terminado,2026-10-14,2026-10-14,"GitHub Actions (.github/workflows/ci.yml): pruebas con cobertura del backend, pruebas y typecheck del frontend."
 Construcción,DEVOPS,Entrega continua,SI,No planeado,,,
 Construcción,DEVOPS,Despliegue continuo,SI,No planeado,,,
 Pruebas,Aseguramiento de la calidad,Casos de prueba,SI,No planeado,,,

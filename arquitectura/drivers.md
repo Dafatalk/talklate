@@ -2,30 +2,28 @@
 
 **Fase 3 - Arquitectura**
 
-**Estado:** propuesta para validar con el equipo y el mentor. Los umbrales son objetivos de trabajo, todavia no medidos.
+Un driver es un requisito que obliga a tomar decisiones de arquitectura. Cada ADR de `decisiones.md` dice a cual driver responde, y cada driver dice como se mide.
 
-Un driver es un requisito que obliga a tomar decisiones de arquitectura. Cada ADR de `decisiones.md` dice a cual driver responde.
-
-| ID | Driver | Objetivo (por validar) | Origen |
+| ID | Driver | Objetivo | Origen |
 | --- | --- | --- | --- |
-| DRV-01 | Tiempo de respuesta de la traduccion | Un mensaje de texto se traduce en 3 segundos o menos (percentil 95); uno de voz en 5 segundos o menos, contando el audio | RNF-002 |
-| DRV-02 | Calidad cultural | Los modismos de un glosario de prueba se cambian por su equivalente cultural y no se traducen literal | Vision, REQ-IA-004 |
-| DRV-03 | Privacidad de los datos | Mensajes, correo y fecha de nacimiento solo los ve su dueno; contrasenas con hash; trafico cifrado en produccion | RNF-001, `convenciones/seguridad.md` |
-| DRV-04 | Crecimiento de idiomas | Agregar un idioma o region sin cambiar codigo (el catalogo esta en la base de datos) | Impacto del Administrador, REQ-IDIOMA |
-| DRV-05 | Continuidad ante fallas del motor de IA | Si Qwen o Claude fallan, el servicio sigue con un motor de reglas reducido | Riesgo del motor de IA |
-| DRV-06 | Costo por uso | Qwen local no cuesta por mensaje; si se usa Claude el costo es predecible porque el contexto es acotado | Respaldo con Claude de pago por uso |
-| DRV-07 | Un solo desarrollo para varias plataformas | Misma base de codigo para iOS, Android y web | Equipo de 2 personas |
-| DRV-08 | Facilidad de prueba | Las reglas de negocio se prueban sin internet ni claves | Calidad de codigo |
+| DRV-01 | Tiempo de respuesta de la traduccion (tiempo real **por turno**) | Texto: 3 segundos o menos (p95). Voz: 5 segundos o menos, contando el audio | RNF-001, contexto.md |
+| DRV-02 | Calidad cultural | 80 % de los modismos del glosario de prueba con su equivalente cultural, no literal | RNF-002, Vision |
+| DRV-03 | Privacidad de los datos | Mensajes, correo y fecha de nacimiento solo los ve su dueno; mensajes cifrados; consentimiento y eliminacion de cuenta; logs sin datos personales | RNF-003, `convenciones/seguridad.md` |
+| DRV-04 | Crecimiento de idiomas | Agregar un idioma o region sin cambiar codigo | RNF-004, impacto del Administrador |
+| DRV-05 | Continuidad ante fallas del motor de IA | Si Qwen o Claude fallan, el servicio sigue con un motor de reglas | RNF-005 |
+| DRV-06 | Costo y abuso | Qwen local sin costo por mensaje; limite de 30 mensajes por minuto por usuario | RNF-006 |
+| DRV-07 | Un solo desarrollo para varias plataformas | Misma base de codigo para iOS, Android y web | RNF-007 |
+| DRV-08 | Facilidad de prueba | Reglas probadas sin internet ni claves; cobertura de 80 % o mas | RNF-008 |
 
-## Como se responde cada driver
+## Como se responde y como se comprueba
 
-| Driver | Decision | Como se comprueba hoy |
+| Driver | Decision | Evidencia hoy |
 | --- | --- | --- |
-| DRV-01 | ADR-004 (motores en cadena) | Pendiente: medir con Qwen local y datos de prueba |
-| DRV-02 | ADR-004 (prompt de equivalencia cultural y glosario local) | `backend/test/motores.test.js`: modismos con variantes por pais |
-| DRV-03 | ADR-006 (JWT con revocacion, bcrypt) | `backend/test/api.test.js`: una persona no ve conversaciones de otra, logout invalida el token |
-| DRV-04 | ADR-003 y ADR-008 (catalogo en base de datos) | Prueba del administrador que activa un idioma y agrega una region |
-| DRV-05 | ADR-004 (cadena de respaldo) | `backend/test/motores.test.js`: si Qwen falla pasa a Claude y luego a reglas |
-| DRV-06 | ADR-004 | Qwen local sin costo; pendiente enviar solo los ultimos mensajes como contexto |
-| DRV-07 | ADR-001 | La app compila para web y se prueba en navegador; falta probar en celular fisico |
-| DRV-08 | ADR-002, ADR-003 | 19 pruebas del backend con base en memoria |
+| DRV-01 | ADR-002 (REST por turno), ADR-004 (motores en cadena) | `npm run medir` en `backend/` y el evento de log `traduccion` con `duracion_ms`. Resultado con el motor de reglas en `medicion_traduccion.md`; **falta medir con Qwen** en el equipo donde corra Ollama |
+| DRV-02 | ADR-004 (prompt de equivalencia cultural) | `npm run medir`: con el motor de reglas 14 de 15 (93 %), pero ese motor se construyo con estos mismos modismos, asi que no cuenta como evidencia de calidad; **la medicion valida es con Qwen** |
+| DRV-03 | ADR-006, ADR-010 | `backend/test/api.test.js` y `seguridad.test.js`: aislamiento entre usuarios, cifrado en base, consentimiento, eliminar cuenta, logs sin PII |
+| DRV-04 | ADR-003, ADR-008 | Prueba del administrador que activa un idioma y agrega una region |
+| DRV-05 | ADR-004 (Circuit Breaker) | `backend/test/motores.test.js`: Qwen falla -> Claude -> reglas |
+| DRV-06 | ADR-004, ADR-010 | Limites de uso en `src/lib/limites.js` |
+| DRV-07 | ADR-001 | Compila para web; falta probar en celular fisico con Expo Go |
+| DRV-08 | ADR-002, ADR-003 | 28 pruebas del backend con cerca de 98 % de cobertura de lineas (`npm run coverage`), pruebas del frontend y CI |
