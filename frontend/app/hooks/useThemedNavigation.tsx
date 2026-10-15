@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Platform, StatusBar as RNStatusBar } from 'react-native';
+import React from 'react';
+import { Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import * as NavigationBar from 'expo-navigation-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import { useTheme } from '@/app/contexts/ThemeContext';
 import useThemeColors from '@/app/contexts/ThemeColors';
 
@@ -13,29 +13,15 @@ export default function useThemedNavigation() {
   const { isDark } = useTheme();
   const colors = useThemeColors();
   
-  // Set up status/navigation bar styling based on theme
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      // Set navigation bar color
-      NavigationBar.setBackgroundColorAsync(colors.bg);
-      NavigationBar.setButtonStyleAsync(isDark ? 'light' : 'dark');
-
-      // // Set status bar styling directly using the native StatusBar API
-      // RNStatusBar.setBackgroundColor(colors.bg, true);
-      // RNStatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content', true);
-
-      // // Prevent translucency which can cause dimming
-      // RNStatusBar.setTranslucent(true);
-    } 
-  }, [isDark, colors.bg]);
-
-  // StatusBar component with appropriate theme styling
+  // StatusBar y barra de navegacion de Android segun el tema.
+  // Desde SDK 57 la app es edge-to-edge: ya no se pinta el fondo de las barras
+  // (setBackgroundColorAsync/setButtonStyleAsync se eliminaron); solo se elige el
+  // color de los botones: con tema oscuro, botones claros ('light'), igual que la StatusBar.
   const ThemedStatusBar = () => (
-    <StatusBar
-      style={isDark ? 'light' : 'dark'}
-      backgroundColor="transparent"
-      translucent={true}
-    />
+    <>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      {Platform.OS === 'android' && <NavigationBar style={isDark ? 'light' : 'dark'} />}
+    </>
   );
 
   // Navigation container/stack screen options for themed backgrounds

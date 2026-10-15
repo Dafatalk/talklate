@@ -133,21 +133,14 @@ CREATE TABLE IF NOT EXISTS reporte (
 );
 `;
 
-// Catalogo inicial. Espanol e Ingles activos; Frances y Portugues existen pero inactivos (como en el modelo de dominio).
-const PAISES = [
-  ['Colombia', 'CO'], ['Estados Unidos', 'US'], ['Espana', 'ES'], ['Mexico', 'MX'],
-  ['Argentina', 'AR'], ['Reino Unido', 'GB'], ['Francia', 'FR'], ['Brasil', 'BR'],
-];
+// Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./Miami).
+const PAISES = [['Colombia', 'CO'], ['Estados Unidos', 'US']];
 const REGIONES = [
   // [nombre, pais, lenguajes]
-  ['Antioquia', 'Colombia', ['es']], ['Bogota', 'Colombia', ['es']],
-  ['Madrid', 'Espana', ['es']], ['Ciudad de Mexico', 'Mexico', ['es']],
-  ['Buenos Aires', 'Argentina', ['es']],
-  ['California', 'Estados Unidos', ['en']], ['Texas', 'Estados Unidos', ['en', 'es']],
-  ['Londres', 'Reino Unido', ['en']],
-  ['Paris', 'Francia', ['fr']], ['Rio de Janeiro', 'Brasil', ['pt']],
+  ['Antioquia', 'Colombia', ['es']],
+  ['Miami', 'Estados Unidos', ['en']],
 ];
-const LENGUAJES = [['Espanol', 'es', 1], ['Ingles', 'en', 1], ['Frances', 'fr', 0], ['Portugues', 'pt', 0]];
+const LENGUAJES = [['Espanol', 'es', 1], ['Ingles', 'en', 1]];
 const ENTONACIONES = ['Neutral', 'Amigable', 'Alegre', 'Preocupado', 'Enojado', 'Formal'];
 const CANALES = ['Texto', 'Voz'];
 
