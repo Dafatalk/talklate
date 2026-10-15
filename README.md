@@ -16,7 +16,7 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 | `componentes/` | Especificación de vistas/UI (F4/F5) |
 | `convenciones/` | Convenciones institucionales heredadas (F0) |
 | `seguimiento/` | Actas con el mentor, marco metodológico, Excel fuente (Mapa de Impacto), matrices y estado de artefactos |
-| `backend/` | API de TalkLate (Node + Express + SQLite) — ver `backend/README.md` |
+| `backend/` | API de TalkLate (Node + Express + SurrealDB) — ver `backend/README.md` |
 | `frontend/` | App móvil (Expo / React Native) adaptada del template Luna — ver `frontend/README.md` |
 | `softverse-mcp/` | Servidor MCP que trackea el estado de las fases |
 

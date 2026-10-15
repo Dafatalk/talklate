@@ -68,7 +68,7 @@ Toda entidad de datos del sistema debe clasificarse según la Matriz de Sensibil
 | Medida | Implementación |
 | --- | --- |
 | Validación de inputs | Según reglas de negocio definidas por entidad en `arquitectura/modelo_datos.md` |
-| SQL Injection | Consultas parametrizadas u ORM — nunca SQL concatenado (TalkLate usa consultas parametrizadas de `node:sqlite`) |
+| SQL Injection | Consultas parametrizadas u ORM — nunca SQL concatenado (TalkLate usa consultas parametrizadas en SQLite y, en SurrealDB, literales serializados con `lit`/`rid`; nunca texto del usuario concatenado) |
 | Rate limiting | En la capa de API, especialmente sobre los endpoints de traducción (costo de cómputo/IA) |
 | CORS | Configuración centralizada, orígenes explícitos |
 | Dependency scanning | Automatizado en pipeline CI cuando exista |

@@ -10,7 +10,7 @@
 | Interfaz | Template Luna adaptado (componentes Header, Button, Chip, Input, ThemedText; tema claro y oscuro) | ADR-007 |
 | Voz | `expo-speech` para escuchar la traduccion; dictado del navegador o del teclado para hablar | ADR-005 |
 | Backend | Node.js 22, Express 4, API REST `/api/v1` con OpenAPI | ADR-002, ADR-011 |
-| Base de datos | SQLite (`node:sqlite`); migracion futura a PostgreSQL | ADR-003 |
+| Base de datos | SurrealDB 3.x por HTTP, detras de un repositorio; SQLite (`node:sqlite`) solo para pruebas sin servidor | ADR-012 |
 | Traduccion e IA | Qwen local (Ollama), Claude Sonnet de respaldo y motor de reglas espanol/ingles | ADR-004 |
 | Autenticacion | JWT de acceso (15 min) + token de refresco rotativo, bcrypt | ADR-006 |
 | Proteccion de datos | Cifrado AES-256-GCM de mensajes, consentimiento, eliminar cuenta, logs JSON sin PII | ADR-010 |

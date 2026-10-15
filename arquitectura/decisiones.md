@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | ADR-001 | App movil con Expo (React Native) y NativeWind | - | aceptada |
 | ADR-002 | Backend monolitico en Node.js con Express, API REST sincrona | Request-Reply (2.3) | aceptada |
-| ADR-003 | SQLite como base de datos inicial | - | aceptada |
+| ADR-003 | SQLite como base de datos inicial | - | reemplazada por ADR-012 (queda para pruebas sin servidor) |
 | ADR-004 | Traduccion con Qwen local, Claude Sonnet de respaldo y motor de reglas | Circuit Breaker (4.1) con degradacion aceptable | aceptada |
 | ADR-005 | Voz: dictado en el cliente y expo-speech para la salida | - | aceptada |
 | ADR-006 | Autenticacion con JWT de acceso corto y token de refresco rotativo | Token-Based Authentication (5.1) | aceptada |
@@ -17,6 +17,7 @@
 | ADR-009 | Identificadores del dominio en espanol (lenguaje ubicuo) | - | aceptada |
 | ADR-010 | Proteccion de datos personales | Structured Logging (6.1) | aceptada |
 | ADR-011 | API v1 segun la convencion REST y documentada con OpenAPI | Request-Reply (2.3) | aceptada |
+| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio | Repository | aceptada, **validar con el mentor** |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
 
@@ -61,7 +62,7 @@ Un solo lenguaje en todo el proyecto. Si crece, el modulo de traduccion se puede
 
 ## ADR-003: SQLite como base de datos inicial
 
-**Fecha:** 2026-10-14 · **Estado:** aceptada · **Responde a:** DRV-04, DRV-08
+**Fecha:** 2026-10-14 · **Estado:** reemplazada por ADR-012 el 2026-10-15 (SQLite sigue como motor de las pruebas sin servidor) · **Responde a:** DRV-04, DRV-08
 
 ### Contexto
 Hace falta persistir usuarios, conversaciones y mensajes con integridad referencial, y que cualquiera pueda correr el proyecto sin instalar un servidor de base de datos.
@@ -210,3 +211,30 @@ Los campos de las respuestas usan los nombres del dominio en snake_case (por eje
 
 ### Consecuencias
 Contrato claro para la app y para pruebas; cambios incompatibles van en `/api/v2`.
+
+## ADR-012: SurrealDB como fuente de verdad, detras de un repositorio
+
+**Fecha:** 2026-10-15 · **Estado:** aceptada, validar con el mentor · **Reemplaza:** ADR-003 · **Responde a:** DRV-01, DRV-03, DRV-04, DRV-08
+
+### Contexto
+ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasar a un servidor de base de datos. Julian construyo el cambio (PR #29): el modelo de dominio tiene muchas relaciones (conversacion, lenguaje por conversacion, mensaje original y destino, reporte) y combinaciones unicas que se querian expresar directo en la base.
+
+### Decision
+- **SurrealDB 3.x** es la fuente de verdad del backend. El esquema esta en `backend/db/surreal/schema.surql` (SCHEMAFULL) y se aplica al arrancar.
+- Las relaciones son enlaces nativos (`record<...>`); las combinaciones unicas son indices `UNIQUE`; los valores permitidos (rol, estado, remitente) son `ASSERT` en el campo.
+- El acceso a datos pasa por un **repositorio** con la misma interfaz para dos motores: `src/repos/surreal.js` (ejecucion) y `src/repos/sqlite.js` (pruebas sin servidor). Las rutas no conocen el motor; `DB_DRIVER` elige cual usar.
+- La conexion es por HTTP (`/sql`) sin dependencias nuevas. Se entra una vez con `/signin` y se reutiliza el token; los valores se escriben como literales serializados (`lit`, `rid`), nunca concatenando texto del usuario.
+
+### Alternativas (comparadas al justificar)
+- **Seguir con SQLite:** instalacion cero, pero es un archivo local; para varios usuarios a la vez y para produccion habia que cambiarla igual.
+- **PostgreSQL:** muy maduro y era el paso previsto en ADR-003; las relaciones se modelan con llaves foraneas y JOIN. Se eligio SurrealDB porque los enlaces entre registros siguen el modelo de dominio sin tablas intermedias de mas y el esquema con ASSERT deja reglas del dominio en la base.
+- **SDK oficial de SurrealDB:** mas comodo, pero agrega una dependencia; el endpoint HTTP basta para estas consultas.
+
+### Consecuencias
+- Hay que levantar un servidor SurrealDB 3.x para usar la app (`backend/README-surreal.md`). Con la 2.x el esquema no carga; el backend lo revisa al arrancar.
+- Mandar usuario y clave en cada consulta costaba unos 35 ms por consulta (unos 420 ms por mensaje); con el token de sesion bajo a unos 28 ms por mensaje. Sigue por encima de SQLite (unos 7 ms), pero muy lejos del limite de 3 s de DRV-01.
+- La renovacion de la sesion revoca el token de refresco en un solo paso (`tokens.consumir`), porque con un servidor dos pedidos pueden llegar al mismo tiempo.
+- CI corre la suite de la API contra los dos motores (job `backend-surreal`).
+- En produccion son obligatorias `SURREAL_USER` y `SURREAL_PASS` (no se acepta root/root).
+- Pendiente: algunas consultas filtran recorriendo enlaces (por ejemplo mensajes de una conversacion) y no aprovechan indices; con muchos datos hay que revisarlas.
+

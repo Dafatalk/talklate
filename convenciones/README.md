@@ -20,7 +20,7 @@
 | 4 | [`diagramas-como-codigo.md`](diagramas-como-codigo.md) | Diagramas de arquitectura versionables | Transversal |
 | 5 | [`patrones-arquitectonicos.md`](patrones-arquitectonicos.md) | Catálogo de patrones arquitectónicos | Transversal |
 | 6 | [`api-rest.md`](api-rest.md) | Diseño de APIs REST | Transversal |
-| 7 | [`backend-node.md`](backend-node.md) | Node.js + Express + SQLite | Por tecnología |
+| 7 | [`backend-node.md`](backend-node.md) | Node.js + Express + SurrealDB | Por tecnología |
 | 8 | [`frontend-expo.md`](frontend-expo.md) | Expo / React Native + NativeWind | Por tecnología |
 
 Los manuales por tecnología (7 y 8) se agregaron al decidir el stack en F3.

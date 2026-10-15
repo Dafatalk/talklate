@@ -35,5 +35,5 @@ Los datos se conservan mientras la cuenta exista. La persona puede borrar conver
 
 ## Pendiente para produccion
 
-- TLS (HTTPS) en todos los tramos y cifrado de la base y los respaldos por el proveedor (hoy es SQLite local).
+- TLS (HTTPS) en todos los tramos y cifrado de la base y los respaldos por el proveedor (hoy es SurrealDB local).
 - Servicio de correo real para el codigo de recuperacion.
