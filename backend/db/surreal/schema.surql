@@ -1,142 +1,147 @@
 -- =============================================================================
--- TalkLate — Esquema operativo en SurrealDB (fuente de verdad del backend)
--- SCHEMAFULL. Espeja el dominio del backend (antes en SQLite, src/db.js) con
--- record links nativos de SurrealDB. Se aplica de forma idempotente al arrancar
--- (ver src/repos/surreal.js -> inicializar()), por eso usa IF NOT EXISTS.
+-- TalkLate — Operational schema in SurrealDB (backend source of truth)
+-- SCHEMAFULL. Mirrors the backend domain with native SurrealDB record links.
+-- Applied idempotently on boot (src/repos/surreal.js -> inicializar()), hence
+-- IF NOT EXISTS.
 --
--- Namespace/base por defecto: talklate / app (configurable con SURREAL_NS/SURREAL_DB).
--- Fechas (fecha_nacimiento, creado, fecha_inicio, fecha_creacion, fecha) se
--- guardan como string ISO para reflejar exactamente el contrato del API.
+-- Language: table and field names are in ENGLISH. The API/domain use Spanish
+-- keys; the repository adapter (src/repos/surreal.js) maps between them.
+-- ENUM VALUES stay in Spanish (origen/destino, usuario/interlocutor,
+-- Pendiente.., abierto..) because the business logic and API use them as-is.
+--
+-- Default namespace/database: talklate / app (SURREAL_NS / SURREAL_DB).
+-- Dates (birth_date, created_at, started_at) are stored as ISO strings to match
+-- the API contract exactly.
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
--- Catalogo geografico y de idiomas
+-- Geography and languages catalog
 -- ---------------------------------------------------------------------------
-DEFINE TABLE IF NOT EXISTS pais SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON pais TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
-DEFINE FIELD IF NOT EXISTS codigo ON pais TYPE string ASSERT string::len($value) >= 2 AND string::len($value) <= 5;
-DEFINE INDEX IF NOT EXISTS idx_pais_nombre ON pais FIELDS nombre UNIQUE;
-DEFINE INDEX IF NOT EXISTS idx_pais_codigo ON pais FIELDS codigo UNIQUE;
+DEFINE TABLE IF NOT EXISTS country SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS name ON country TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
+DEFINE FIELD IF NOT EXISTS code ON country TYPE string ASSERT string::len($value) >= 2 AND string::len($value) <= 5;
+DEFINE INDEX IF NOT EXISTS idx_country_name ON country FIELDS name UNIQUE;
+DEFINE INDEX IF NOT EXISTS idx_country_code ON country FIELDS code UNIQUE;
 
 DEFINE TABLE IF NOT EXISTS region SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON region TYPE string ASSERT string::len($value) >= 2 AND string::len($value) <= 100;
-DEFINE FIELD IF NOT EXISTS pais ON region TYPE record<pais>;
-DEFINE INDEX IF NOT EXISTS idx_region_nombre_pais ON region FIELDS nombre, pais UNIQUE;
+DEFINE FIELD IF NOT EXISTS name ON region TYPE string ASSERT string::len($value) >= 2 AND string::len($value) <= 100;
+DEFINE FIELD IF NOT EXISTS country ON region TYPE record<country>;
+DEFINE INDEX IF NOT EXISTS idx_region_name_country ON region FIELDS name, country UNIQUE;
 
-DEFINE TABLE IF NOT EXISTS lenguaje SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON lenguaje TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
-DEFINE FIELD IF NOT EXISTS codigo ON lenguaje TYPE string ASSERT string::len($value) >= 2 AND string::len($value) <= 5;
-DEFINE FIELD IF NOT EXISTS activo ON lenguaje TYPE bool DEFAULT false;
-DEFINE INDEX IF NOT EXISTS idx_lenguaje_nombre ON lenguaje FIELDS nombre UNIQUE;
-DEFINE INDEX IF NOT EXISTS idx_lenguaje_codigo ON lenguaje FIELDS codigo UNIQUE;
+DEFINE TABLE IF NOT EXISTS language SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS name ON language TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
+DEFINE FIELD IF NOT EXISTS code ON language TYPE string ASSERT string::len($value) >= 2 AND string::len($value) <= 5;
+DEFINE FIELD IF NOT EXISTS active ON language TYPE bool DEFAULT false;
+DEFINE INDEX IF NOT EXISTS idx_language_name ON language FIELDS name UNIQUE;
+DEFINE INDEX IF NOT EXISTS idx_language_code ON language FIELDS code UNIQUE;
 
--- Puente N:M lenguaje <-> region (una region puede servir a varios lenguajes)
-DEFINE TABLE IF NOT EXISTS lenguaje_region SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS lenguaje ON lenguaje_region TYPE record<lenguaje>;
-DEFINE FIELD IF NOT EXISTS region ON lenguaje_region TYPE record<region>;
-DEFINE INDEX IF NOT EXISTS idx_lenguaje_region ON lenguaje_region FIELDS lenguaje, region UNIQUE;
+-- N:M bridge language <-> region (a region can serve several languages)
+DEFINE TABLE IF NOT EXISTS language_region SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS language ON language_region TYPE record<language>;
+DEFINE FIELD IF NOT EXISTS region ON language_region TYPE record<region>;
+DEFINE INDEX IF NOT EXISTS idx_language_region ON language_region FIELDS language, region UNIQUE;
 
-DEFINE TABLE IF NOT EXISTS canal SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON canal TYPE string ASSERT string::len($value) >= 3 AND string::len($value) <= 50;
-DEFINE INDEX IF NOT EXISTS idx_canal_nombre ON canal FIELDS nombre UNIQUE;
+DEFINE TABLE IF NOT EXISTS channel SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS name ON channel TYPE string ASSERT string::len($value) >= 3 AND string::len($value) <= 50;
+DEFINE INDEX IF NOT EXISTS idx_channel_name ON channel FIELDS name UNIQUE;
 
-DEFINE TABLE IF NOT EXISTS entonacion SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON entonacion TYPE string ASSERT string::len($value) >= 3 AND string::len($value) <= 30;
-DEFINE FIELD IF NOT EXISTS activo ON entonacion TYPE bool DEFAULT true;
-DEFINE INDEX IF NOT EXISTS idx_entonacion_nombre ON entonacion FIELDS nombre UNIQUE;
-
--- ---------------------------------------------------------------------------
--- Usuarios y autenticacion
--- ---------------------------------------------------------------------------
-DEFINE TABLE IF NOT EXISTS usuario SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON usuario TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
-DEFINE FIELD IF NOT EXISTS apellido ON usuario TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
-DEFINE FIELD IF NOT EXISTS correo ON usuario TYPE string ASSERT string::is_email($value);
-DEFINE FIELD IF NOT EXISTS password_hash ON usuario TYPE string;
-DEFINE FIELD IF NOT EXISTS fecha_nacimiento ON usuario TYPE string;
-DEFINE FIELD IF NOT EXISTS rol ON usuario TYPE string DEFAULT 'cliente' ASSERT $value INSIDE ['cliente', 'admin'];
-DEFINE FIELD IF NOT EXISTS consentimiento_datos ON usuario TYPE option<string>;
-DEFINE FIELD IF NOT EXISTS creado ON usuario TYPE string;
-DEFINE INDEX IF NOT EXISTS idx_usuario_correo ON usuario FIELDS correo UNIQUE;
-
--- Tokens de refresco: solo se guarda el hash; se rotan y revocan
-DEFINE TABLE IF NOT EXISTS token_refresco SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS usuario ON token_refresco TYPE record<usuario>;
-DEFINE FIELD IF NOT EXISTS hash ON token_refresco TYPE string;
-DEFINE FIELD IF NOT EXISTS expira ON token_refresco TYPE int;
-DEFINE FIELD IF NOT EXISTS revocado ON token_refresco TYPE bool DEFAULT false;
-DEFINE INDEX IF NOT EXISTS idx_token_refresco_hash ON token_refresco FIELDS hash UNIQUE;
-
--- Sesiones (JWT) revocadas por jti hasta que expiran
-DEFINE TABLE IF NOT EXISTS sesion_revocada SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS jti ON sesion_revocada TYPE string;
-DEFINE FIELD IF NOT EXISTS expira ON sesion_revocada TYPE int;
-DEFINE INDEX IF NOT EXISTS idx_sesion_revocada_jti ON sesion_revocada FIELDS jti UNIQUE;
-
--- Codigos de recuperacion de contrasena (solo hash)
-DEFINE TABLE IF NOT EXISTS recuperacion SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS usuario ON recuperacion TYPE record<usuario>;
-DEFINE FIELD IF NOT EXISTS codigo_hash ON recuperacion TYPE string;
-DEFINE FIELD IF NOT EXISTS expira ON recuperacion TYPE int;
-DEFINE FIELD IF NOT EXISTS usado ON recuperacion TYPE bool DEFAULT false;
+DEFINE TABLE IF NOT EXISTS tone SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS name ON tone TYPE string ASSERT string::len($value) >= 3 AND string::len($value) <= 30;
+DEFINE FIELD IF NOT EXISTS active ON tone TYPE bool DEFAULT true;
+DEFINE INDEX IF NOT EXISTS idx_tone_name ON tone FIELDS name UNIQUE;
 
 -- ---------------------------------------------------------------------------
--- Conversaciones y mensajes
+-- Users and authentication
 -- ---------------------------------------------------------------------------
-DEFINE TABLE IF NOT EXISTS conversacion SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON conversacion TYPE string ASSERT string::len($value) >= 3 AND string::len($value) <= 80;
-DEFINE FIELD IF NOT EXISTS fecha_inicio ON conversacion TYPE string;
-DEFINE FIELD IF NOT EXISTS usuario ON conversacion TYPE record<usuario>;
+DEFINE TABLE IF NOT EXISTS user SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS first_name ON user TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
+DEFINE FIELD IF NOT EXISTS last_name ON user TYPE string ASSERT string::len($value) >= 1 AND string::len($value) <= 50;
+DEFINE FIELD IF NOT EXISTS email ON user TYPE string ASSERT string::is_email($value);
+DEFINE FIELD IF NOT EXISTS password_hash ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS birth_date ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS role ON user TYPE string DEFAULT 'cliente' ASSERT $value INSIDE ['cliente', 'admin'];
+DEFINE FIELD IF NOT EXISTS data_consent ON user TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS created_at ON user TYPE string;
+DEFINE INDEX IF NOT EXISTS idx_user_email ON user FIELDS email UNIQUE;
 
-DEFINE TABLE IF NOT EXISTS lenguaje_por_conversacion SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS nombre ON lenguaje_por_conversacion TYPE string;
-DEFINE FIELD IF NOT EXISTS conversacion ON lenguaje_por_conversacion TYPE record<conversacion>;
-DEFINE FIELD IF NOT EXISTS lenguaje ON lenguaje_por_conversacion TYPE record<lenguaje>;
-DEFINE FIELD IF NOT EXISTS region ON lenguaje_por_conversacion TYPE option<record<region>>;
-DEFINE FIELD IF NOT EXISTS rol ON lenguaje_por_conversacion TYPE string ASSERT $value INSIDE ['origen', 'destino'];
-DEFINE INDEX IF NOT EXISTS idx_lpc_conversacion_lenguaje ON lenguaje_por_conversacion FIELDS conversacion, lenguaje UNIQUE;
+-- Refresh tokens: only the hash is stored; rotated and revoked
+DEFINE TABLE IF NOT EXISTS refresh_token SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS user ON refresh_token TYPE record<user>;
+DEFINE FIELD IF NOT EXISTS hash ON refresh_token TYPE string;
+DEFINE FIELD IF NOT EXISTS expires_at ON refresh_token TYPE int;
+DEFINE FIELD IF NOT EXISTS revoked ON refresh_token TYPE bool DEFAULT false;
+DEFINE INDEX IF NOT EXISTS idx_refresh_token_hash ON refresh_token FIELDS hash UNIQUE;
 
-DEFINE TABLE IF NOT EXISTS mensaje_original SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS lenguaje_conversacion ON mensaje_original TYPE record<lenguaje_por_conversacion>;
-DEFINE FIELD IF NOT EXISTS canal ON mensaje_original TYPE record<canal>;
-DEFINE FIELD IF NOT EXISTS entonacion ON mensaje_original TYPE record<entonacion>;
-DEFINE FIELD IF NOT EXISTS contenido ON mensaje_original TYPE string;
-DEFINE FIELD IF NOT EXISTS remitente ON mensaje_original TYPE string DEFAULT 'usuario' ASSERT $value INSIDE ['usuario', 'interlocutor'];
-DEFINE FIELD IF NOT EXISTS fecha_creacion ON mensaje_original TYPE string;
+-- Revoked JWT sessions (by jti, until they expire)
+DEFINE TABLE IF NOT EXISTS revoked_session SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS jti ON revoked_session TYPE string;
+DEFINE FIELD IF NOT EXISTS expires_at ON revoked_session TYPE int;
+DEFINE INDEX IF NOT EXISTS idx_revoked_session_jti ON revoked_session FIELDS jti UNIQUE;
 
-DEFINE TABLE IF NOT EXISTS mensaje_destino SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS mensaje_original ON mensaje_destino TYPE record<mensaje_original>;
-DEFINE FIELD IF NOT EXISTS lenguaje_conversacion ON mensaje_destino TYPE record<lenguaje_por_conversacion>;
-DEFINE FIELD IF NOT EXISTS contenido_traducido ON mensaje_destino TYPE string;
-DEFINE FIELD IF NOT EXISTS nota_cultural ON mensaje_destino TYPE option<string>;
-DEFINE FIELD IF NOT EXISTS aproximada ON mensaje_destino TYPE bool DEFAULT false;
-DEFINE FIELD IF NOT EXISTS motor ON mensaje_destino TYPE string;
-DEFINE FIELD IF NOT EXISTS estado_entrega ON mensaje_destino TYPE string DEFAULT 'Pendiente' ASSERT $value INSIDE ['Pendiente', 'Enviado', 'Entregado', 'Fallido'];
-DEFINE FIELD IF NOT EXISTS fecha_creacion ON mensaje_destino TYPE string;
-
-DEFINE TABLE IF NOT EXISTS reporte SCHEMAFULL;
-DEFINE FIELD IF NOT EXISTS mensaje_destino ON reporte TYPE record<mensaje_destino>;
-DEFINE FIELD IF NOT EXISTS usuario ON reporte TYPE record<usuario>;
-DEFINE FIELD IF NOT EXISTS motivo ON reporte TYPE string;
-DEFINE FIELD IF NOT EXISTS sugerencia ON reporte TYPE option<string>;
-DEFINE FIELD IF NOT EXISTS estado ON reporte TYPE string DEFAULT 'abierto' ASSERT $value INSIDE ['abierto', 'revisado', 'descartado'];
-DEFINE FIELD IF NOT EXISTS nota_admin ON reporte TYPE option<string>;
-DEFINE FIELD IF NOT EXISTS fecha ON reporte TYPE string;
-DEFINE INDEX IF NOT EXISTS idx_reporte_md_usuario ON reporte FIELDS mensaje_destino, usuario UNIQUE;
+-- Password recovery codes (hash only)
+DEFINE TABLE IF NOT EXISTS password_reset SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS user ON password_reset TYPE record<user>;
+DEFINE FIELD IF NOT EXISTS code_hash ON password_reset TYPE string;
+DEFINE FIELD IF NOT EXISTS expires_at ON password_reset TYPE int;
+DEFINE FIELD IF NOT EXISTS used ON password_reset TYPE bool DEFAULT false;
 
 -- ---------------------------------------------------------------------------
--- Indices de busqueda por enlace (evitan recorrer toda la tabla en las
--- consultas por usuario, conversacion o mensaje)
+-- Conversations and messages
 -- ---------------------------------------------------------------------------
-DEFINE INDEX IF NOT EXISTS idx_lenguaje_region_region ON lenguaje_region FIELDS region;
-DEFINE INDEX IF NOT EXISTS idx_token_refresco_usuario ON token_refresco FIELDS usuario;
-DEFINE INDEX IF NOT EXISTS idx_recuperacion_usuario ON recuperacion FIELDS usuario;
-DEFINE INDEX IF NOT EXISTS idx_conversacion_usuario ON conversacion FIELDS usuario;
-DEFINE INDEX IF NOT EXISTS idx_mensaje_original_lpc ON mensaje_original FIELDS lenguaje_conversacion;
-DEFINE INDEX IF NOT EXISTS idx_mensaje_destino_original ON mensaje_destino FIELDS mensaje_original;
-DEFINE INDEX IF NOT EXISTS idx_mensaje_destino_lpc ON mensaje_destino FIELDS lenguaje_conversacion;
-DEFINE INDEX IF NOT EXISTS idx_reporte_usuario ON reporte FIELDS usuario;
+DEFINE TABLE IF NOT EXISTS conversation SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS name ON conversation TYPE string ASSERT string::len($value) >= 3 AND string::len($value) <= 80;
+DEFINE FIELD IF NOT EXISTS started_at ON conversation TYPE string;
+DEFINE FIELD IF NOT EXISTS user ON conversation TYPE record<user>;
+
+DEFINE TABLE IF NOT EXISTS conversation_language SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS label ON conversation_language TYPE string;
+DEFINE FIELD IF NOT EXISTS conversation ON conversation_language TYPE record<conversation>;
+DEFINE FIELD IF NOT EXISTS language ON conversation_language TYPE record<language>;
+DEFINE FIELD IF NOT EXISTS region ON conversation_language TYPE option<record<region>>;
+DEFINE FIELD IF NOT EXISTS role ON conversation_language TYPE string ASSERT $value INSIDE ['origen', 'destino'];
+DEFINE INDEX IF NOT EXISTS idx_cl_conversation_language ON conversation_language FIELDS conversation, language UNIQUE;
+
+DEFINE TABLE IF NOT EXISTS original_message SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS conversation_language ON original_message TYPE record<conversation_language>;
+DEFINE FIELD IF NOT EXISTS channel ON original_message TYPE record<channel>;
+DEFINE FIELD IF NOT EXISTS tone ON original_message TYPE record<tone>;
+DEFINE FIELD IF NOT EXISTS content ON original_message TYPE string;
+DEFINE FIELD IF NOT EXISTS sender ON original_message TYPE string DEFAULT 'usuario' ASSERT $value INSIDE ['usuario', 'interlocutor'];
+DEFINE FIELD IF NOT EXISTS created_at ON original_message TYPE string;
+
+DEFINE TABLE IF NOT EXISTS translated_message SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS original_message ON translated_message TYPE record<original_message>;
+DEFINE FIELD IF NOT EXISTS conversation_language ON translated_message TYPE record<conversation_language>;
+DEFINE FIELD IF NOT EXISTS translated_content ON translated_message TYPE string;
+DEFINE FIELD IF NOT EXISTS cultural_note ON translated_message TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS approximate ON translated_message TYPE bool DEFAULT false;
+DEFINE FIELD IF NOT EXISTS engine ON translated_message TYPE string;
+DEFINE FIELD IF NOT EXISTS delivery_status ON translated_message TYPE string DEFAULT 'Pendiente' ASSERT $value INSIDE ['Pendiente', 'Enviado', 'Entregado', 'Fallido'];
+DEFINE FIELD IF NOT EXISTS created_at ON translated_message TYPE string;
+
+DEFINE TABLE IF NOT EXISTS report SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS translated_message ON report TYPE record<translated_message>;
+DEFINE FIELD IF NOT EXISTS user ON report TYPE record<user>;
+DEFINE FIELD IF NOT EXISTS reason ON report TYPE string;
+DEFINE FIELD IF NOT EXISTS suggestion ON report TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS status ON report TYPE string DEFAULT 'abierto' ASSERT $value INSIDE ['abierto', 'revisado', 'descartado'];
+DEFINE FIELD IF NOT EXISTS admin_note ON report TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS created_at ON report TYPE string;
+DEFINE INDEX IF NOT EXISTS idx_report_tm_user ON report FIELDS translated_message, user UNIQUE;
+
+-- ---------------------------------------------------------------------------
+-- Link lookup indexes (avoid full-table scans on per-user/conversation/message
+-- queries)
+-- ---------------------------------------------------------------------------
+DEFINE INDEX IF NOT EXISTS idx_language_region_region ON language_region FIELDS region;
+DEFINE INDEX IF NOT EXISTS idx_refresh_token_user ON refresh_token FIELDS user;
+DEFINE INDEX IF NOT EXISTS idx_password_reset_user ON password_reset FIELDS user;
+DEFINE INDEX IF NOT EXISTS idx_conversation_user ON conversation FIELDS user;
+DEFINE INDEX IF NOT EXISTS idx_original_message_cl ON original_message FIELDS conversation_language;
+DEFINE INDEX IF NOT EXISTS idx_translated_message_original ON translated_message FIELDS original_message;
+DEFINE INDEX IF NOT EXISTS idx_translated_message_cl ON translated_message FIELDS conversation_language;
+DEFINE INDEX IF NOT EXISTS idx_report_user ON report FIELDS user;
 
 -- =============================================================================
--- Fin del esquema operativo TalkLate (SurrealDB)
+-- End of TalkLate operational schema (SurrealDB)
 -- =============================================================================

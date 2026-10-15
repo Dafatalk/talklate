@@ -32,26 +32,27 @@ negocio no cambiaron: solo se movió el acceso a datos detrás del repositorio.
 | Variable | Default | Descripción |
 |---|---|---|
 | `DB_DRIVER` | `surreal` | `surreal` (fuente de verdad) o `sqlite` (tests/offline) |
-| `SURREAL_URL` | `http://127.0.0.1:8000` | Endpoint HTTP de SurrealDB |
+| `SURREAL_URL` | instancia **remota** (SurrealDB Cloud) | Endpoint HTTP; acepta tambien `wss://host/rpc` y lo normaliza a `/sql`. Nunca apunta a local por defecto |
 | `SURREAL_NS` | `talklate` | Namespace |
 | `SURREAL_DB` | `app` | Base de datos |
-| `SURREAL_USER` / `SURREAL_PASS` | `root` / `root` | Credenciales. En produccion (`NODE_ENV=production`) son obligatorias y no se acepta `root/root` |
+| `SURREAL_USER` / `SURREAL_PASS` | — | Credenciales del usuario de BD (requeridas para el remoto). En produccion (`NODE_ENV=production`) no se acepta `root/root` |
 | `SURREAL_TIMEOUT_MS` | `15000` | Timeout por consulta |
 
-## Levantar en local
+## Levantar (siempre contra el remoto)
+
+El backend apunta por defecto a la instancia **remota** de SurrealDB Cloud; no se usa
+ninguna instancia local. La configuración (URL, credenciales, claves) vive en
+`backend/.env` (gitignoreado); `npm run dev` / `npm start` la cargan solas
+(`--env-file-if-exists=.env`).
 
 ```bash
-# 1. Instancia SurrealDB persistente (desde la raíz del repo)
-surreal start --user root --pass root surrealkv://.surrealdb/talklate.db
-
-# 2. Dependencias del backend
 cd backend && npm install
-
-# 3. Backend apuntando a SurrealDB (aplica esquema + semilla al arrancar)
-DB_DRIVER=surreal JWT_SECRET=dev TALKLATE_CLAVE_CIFRADO=dev npm run dev
+npm run dev   # lee backend/.env y conecta al Cloud (aplica esquema + semilla al arrancar)
 ```
 
-`GET /health` incluye el estado de la conexión a SurrealDB (`db.ok`).
+`backend/.env` debe traer al menos `SURREAL_USER` y `SURREAL_PASS` (usuario de BD con
+rol suficiente), más `JWT_SECRET` y `TALKLATE_CLAVE_CIFRADO`. `GET /health` incluye el
+estado de la conexión a SurrealDB (`db.ok`).
 
 ## Verificación
 
@@ -73,11 +74,13 @@ CI corre las dos: `backend` (SQLite) y `backend-surreal` (levanta SurrealDB 3.0.
 
 ## Notas
 
-- El esquema operativo refleja el dominio del backend (nombres en español,
-  record links). El esquema en inglés de `seguimiento/follow-up/modelo_dominio/`
-  queda como modelo de dominio de referencia.
+- **Idioma:** las tablas y campos del esquema están en **inglés** (`user`, `country`,
+  `original_message`, …); el API/dominio siguen en español y el adaptador
+  (`src/repos/surreal.js`) traduce EN↔ES en cada operación. Los **valores de enum** se
+  mantienen en español (origen/destino, usuario/interlocutor, Pendiente…, abierto…)
+  porque la lógica de negocio y el API los usan tal cual.
 - `ns/db` se crean solos al conectar (`DEFINE NAMESPACE/DATABASE IF NOT EXISTS`).
-- El store `.surrealdb/` está en `.gitignore` (datos locales, no se versiona).
+- **No se usa SurrealDB local**: el default de `SURREAL_URL` es la instancia remota.
 - Conexion: se entra una vez con `/signin` y se reutiliza el token (Bearer). Mandar
   usuario y clave en cada consulta hacia que SurrealDB verificara la clave cada vez
   (unos 35 ms por consulta). Si el token vence, se entra de nuevo solo.

@@ -7,8 +7,8 @@
     "node": ">=22.5"
   },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
     "test": "node --test test/*.test.js",
     "test:surreal": "TEST_DB_DRIVER=surreal node --test test/api.test.js",
     "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=80 --test-coverage-functions=80 test/*.test.js",
