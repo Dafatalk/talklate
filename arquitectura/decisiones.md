@@ -14,10 +14,10 @@
 | ADR-006 | Autenticacion con JWT de acceso corto y token de refresco rotativo | Token-Based Authentication (5.1) | aceptada |
 | ADR-007 | Interfaz basada en el template Luna | - | aceptada |
 | ADR-008 | Ajustes al modelo de dominio al implementarlo | - | aceptada, **validar con el mentor** |
-| ADR-009 | Identificadores del dominio en espanol (lenguaje ubicuo) | - | aceptada |
+| ADR-009 | Identificadores del dominio en espanol (lenguaje ubicuo) | - | aceptada (excepcion: esquema de SurrealDB en ingles, ver ADR-012) |
 | ADR-010 | Proteccion de datos personales | Structured Logging (6.1) | aceptada |
 | ADR-011 | API v1 segun la convencion REST y documentada con OpenAPI | Request-Reply (2.3) | aceptada |
-| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio | Repository | aceptada, **validar con el mentor** |
+| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio (esquema en ingles, instancia remota) | Repository | aceptada, **validar con el mentor** |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
 
@@ -176,6 +176,7 @@ Usar en el codigo los mismos nombres del modelo de dominio, en espanol (lenguaje
 
 ### Consecuencias
 Trazabilidad directa: una regla como Conversacion-RN-2 se encuentra en el codigo con el mismo nombre. Mezcla de idiomas en el codigo (dominio en espanol, framework en ingles).
+Excepcion (2026-10-15): el esquema de SurrealDB usa nombres en ingles para alinearse con el modelo de dominio en ingles; la traduccion de nombres queda encerrada en el adaptador (ver ADR-012).
 
 ## ADR-010: Proteccion de datos personales
 
@@ -231,10 +232,14 @@ ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasa
 - **SDK oficial de SurrealDB:** mas comodo, pero agrega una dependencia; el endpoint HTTP basta para estas consultas.
 
 ### Consecuencias
-- Hay que levantar un servidor SurrealDB 3.x para usar la app (`backend/README-surreal.md`). Con la 2.x el esquema no carga; el backend lo revisa al arrancar.
+- Hace falta un servidor SurrealDB 3.x: el remoto para usar la app, o uno local para las pruebas (`backend/README-surreal.md`). Con la 2.x el esquema no carga; el backend lo revisa al arrancar.
 - Mandar usuario y clave en cada consulta costaba unos 35 ms por consulta (unos 420 ms por mensaje); con el token de sesion bajo a unos 28 ms por mensaje. Sigue por encima de SQLite (unos 7 ms), pero muy lejos del limite de 3 s de DRV-01.
 - La renovacion de la sesion revoca el token de refresco en un solo paso (`tokens.consumir`), porque con un servidor dos pedidos pueden llegar al mismo tiempo.
 - CI corre la suite de la API contra los dos motores (job `backend-surreal`).
 - En produccion son obligatorias `SURREAL_USER` y `SURREAL_PASS` (no se acepta root/root).
 - Pendiente: algunas consultas filtran recorriendo enlaces (por ejemplo mensajes de una conversacion) y no aprovechan indices; con muchos datos hay que revisarlas.
+
+### Ajuste del 2026-10-15 (PR #30)
+- **Esquema en ingles:** las tablas y campos de SurrealDB estan en ingles (`user`, `conversation`, `original_message`, `translated_message`...), alineados con el modelo de dominio en ingles de `seguimiento/follow-up/modelo_dominio/`. Es una excepcion a ADR-009 solo para la base: la API, el codigo y los valores de los enumerados (`origen`/`destino`, `abierto`...) siguen en espanol, y el adaptador (`src/repos/surreal.js`) traduce los nombres en cada consulta.
+- **Instancia remota:** la app usa por defecto una instancia de SurrealDB Cloud; las credenciales van en `backend/.env` (fuera del repo). Las pruebas y CI usan un SurrealDB local para no crear ni borrar datos en el remoto.
 

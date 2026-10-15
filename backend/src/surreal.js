@@ -1,11 +1,11 @@
 // Conexion a SurrealDB por HTTP (endpoint /sql). Sin dependencias nuevas: usa el
 // fetch global de Node 22. SurrealDB es la fuente de verdad del backend.
 //
-// Config por entorno (ver .env.example):
-//   SURREAL_URL   (default http://127.0.0.1:8000)
+// Config por entorno (ver .env / .env.example):
+//   SURREAL_URL   (default: la instancia REMOTA de SurrealDB Cloud; nunca local)
 //   SURREAL_NS    (default talklate)
 //   SURREAL_DB    (default app)
-//   SURREAL_USER / SURREAL_PASS (default root / root; en produccion son obligatorias)
+//   SURREAL_USER / SURREAL_PASS (credenciales; obligatorias, no hay fallback local)
 //
 // Requiere SurrealDB 3.x (el esquema usa funciones de la v3, p. ej. string::is_email).
 // Se entra una sola vez con /signin y se reutiliza el token (Bearer): mandar usuario y
@@ -15,12 +15,27 @@
 // evitar inyeccion y los limites del paso de variables por query-string.
 const log = require('./lib/log');
 
+// El backend trabaja SIEMPRE contra la instancia remota (SurrealDB Cloud). No se usa
+// ninguna instancia local. Se puede sobreescribir con SURREAL_URL si hiciera falta.
+const URL_REMOTA = 'https://talklate-06gheqc0f1ov791h9h9udu6t9c.aws-use1.surreal.cloud';
+
+// Acepta tanto el endpoint HTTP (https://host) como el WebSocket de Cloud
+// (wss://host/rpc): se normaliza al endpoint HTTP /sql.
+function normalizarUrl(valor) {
+  return String(valor || URL_REMOTA)
+    .trim()
+    .replace(/^wss:\/\//i, 'https://')
+    .replace(/^ws:\/\//i, 'http://')
+    .replace(/\/rpc\/?$/i, '')
+    .replace(/\/+$/, '');
+}
+
 function config() {
   if (process.env.NODE_ENV === 'production' && (!process.env.SURREAL_USER || !process.env.SURREAL_PASS || process.env.SURREAL_PASS === 'root')) {
     throw new Error('En produccion define SURREAL_USER y SURREAL_PASS (no uses root/root).');
   }
   return {
-    url: (process.env.SURREAL_URL || 'http://127.0.0.1:8000').replace(/\/+$/, ''),
+    url: normalizarUrl(process.env.SURREAL_URL),
     ns: process.env.SURREAL_NS || 'talklate',
     db: process.env.SURREAL_DB || 'app',
     usuario: process.env.SURREAL_USER || 'root',
