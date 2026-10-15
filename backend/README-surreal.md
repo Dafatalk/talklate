@@ -63,7 +63,10 @@ node scripts/verificar-surreal.js
 # Flujo HTTP completo contra un backend corriendo (DB_DRIVER=surreal)
 BASE=http://127.0.0.1:3100 node scripts/smoke-http.js
 
-# La suite de la API completa contra SurrealDB (namespace nuevo en cada corrida)
+# La suite de la API completa contra SurrealDB (namespace nuevo en cada corrida).
+# Usa un SurrealDB local (http://127.0.0.1:8000) salvo que se pase SURREAL_URL:
+# las pruebas crean y borran datos, asi que no deben correr contra el remoto.
+surreal start --user root --pass root memory &
 npm run test:surreal
 
 # Suite offline (usa el driver SQLite)

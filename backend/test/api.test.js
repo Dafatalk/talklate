@@ -12,6 +12,8 @@ const { crearApp } = require('../src/app');
 const DRIVER = (process.env.TEST_DB_DRIVER || 'sqlite').toLowerCase();
 function crearRepo() {
   if (DRIVER === 'surreal') {
+    // Las pruebas crean y borran datos: sin SURREAL_URL explicita usan un SurrealDB local, no el remoto
+    process.env.SURREAL_URL = process.env.SURREAL_URL || 'http://127.0.0.1:8000';
     process.env.SURREAL_NS = process.env.SURREAL_NS || `prueba_${Date.now()}`;
     return require('../src/repos/surreal')();
   }

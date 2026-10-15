@@ -28,7 +28,7 @@
 - [ ] Motor: Qwen local primero, Claude Sonnet de respaldo y reglas al final (Circuit Breaker). Que modelo Qwen usar.
 - [ ] Drivers: medir con Qwen antes de la sustentacion (`npm run medir`).
 - [ ] Diagramas C4 de contexto y contenedores.
-- [ ] ADR-012: SurrealDB como fuente de verdad (reemplaza a SQLite); SQLite queda solo para pruebas.
+- [ ] ADR-012: SurrealDB como fuente de verdad (reemplaza a SQLite), con esquema en ingles e instancia remota en SurrealDB Cloud; SQLite queda solo para pruebas.
 
 ## 5. Alcance
 - [ ] "Tiempo real" = por turno, y acento reconocido por vocabulario (no por sonido) en el MVP.
