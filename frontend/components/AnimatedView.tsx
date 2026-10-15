@@ -1,6 +1,6 @@
 import React, { useEffect, memo, useRef, useState } from 'react';
 import { Animated, ViewStyle, StyleProp, EasingFunction, Easing, View, LayoutChangeEvent, Dimensions, InteractionManager } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from 'expo-router';
 
 export type AnimationType =
     | 'fadeIn'
@@ -89,7 +89,7 @@ function AnimatedViewComponent({
     // Important: initial state is false if triggerOnVisible is true, otherwise we animate immediately
     const [isVisible, setIsVisible] = useState(false);
     const { height: windowHeight } = Dimensions.get('window');
-    const measureInterval = useRef<NodeJS.Timeout | null>(null);
+    const measureInterval = useRef<ReturnType<typeof setInterval> | null>(null);
     const isFirstRender = useRef(true);
     // Track the last animation type to detect changes
     const lastAnimationType = useRef<AnimationType>(animation);

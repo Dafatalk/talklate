@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useCallback } from 'react';
-import { DrawerActions } from '@react-navigation/native';
 import { useNavigation } from 'expo-router';
+
+// As of Expo SDK 56, expo-router no longer uses react-navigation; its bundled
+// drawer router handles these plain navigation actions (equivalent to the old
+// DrawerActions.openDrawer()/closeDrawer()/toggleDrawer()).
+const OPEN_DRAWER = { type: 'OPEN_DRAWER' } as const;
+const CLOSE_DRAWER = { type: 'CLOSE_DRAWER' } as const;
+const TOGGLE_DRAWER = { type: 'TOGGLE_DRAWER' } as const;
 
 interface DrawerContextType {
   openDrawer: () => void;
@@ -14,15 +20,15 @@ export function DrawerProvider({ children }: { children: React.ReactNode }) {
   const navigation = useNavigation();
 
   const openDrawer = useCallback(() => {
-    navigation.dispatch(DrawerActions.openDrawer());
+    navigation.dispatch(OPEN_DRAWER);
   }, [navigation]);
 
   const closeDrawer = useCallback(() => {
-    navigation.dispatch(DrawerActions.closeDrawer());
+    navigation.dispatch(CLOSE_DRAWER);
   }, [navigation]);
 
   const toggleDrawer = useCallback(() => {
-    navigation.dispatch(DrawerActions.toggleDrawer());
+    navigation.dispatch(TOGGLE_DRAWER);
   }, [navigation]);
 
   return (
