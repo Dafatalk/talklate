@@ -25,7 +25,7 @@ function crearApp(repo, opciones = {}) {
   app.get('/health', async (_req, res) => {
     let db = { ok: true };
     if (opciones.saludDb) {
-      try { db = await opciones.saludDb(); } catch (e) { db = { ok: false, error: e.message }; }
+      try { db = await opciones.saludDb(); } catch (e) { log.error('salud_db_fallida', { detalle: e.message }); db = { ok: false }; }
     }
     res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: traductor.cadena(), db });
   });

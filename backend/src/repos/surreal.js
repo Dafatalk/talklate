@@ -162,8 +162,16 @@ const tokens = {
     const f = await S.fila(`SELECT *, meta::id(usuario) AS usuario_id FROM token_refresco WHERE hash = ${lit(hash)} LIMIT 1;`);
     return planoId(f);
   },
-  async revocarId(id) {
-    await S.consulta(`UPDATE ${lit(rid('token_refresco', id))} SET revocado = true;`);
+  // Revoca y devuelve el token en un solo paso: si dos pedidos usan el mismo token, solo uno lo obtiene.
+  // Un conflicto de transaccion significa que otro pedido lo consumio primero.
+  async consumir(hash, ahora) {
+    try {
+      const f = await S.fila(`UPDATE token_refresco SET revocado = true WHERE hash = ${lit(hash)} AND revocado = false AND expira >= ${lit(ahora)} RETURN BEFORE;`);
+      return f ? { ...planoId(f), usuario_id: idPlano(f.usuario) } : null;
+    } catch (e) {
+      if (/conflict|retry/i.test(e.message)) return null;
+      throw e;
+    }
   },
   async revocarHash(hash) {
     await S.consulta(`UPDATE token_refresco SET revocado = true WHERE hash = ${lit(hash)};`);

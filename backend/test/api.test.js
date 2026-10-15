@@ -5,15 +5,26 @@ process.env.TALKLATE_LOGS = 'silencio';
 process.env.LIMITE_MENSAJES_POR_MINUTO = '1000';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { abrir } = require('../src/db');
-const crearRepoSqlite = require('../src/repos/sqlite');
 const { crearApp } = require('../src/app');
 
+// TEST_DB_DRIVER=surreal corre la misma suite contra un SurrealDB real (ver npm run test:surreal);
+// por defecto usa SQLite en memoria. Cada corrida en SurrealDB usa un namespace nuevo.
+const DRIVER = (process.env.TEST_DB_DRIVER || 'sqlite').toLowerCase();
+function crearRepo() {
+  if (DRIVER === 'surreal') {
+    process.env.SURREAL_NS = process.env.SURREAL_NS || `prueba_${Date.now()}`;
+    return require('../src/repos/surreal')();
+  }
+  const { abrir } = require('../src/db');
+  return require('../src/repos/sqlite')(abrir(':memory:'));
+}
+
 const ADMIN = { correo: 'dafa123.daf@gmail.com', password: 'Admin123!' };
-let servidor, raiz, base, db;
+let servidor, raiz, base, repo;
 test.before(async () => {
-  db = abrir(':memory:');
-  servidor = crearApp(crearRepoSqlite(db)).listen(0);
+  repo = crearRepo();
+  await repo.inicializar();
+  servidor = crearApp(repo).listen(0);
   await new Promise((r) => servidor.once('listening', r));
   raiz = `http://127.0.0.1:${servidor.address().port}`;
   base = `${raiz}/api/v1`;
@@ -65,7 +76,7 @@ test('registro: validaciones, consentimiento y edad (Usuario-RN-1 a RN-4, Ley 15
   assert.equal(ok.estado, 201);
   assert.equal(ok.cabeceras.get('location'), '/api/v1/usuarios/yo');
   assert.ok(ok.datos.token && ok.datos.token_refresco);
-  assert.equal(db.prepare('SELECT consentimiento_datos FROM usuario WHERE correo = ?').get(usuarioBase.correo).consentimiento_datos.length > 0, true);
+  assert.equal((await repo.usuarios.porCorreo(usuarioBase.correo)).consentimiento_datos.length > 0, true);
   assert.equal((await api('POST', '/auth/registro', usuarioBase)).estado, 409);
 });
 
@@ -79,6 +90,10 @@ test('login, usuario autenticado y token de refresco que se rota', async () => {
   assert.equal(nuevo.estado, 200);
   assert.notEqual(nuevo.datos.token_refresco, ok.datos.token_refresco);
   assert.equal((await api('POST', '/auth/refrescar', { token_refresco: ok.datos.token_refresco })).estado, 401); // el usado ya no sirve
+  // Dos pedidos al mismo tiempo con el mismo token: solo uno obtiene sesion nueva
+  const otra = await api('POST', '/auth/login', { correo: usuarioBase.correo, password: usuarioBase.password });
+  const dobles = await Promise.all([1, 2].map(() => api('POST', '/auth/refrescar', { token_refresco: otra.datos.token_refresco })));
+  assert.deepEqual(dobles.map((d) => d.estado).sort(), [200, 401]);
   token = nuevo.datos.token;
   refresco = nuevo.datos.token_refresco;
 });
@@ -136,7 +151,7 @@ test('mensaje por voz: reconoce el idioma, adapta el modismo, entrega por el mis
   assert.equal(r.datos.mensaje.tono, 'Preocupado');
   assert.equal(r.datos.entrega.reproducir_audio, true);
   assert.equal(r.datos.configuracion.origen.codigo, 'es'); // Conversacion-RN-2
-  const crudo = db.prepare('SELECT contenido FROM mensaje_original WHERE id = ?').get(r.datos.mensaje.id).contenido;
+  const crudo = (await repo.mensajes.deConversacion(conversacion.id)).find((m) => m.id === r.datos.mensaje.id).contenido;
   assert.match(crudo, /^enc:v1:/);
   assert.ok(!crudo.includes('pilas'));
   const uno = await api('GET', `/conversaciones/${conversacion.id}/mensajes/${r.datos.mensaje.id}`, null, token);
@@ -233,8 +248,8 @@ test('eliminar mi cuenta borra todos mis datos (derecho al olvido)', async () =>
   await api('POST', `/conversaciones/${c.datos.id}/mensajes`, { contenido: 'Hola amigo' }, s.datos.token);
   assert.equal((await api('DELETE', '/usuarios/yo', { password: 'mala' }, s.datos.token)).estado, 401);
   assert.equal((await api('DELETE', '/usuarios/yo', { password: 'Nueva123!' }, s.datos.token)).estado, 204);
-  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM usuario WHERE correo = ?').get(usuarioBase.correo).n, 0);
-  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM conversacion WHERE id = ?').get(c.datos.id).n, 0);
+  assert.equal(await repo.usuarios.porCorreo(usuarioBase.correo), null);
+  assert.equal(await repo.conversaciones.porId(c.datos.id), null);
   assert.equal((await api('POST', '/auth/login', { correo: usuarioBase.correo, password: 'Nueva123!' })).estado, 401);
   const admin = await api('POST', '/auth/login', ADMIN);
   assert.equal((await api('DELETE', '/usuarios/yo', { password: ADMIN.password }, admin.datos.token)).estado, 409); // unico admin

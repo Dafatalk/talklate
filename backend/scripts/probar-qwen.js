@@ -1,7 +1,7 @@
 // Prueba el motor de traduccion Qwen (Ollama) de forma aislada, sin HTTP ni DB.
-// Uso: QWEN_MODEL=qwen3:30b-a3b node scripts/probar-qwen.js
+// Uso: node scripts/probar-qwen.js  (otro modelo: QWEN_MODEL=qwen3:30b-a3b node scripts/probar-qwen.js)
 process.env.TRADUCTOR = 'qwen';
-process.env.QWEN_MODEL = process.env.QWEN_MODEL || 'qwen3:30b-a3b';
+process.env.QWEN_MODEL = process.env.QWEN_MODEL || 'qwen2.5:7b'; // el mismo modelo por defecto del backend
 process.env.QWEN_TIMEOUT_MS = process.env.QWEN_TIMEOUT_MS || '180000';
 process.env.TALKLATE_LOGS = process.env.TALKLATE_LOGS || 'silencio';
 

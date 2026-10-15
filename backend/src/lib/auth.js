@@ -26,11 +26,11 @@ async function emitirSesion(repo, usuario) {
   return { token: firmarAcceso(usuario), token_refresco: refresco, expira_en: DURACION_ACCESO_SEG };
 }
 
-// Rota el token de refresco: el usado queda revocado y se entrega uno nuevo
+// Rota el token de refresco: el usado queda revocado y se entrega uno nuevo.
+// consumir() revoca y lee en un solo paso, asi un mismo token no sirve para dos sesiones.
 async function refrescarSesion(repo, refresco) {
-  const fila = typeof refresco === 'string' ? await repo.tokens.porHash(hash(refresco)) : null;
-  if (!fila || fila.revocado || fila.expira < Date.now()) throw noAutorizado('La sesion ya ha expirado. Inicia sesion de nuevo.');
-  await repo.tokens.revocarId(fila.id);
+  const fila = typeof refresco === 'string' ? await repo.tokens.consumir(hash(refresco), Date.now()) : null;
+  if (!fila) throw noAutorizado('La sesion ya ha expirado. Inicia sesion de nuevo.');
   const usuario = await repo.usuarios.porId(fila.usuario_id);
   if (!usuario) throw noAutorizado('La sesion ya ha expirado. Inicia sesion de nuevo.');
   return { usuario, sesion: await emitirSesion(repo, usuario) };

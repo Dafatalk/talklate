@@ -59,6 +59,9 @@ async function main() {
   await paso('tokens / sesiones / recuperaciones', async () => {
     await repo.tokens.crear({ id: randomUUID(), usuario_id: uid, hash: hashTok, expira: Date.now() + 100000 });
     assert.equal((await repo.tokens.porHash(hashTok)).usuario_id, uid);
+    const consumos = await Promise.all([repo.tokens.consumir(hashTok, Date.now()), repo.tokens.consumir(hashTok, Date.now())]);
+    assert.equal(consumos.filter(Boolean).length, 1); // un token de refresco solo se usa una vez
+    assert.equal(consumos.find(Boolean).usuario_id, uid);
     await repo.tokens.revocarHash(hashTok);
     assert.equal((await repo.tokens.porHash(hashTok)).revocado, true);
     const jti = 'jti-' + randomUUID();

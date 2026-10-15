@@ -124,6 +124,19 @@ DEFINE FIELD IF NOT EXISTS nota_admin ON reporte TYPE option<string>;
 DEFINE FIELD IF NOT EXISTS fecha ON reporte TYPE string;
 DEFINE INDEX IF NOT EXISTS idx_reporte_md_usuario ON reporte FIELDS mensaje_destino, usuario UNIQUE;
 
+-- ---------------------------------------------------------------------------
+-- Indices de busqueda por enlace (evitan recorrer toda la tabla en las
+-- consultas por usuario, conversacion o mensaje)
+-- ---------------------------------------------------------------------------
+DEFINE INDEX IF NOT EXISTS idx_lenguaje_region_region ON lenguaje_region FIELDS region;
+DEFINE INDEX IF NOT EXISTS idx_token_refresco_usuario ON token_refresco FIELDS usuario;
+DEFINE INDEX IF NOT EXISTS idx_recuperacion_usuario ON recuperacion FIELDS usuario;
+DEFINE INDEX IF NOT EXISTS idx_conversacion_usuario ON conversacion FIELDS usuario;
+DEFINE INDEX IF NOT EXISTS idx_mensaje_original_lpc ON mensaje_original FIELDS lenguaje_conversacion;
+DEFINE INDEX IF NOT EXISTS idx_mensaje_destino_original ON mensaje_destino FIELDS mensaje_original;
+DEFINE INDEX IF NOT EXISTS idx_mensaje_destino_lpc ON mensaje_destino FIELDS lenguaje_conversacion;
+DEFINE INDEX IF NOT EXISTS idx_reporte_usuario ON reporte FIELDS usuario;
+
 -- =============================================================================
 -- Fin del esquema operativo TalkLate (SurrealDB)
 -- =============================================================================

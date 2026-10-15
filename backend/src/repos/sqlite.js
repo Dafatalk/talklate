@@ -36,7 +36,10 @@ module.exports = function crearRepoSqlite(db) {
   const tokens = {
     async crear({ id, usuario_id, hash, expira }) { corre('INSERT INTO token_refresco (id, usuario_id, hash, expira, revocado) VALUES (?,?,?,?,0)', id, usuario_id, hash, expira); },
     async porHash(hash) { return uno('SELECT * FROM token_refresco WHERE hash = ?', hash) || null; },
-    async revocarId(id) { corre('UPDATE token_refresco SET revocado = 1 WHERE id = ?', id); },
+    // Revoca y devuelve el token en un solo paso: si dos pedidos usan el mismo token, solo uno lo obtiene
+    async consumir(hash, ahora) {
+      return uno('UPDATE token_refresco SET revocado = 1 WHERE hash = ? AND revocado = 0 AND expira >= ? RETURNING *', hash, ahora) || null;
+    },
     async revocarHash(hash) { corre('UPDATE token_refresco SET revocado = 1 WHERE hash = ?', hash); },
     async revocarDeUsuario(usuario_id) { corre('UPDATE token_refresco SET revocado = 1 WHERE usuario_id = ?', usuario_id); },
   };

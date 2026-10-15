@@ -5,13 +5,20 @@
 //   SURREAL_URL   (default http://127.0.0.1:8000)
 //   SURREAL_NS    (default talklate)
 //   SURREAL_DB    (default app)
-//   SURREAL_USER / SURREAL_PASS (default root / root)
+//   SURREAL_USER / SURREAL_PASS (default root / root; en produccion son obligatorias)
+//
+// Requiere SurrealDB 3.x (el esquema usa funciones de la v3, p. ej. string::is_email).
+// Se entra una sola vez con /signin y se reutiliza el token (Bearer): mandar usuario y
+// clave en cada consulta obliga a SurrealDB a verificar la clave cada vez (~35 ms extra).
 //
 // Las sentencias se arman inlineando literales ya serializados (lit/rid) para
 // evitar inyeccion y los limites del paso de variables por query-string.
 const log = require('./lib/log');
 
 function config() {
+  if (process.env.NODE_ENV === 'production' && (!process.env.SURREAL_USER || !process.env.SURREAL_PASS || process.env.SURREAL_PASS === 'root')) {
+    throw new Error('En produccion define SURREAL_USER y SURREAL_PASS (no uses root/root).');
+  }
   return {
     url: (process.env.SURREAL_URL || 'http://127.0.0.1:8000').replace(/\/+$/, ''),
     ns: process.env.SURREAL_NS || 'talklate',
@@ -22,11 +29,45 @@ function config() {
   };
 }
 
-function cabeceras(c, nivel) {
+// Token de sesion de SurrealDB compartido por todas las consultas
+let sesion = null; // { token, vence }
+let entrando = null;
+const DURACION_TOKEN_MS = 50 * 60 * 1000; // SurrealDB emite tokens de 1 hora; se renueva antes
+
+async function entrar(c, fetchFn) {
+  let resp;
+  try {
+    resp = await fetchFn(`${c.url}/signin`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: c.usuario, pass: c.password }),
+      signal: AbortSignal.timeout(c.timeoutMs),
+    });
+  } catch (e) {
+    throw new Error(`No se pudo conectar a SurrealDB en ${c.url}: ${e.message}`);
+  }
+  if (!resp.ok) throw new Error(`SurrealDB rechazo las credenciales (${resp.status})`);
+  const { token } = await resp.json();
+  if (!token) throw new Error('SurrealDB no devolvio un token de sesion');
+  sesion = { token, vence: Date.now() + DURACION_TOKEN_MS };
+  return token;
+}
+
+async function token(c, fetchFn, renovar = false) {
+  if (!renovar && sesion && sesion.vence > Date.now()) return sesion.token;
+  if (!entrando) entrando = entrar(c, fetchFn).finally(() => { entrando = null; });
+  return entrando;
+}
+
+function olvidarSesion() {
+  sesion = null;
+}
+
+function cabeceras(c, nivel, tk) {
   const h = {
     Accept: 'application/json',
     'Content-Type': 'text/plain',
-    Authorization: 'Basic ' + Buffer.from(`${c.usuario}:${c.password}`).toString('base64'),
+    Authorization: `Bearer ${tk}`,
   };
   if (nivel === 'ns' || nivel === 'db') h['surreal-ns'] = c.ns;
   if (nivel === 'db') h['surreal-db'] = c.db;
@@ -64,17 +105,21 @@ function idPlano(thing) {
 
 async function crudo(surql, { nivel = 'db', fetchFn = fetch } = {}) {
   const c = config();
-  let resp;
-  try {
-    resp = await fetchFn(`${c.url}/sql`, {
-      method: 'POST',
-      headers: cabeceras(c, nivel),
-      body: surql,
-      signal: AbortSignal.timeout(c.timeoutMs),
-    });
-  } catch (e) {
-    throw new Error(`No se pudo conectar a SurrealDB en ${c.url}: ${e.message}`);
-  }
+  const enviar = async (tk) => {
+    try {
+      return await fetchFn(`${c.url}/sql`, {
+        method: 'POST',
+        headers: cabeceras(c, nivel, tk),
+        body: surql,
+        signal: AbortSignal.timeout(c.timeoutMs),
+      });
+    } catch (e) {
+      throw new Error(`No se pudo conectar a SurrealDB en ${c.url}: ${e.message}`);
+    }
+  };
+  let resp = await enviar(await token(c, fetchFn));
+  // Token vencido o invalidado (p. ej. SurrealDB se reinicio): se entra de nuevo una vez
+  if (resp.status === 401 || resp.status === 403) resp = await enviar(await token(c, fetchFn, true));
   if (!resp.ok) throw new Error(`SurrealDB respondio ${resp.status}: ${(await resp.text()).slice(0, 300)}`);
   const cuerpo = await resp.json();
   if (!Array.isArray(cuerpo)) throw new Error(`Respuesta inesperada de SurrealDB: ${JSON.stringify(cuerpo).slice(0, 300)}`);
@@ -106,6 +151,7 @@ async function fila(surql, opciones) {
 // Asegura namespace/base (modo estricto) y verifica conectividad + credenciales.
 async function conectar() {
   const c = config();
+  await verificarVersion(c);
   await consulta(`DEFINE NAMESPACE IF NOT EXISTS ${ident(c.ns)};`, { nivel: 'root' });
   await consulta(`DEFINE DATABASE IF NOT EXISTS ${ident(c.db)};`, { nivel: 'ns' });
   await consulta('RETURN 1;');
@@ -113,15 +159,28 @@ async function conectar() {
   return { url: c.url, ns: c.ns, db: c.db };
 }
 
-// Estado para /health (no lanza; informa ok:false con el detalle).
+// El esquema usa funciones de SurrealDB 3 (string::is_email); con la 2.x falla al arrancar
+async function verificarVersion(c) {
+  let texto = '';
+  try {
+    const r = await fetch(`${c.url}/version`, { signal: AbortSignal.timeout(c.timeoutMs) });
+    texto = (await r.text()).trim();
+  } catch (e) {
+    throw new Error(`No se pudo conectar a SurrealDB en ${c.url}: ${e.message}`);
+  }
+  const mayor = Number((texto.match(/(\d+)\./) || [])[1]);
+  if (mayor && mayor < 3) throw new Error(`TalkLate requiere SurrealDB 3.x y el servidor es ${texto}`);
+}
+
+// Estado para /health (no lanza). /health es publico: el detalle del error va al log, no a la respuesta.
 async function estado() {
-  const c = config();
   try {
     await consulta('RETURN 1;');
-    return { ok: true, url: c.url, ns: c.ns, db: c.db };
+    return { ok: true, motor: 'surrealdb' };
   } catch (e) {
-    return { ok: false, url: c.url, ns: c.ns, db: c.db, error: e.message };
+    log.error('surreal_no_disponible', { detalle: e.message });
+    return { ok: false, motor: 'surrealdb' };
   }
 }
 
-module.exports = { config, consulta, filas, fila, conectar, estado, lit, rid, ident, idPlano };
+module.exports = { config, olvidarSesion, consulta, filas, fila, conectar, estado, lit, rid, ident, idPlano };
