@@ -126,11 +126,11 @@ test('crear conversacion: region valida (Conversacion-RN-1, 422), nombre (RN-4, 
   const en = catalogoDatos.idiomas.find((i) => i.codigo === 'en');
   const es = catalogoDatos.idiomas.find((i) => i.codigo === 'es');
   const antioquia = es.regiones.find((x) => x.nombre === 'Antioquia');
-  const california = en.regiones.find((x) => x.nombre === 'California');
+  const miami = en.regiones.find((x) => x.nombre === 'Miami');
   assert.equal((await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: antioquia.id }, token)).estado, 422);
-  assert.equal((await api('POST', '/conversaciones', { nombre: 'ab', idioma_destino_id: en.id, region_destino_id: california.id }, token)).estado, 400);
-  assert.equal((await api('POST', '/conversaciones', { nombre: 'Hola @#$', idioma_destino_id: en.id, region_destino_id: california.id }, token)).estado, 400);
-  const ok = await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: california.id }, token);
+  assert.equal((await api('POST', '/conversaciones', { nombre: 'ab', idioma_destino_id: en.id, region_destino_id: miami.id }, token)).estado, 400);
+  assert.equal((await api('POST', '/conversaciones', { nombre: 'Hola @#$', idioma_destino_id: en.id, region_destino_id: miami.id }, token)).estado, 400);
+  const ok = await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: miami.id }, token);
   assert.equal(ok.estado, 201);
   assert.equal(ok.cabeceras.get('location'), `/api/v1/conversaciones/${ok.datos.id}`);
   assert.equal(ok.datos.nombre, 'Nueva Conversacion');
@@ -206,13 +206,9 @@ test('reportar una mala traduccion y revisarla como administrador', async () => 
   assert.equal((await api('PATCH', `/admin/reportes/${rep.datos.id}`, { estado: 'otro' }, admin.datos.token)).estado, 400);
 });
 
-test('el administrador activa un idioma y agrega una region; el cliente no puede', async () => {
+test('el administrador agrega un idioma + region, lo activa/desactiva; el cliente no puede', async () => {
   const admin = await api('POST', '/auth/login', ADMIN);
-  const todos = await api('GET', '/catalogo?todos=1', null, admin.datos.token);
-  const fr = todos.datos.idiomas.find((i) => i.codigo === 'fr');
-  assert.equal(fr.activo, false);
-  assert.equal((await api('PATCH', `/admin/idiomas/${fr.id}`, { activo: true }, token)).estado, 403);
-  assert.equal((await api('PATCH', `/admin/idiomas/${fr.id}`, { activo: true }, admin.datos.token)).datos.activo, true);
+  // Fixture propio del test: un idioma inactivo con su region (no depende del seed)
   const nuevo = await api('POST', '/admin/idiomas', { nombre: 'Italiano', codigo: 'it', activo: false }, admin.datos.token);
   assert.equal(nuevo.estado, 201);
   assert.equal(nuevo.cabeceras.get('location'), `/api/v1/admin/idiomas/${nuevo.datos.id}`);
@@ -222,13 +218,16 @@ test('el administrador activa un idioma y agrega una region; el cliente no puede
   assert.equal(reg.estado, 201);
   assert.equal((await api('GET', `/admin/regiones/${reg.datos.id}`, null, admin.datos.token)).datos.pais.nombre, 'Italia');
   assert.equal((await api('POST', '/admin/regiones', { nombre: 'Lombardia', pais: 'Italia', idiomas: [] }, admin.datos.token)).estado, 409);
+  // El cliente no puede activar un idioma; el administrador si
+  assert.equal((await api('PATCH', `/admin/idiomas/${nuevo.datos.id}`, { activo: true }, token)).estado, 403);
+  assert.equal((await api('PATCH', `/admin/idiomas/${nuevo.datos.id}`, { activo: true }, admin.datos.token)).datos.activo, true);
   // con solo el motor de reglas, un par que no soporta se rechaza (Conversacion-RN-3, 422)
   const catAct = await api('GET', '/catalogo', null, token);
-  const frAct = catAct.datos.idiomas.find((i) => i.codigo === 'fr');
+  const itAct = catAct.datos.idiomas.find((i) => i.codigo === 'it');
   const es = catAct.datos.idiomas.find((i) => i.codigo === 'es');
-  assert.equal((await api('POST', '/conversaciones', { idioma_destino_id: frAct.id, region_destino_id: frAct.regiones[0].id, idioma_origen_id: es.id }, token)).estado, 422);
-  await api('PATCH', `/admin/idiomas/${fr.id}`, { activo: false }, admin.datos.token);
-  assert.ok(!(await api('GET', '/catalogo', null, token)).datos.idiomas.some((i) => i.codigo === 'fr'));
+  assert.equal((await api('POST', '/conversaciones', { idioma_destino_id: itAct.id, region_destino_id: itAct.regiones[0].id, idioma_origen_id: es.id }, token)).estado, 422);
+  await api('PATCH', `/admin/idiomas/${nuevo.datos.id}`, { activo: false }, admin.datos.token);
+  assert.ok(!(await api('GET', '/catalogo', null, token)).datos.idiomas.some((i) => i.codigo === 'it'));
 });
 
 test('eliminar conversacion (204) y cerrar sesion invalida los tokens (Usuario-RN-10)', async () => {

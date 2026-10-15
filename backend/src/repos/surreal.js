@@ -14,20 +14,14 @@ const S = require('../surreal');
 
 const ESQUEMA = fs.readFileSync(path.join(__dirname, '..', '..', 'db', 'surreal', 'schema.surql'), 'utf8');
 
-// Catalogo inicial. Nombres de catalogo (datos) en espanol; es/en activos; fr/pt inactivos.
-const PAISES = [
-  ['Colombia', 'CO'], ['Estados Unidos', 'US'], ['Espana', 'ES'], ['Mexico', 'MX'],
-  ['Argentina', 'AR'], ['Reino Unido', 'GB'], ['Francia', 'FR'], ['Brasil', 'BR'],
-];
+// Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./Miami).
+// Nombres de catalogo (datos) en espanol; ambos idiomas activos.
+const PAISES = [['Colombia', 'CO'], ['Estados Unidos', 'US']];
 const REGIONES = [
-  ['Antioquia', 'Colombia', ['es']], ['Bogota', 'Colombia', ['es']],
-  ['Madrid', 'Espana', ['es']], ['Ciudad de Mexico', 'Mexico', ['es']],
-  ['Buenos Aires', 'Argentina', ['es']],
-  ['California', 'Estados Unidos', ['en']], ['Texas', 'Estados Unidos', ['en', 'es']],
-  ['Londres', 'Reino Unido', ['en']],
-  ['Paris', 'Francia', ['fr']], ['Rio de Janeiro', 'Brasil', ['pt']],
+  ['Antioquia', 'Colombia', ['es']],
+  ['Miami', 'Estados Unidos', ['en']],
 ];
-const LENGUAJES = [['Espanol', 'es', true], ['Ingles', 'en', true], ['Frances', 'fr', false], ['Portugues', 'pt', false]];
+const LENGUAJES = [['Espanol', 'es', true], ['Ingles', 'en', true]];
 const ENTONACIONES = ['Neutral', 'Amigable', 'Alegre', 'Preocupado', 'Enojado', 'Formal'];
 const CANALES = ['Texto', 'Voz'];
 
