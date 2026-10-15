@@ -89,7 +89,7 @@ function AnimatedViewComponent({
     // Important: initial state is false if triggerOnVisible is true, otherwise we animate immediately
     const [isVisible, setIsVisible] = useState(false);
     const { height: windowHeight } = Dimensions.get('window');
-    const measureInterval = useRef<NodeJS.Timeout | null>(null);
+    const measureInterval = useRef<ReturnType<typeof setInterval> | null>(null);
     const isFirstRender = useRef(true);
     // Track the last animation type to detect changes
     const lastAnimationType = useRef<AnimationType>(animation);

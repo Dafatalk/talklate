@@ -21,7 +21,7 @@ npm run medir      # mide tiempo de traduccion y modismos adaptados (DRV-01 y DR
 Variables de entorno: ver `.env.example`. Documentacion interactiva de la API (OpenAPI 3): `http://localhost:3000/api/v1/docs`.
 
 Al arrancar se crea un administrador (`dafa123.daf@gmail.com` / `Admin123!`, cambialo con las variables) y un catalogo
-inicial: Espanol e Ingles activos; Frances y Portugues inactivos; paises, regiones, canales (Texto, Voz) y
+inicial al alcance del proyecto: Espanol (Colombia, Antioquia) e Ingles (Estados Unidos, Miami), activos; canales (Texto, Voz) y
 entonaciones (Neutral, Amigable, Alegre, Preocupado, Enojado, Formal).
 
 ## Motor de traduccion

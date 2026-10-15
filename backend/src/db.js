@@ -133,7 +133,6 @@ CREATE TABLE IF NOT EXISTS reporte (
 );
 `;
 
-// Catalogo inicial. Espanol e Ingles activos; Frances y Portugues existen pero inactivos (como en el modelo de dominio).
 // Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./Miami).
 const PAISES = [['Colombia', 'CO'], ['Estados Unidos', 'US']];
 const REGIONES = [
