@@ -6,13 +6,14 @@ process.env.LIMITE_MENSAJES_POR_MINUTO = '1000';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { abrir } = require('../src/db');
+const crearRepoSqlite = require('../src/repos/sqlite');
 const { crearApp } = require('../src/app');
 
 const ADMIN = { correo: 'dafa123.daf@gmail.com', password: 'Admin123!' };
 let servidor, raiz, base, db;
 test.before(async () => {
   db = abrir(':memory:');
-  servidor = crearApp(db).listen(0);
+  servidor = crearApp(crearRepoSqlite(db)).listen(0);
   await new Promise((r) => servidor.once('listening', r));
   raiz = `http://127.0.0.1:${servidor.address().port}`;
   base = `${raiz}/api/v1`;

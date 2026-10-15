@@ -6,43 +6,20 @@ const { requerirSesion, requerirAdmin } = require('../lib/auth');
 const V = require('../lib/validaciones');
 
 const ruta = (fn) => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
-const aBool = (v) => (v === true || v === 1 || v === '1' || v === 'true' ? 1 : 0);
+const aBool = (v) => v === true || v === 1 || v === '1' || v === 'true';
 
-function catalogo(db, { todos }) {
-  const idiomas = db.prepare(`SELECT id, nombre, codigo, activo FROM lenguaje ${todos ? '' : 'WHERE activo = 1'} ORDER BY nombre`).all();
-  const regiones = db.prepare(`
-    SELECT lr.lenguaje_id, r.id, r.nombre, p.id AS pais_id, p.nombre AS pais_nombre, p.codigo AS pais_codigo
-    FROM lenguaje_region lr JOIN region r ON r.id = lr.region_id JOIN pais p ON p.id = r.pais_id
-    ORDER BY p.nombre, r.nombre`).all();
-  return {
-    idiomas: idiomas.map((i) => ({
-      id: i.id, nombre: i.nombre, codigo: i.codigo, activo: !!i.activo,
-      regiones: regiones.filter((r) => r.lenguaje_id === i.id).map((r) => ({ id: r.id, nombre: r.nombre, pais: { id: r.pais_id, nombre: r.pais_nombre, codigo: r.pais_codigo } })),
-    })),
-    entonaciones: db.prepare('SELECT id, nombre FROM entonacion WHERE activo = 1 ORDER BY nombre').all(),
-    canales: db.prepare('SELECT id, nombre FROM canal ORDER BY nombre').all(),
-  };
+async function asegurarIdiomas(repo, ids) {
+  for (const id of ids) if (!(await repo.catalogo.existeLenguaje(id))) throw mal('Uno de los idiomas indicados no existe.');
 }
 
-function regionPorId(db, id) {
-  const r = db.prepare('SELECT r.id, r.nombre, p.id AS pais_id, p.nombre AS pais_nombre, p.codigo AS pais_codigo FROM region r JOIN pais p ON p.id = r.pais_id WHERE r.id = ?').get(id);
-  if (!r) return null;
-  const idiomas = db.prepare('SELECT l.id, l.nombre, l.codigo FROM lenguaje_region lr JOIN lenguaje l ON l.id = lr.lenguaje_id WHERE lr.region_id = ?').all(id);
-  return { id: r.id, nombre: r.nombre, pais: { id: r.pais_id, nombre: r.pais_nombre, codigo: r.pais_codigo }, idiomas };
-}
-
-function asegurarIdiomas(db, ids) {
-  for (const id of ids) if (!db.prepare('SELECT 1 FROM lenguaje WHERE id = ?').get(id)) throw mal('Uno de los idiomas indicados no existe.');
-}
-
-module.exports = function catalogoRouter(db) {
+module.exports = function catalogoRouter(repo) {
   const r = express.Router();
-  r.use(['/catalogo', '/admin'], requerirSesion(db));
+  r.use(['/catalogo', '/admin'], requerirSesion(repo));
 
   // HU Consultar idiomas disponibles
-  r.get('/catalogo', (req, res) => {
-    res.json(catalogo(db, { todos: req.usuario.rol === 'admin' && req.query.todos === '1' }));
-  });
+  r.get('/catalogo', ruta(async (req, res) => {
+    res.json(await repo.catalogo.obtener({ todos: req.usuario.rol === 'admin' && req.query.todos === '1' }));
+  }));
 
   // HU Administrar idiomas y regiones (solo administrador)
   const admin = express.Router();
@@ -54,34 +31,31 @@ module.exports = function catalogoRouter(db) {
     const codigo = V.texto(b.codigo).toLowerCase();
     if (nombre.length < 1 || nombre.length > 50) throw mal('El nombre del idioma es obligatorio (maximo 50 caracteres).');
     if (!/^[a-z]{2,5}$/.test(codigo)) throw mal('El codigo del idioma debe tener entre 2 y 5 letras (ej. es, en, fr).');
-    if (db.prepare('SELECT 1 FROM lenguaje WHERE lower(nombre) = lower(?) OR codigo = ?').get(nombre, codigo)) throw conflicto('Ya existe un idioma con ese nombre o codigo.');
+    if (await repo.catalogo.existeLenguajeNombreOCodigo(nombre, codigo)) throw conflicto('Ya existe un idioma con ese nombre o codigo.');
     const id = randomUUID();
-    db.prepare('INSERT INTO lenguaje (id, nombre, codigo, activo) VALUES (?,?,?,?)').run(id, nombre, codigo, aBool(b.activo));
-    for (const rid of b.regiones || []) db.prepare('INSERT OR IGNORE INTO lenguaje_region (lenguaje_id, region_id) VALUES (?,?)').run(id, rid);
+    await repo.catalogo.crearLenguaje({ id, nombre, codigo, activo: aBool(b.activo) });
+    for (const rid of b.regiones || []) await repo.catalogo.addRegionLenguaje(id, rid);
     log.info('catalogo_idioma_creado', { usuario_id: req.usuario.id, lenguaje_id: id });
-    res.status(201).location(`/api/v1/admin/idiomas/${id}`).json(catalogo(db, { todos: true }).idiomas.find((i) => i.id === id));
+    res.status(201).location(`/api/v1/admin/idiomas/${id}`).json((await repo.catalogo.obtener({ todos: true })).idiomas.find((i) => i.id === id));
   }));
 
   admin.patch('/idiomas/:id', ruta(async (req, res) => {
-    const idioma = db.prepare('SELECT * FROM lenguaje WHERE id = ?').get(req.params.id);
+    const idioma = await repo.catalogo.lenguajePorId(req.params.id);
     if (!idioma) throw noEncontrado('No encontramos ese idioma.');
     const b = req.body || {};
     if (b.nombre !== undefined) {
       const n = V.texto(b.nombre);
       if (!n || n.length > 50) throw mal('El nombre del idioma es obligatorio (maximo 50 caracteres).');
-      if (db.prepare('SELECT 1 FROM lenguaje WHERE lower(nombre) = lower(?) AND id <> ?').get(n, idioma.id)) throw conflicto('Ya existe un idioma con ese nombre.');
-      db.prepare('UPDATE lenguaje SET nombre = ? WHERE id = ?').run(n, idioma.id);
+      if (await repo.catalogo.existeOtroLenguajeConNombre(n, idioma.id)) throw conflicto('Ya existe un idioma con ese nombre.');
+      await repo.catalogo.renombrarLenguaje(idioma.id, n);
     }
-    if (b.activo !== undefined) db.prepare('UPDATE lenguaje SET activo = ? WHERE id = ?').run(aBool(b.activo), idioma.id);
+    if (b.activo !== undefined) await repo.catalogo.activarLenguaje(idioma.id, aBool(b.activo));
     if (Array.isArray(b.regiones)) {
-      db.prepare('DELETE FROM lenguaje_region WHERE lenguaje_id = ?').run(idioma.id);
-      for (const rid of b.regiones) {
-        if (!db.prepare('SELECT 1 FROM region WHERE id = ?').get(rid)) throw mal('Una de las regiones indicadas no existe.');
-        db.prepare('INSERT OR IGNORE INTO lenguaje_region (lenguaje_id, region_id) VALUES (?,?)').run(idioma.id, rid);
-      }
+      for (const rid of b.regiones) if (!(await repo.catalogo.existeRegion(rid))) throw mal('Una de las regiones indicadas no existe.');
+      await repo.catalogo.setRegionesLenguaje(idioma.id, b.regiones);
     }
     log.info('catalogo_idioma_modificado', { usuario_id: req.usuario.id, lenguaje_id: idioma.id, activo: b.activo });
-    res.json(catalogo(db, { todos: true }).idiomas.find((i) => i.id === idioma.id));
+    res.json((await repo.catalogo.obtener({ todos: true })).idiomas.find((i) => i.id === idioma.id));
   }));
 
   admin.post('/regiones', ruta(async (req, res) => {
@@ -90,35 +64,34 @@ module.exports = function catalogoRouter(db) {
     const paisNombre = V.texto(b.pais);
     if (nombre.length < 2 || nombre.length > 100) throw mal('El nombre de la region debe tener entre 2 y 100 caracteres.');
     if (!paisNombre) throw mal('Indica el pais de la region.');
-    let pais = db.prepare('SELECT id FROM pais WHERE lower(nombre) = lower(?)').get(paisNombre);
+    let pais = await repo.catalogo.paisPorNombre(paisNombre);
     if (!pais) {
       const cod = V.texto(b.pais_codigo).toUpperCase();
       if (!/^[A-Z]{2}$/.test(cod)) throw mal('El pais no existe: indica su codigo de 2 letras (ej. CO) para crearlo.');
-      if (db.prepare('SELECT 1 FROM pais WHERE codigo = ?').get(cod)) throw conflicto('Ya existe un pais con ese codigo.');
-      pais = { id: randomUUID() };
-      db.prepare('INSERT INTO pais (id, nombre, codigo) VALUES (?,?,?)').run(pais.id, paisNombre, cod);
+      if (await repo.catalogo.existePaisCodigo(cod)) throw conflicto('Ya existe un pais con ese codigo.');
+      pais = await repo.catalogo.crearPais({ id: randomUUID(), nombre: paisNombre, codigo: cod });
     }
-    if (db.prepare('SELECT 1 FROM region WHERE lower(nombre) = lower(?) AND pais_id = ?').get(nombre, pais.id)) throw conflicto('Esa region ya existe en ese pais.');
+    if (await repo.catalogo.existeRegionEnPais(nombre, pais.id)) throw conflicto('Esa region ya existe en ese pais.');
     const idiomas = Array.isArray(b.idiomas) ? b.idiomas : [];
-    asegurarIdiomas(db, idiomas);
+    await asegurarIdiomas(repo, idiomas);
     const id = randomUUID();
-    db.prepare('INSERT INTO region (id, nombre, pais_id) VALUES (?,?,?)').run(id, nombre, pais.id);
-    for (const l of idiomas) db.prepare('INSERT OR IGNORE INTO lenguaje_region (lenguaje_id, region_id) VALUES (?,?)').run(l, id);
+    await repo.catalogo.crearRegion({ id, nombre, pais_id: pais.id });
+    for (const l of idiomas) await repo.catalogo.addRegionLenguaje(l, id);
     log.info('catalogo_region_creada', { usuario_id: req.usuario.id, region_id: id });
-    res.status(201).location(`/api/v1/admin/regiones/${id}`).json(regionPorId(db, id));
+    res.status(201).location(`/api/v1/admin/regiones/${id}`).json(await repo.catalogo.regionPorId(id));
   }));
 
-  admin.get('/idiomas/:id', (req, res, next) => {
-    const i = catalogo(db, { todos: true }).idiomas.find((x) => x.id === req.params.id);
+  admin.get('/idiomas/:id', ruta(async (req, res, next) => {
+    const i = (await repo.catalogo.obtener({ todos: true })).idiomas.find((x) => x.id === req.params.id);
     if (!i) return next(noEncontrado('No encontramos ese idioma.'));
     res.json(i);
-  });
+  }));
 
-  admin.get('/regiones/:id', (req, res, next) => {
-    const r2 = regionPorId(db, req.params.id);
+  admin.get('/regiones/:id', ruta(async (req, res, next) => {
+    const r2 = await repo.catalogo.regionPorId(req.params.id);
     if (!r2) return next(noEncontrado('No encontramos esa region.'));
     res.json(r2);
-  });
+  }));
 
   r.use('/admin', admin);
   return r;
