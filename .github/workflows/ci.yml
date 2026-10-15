@@ -20,6 +20,32 @@ jobs:
       - run: npm ci
       - run: npm run coverage
 
+  # La misma suite de la API contra un SurrealDB real (la fuente de verdad en ejecucion)
+  backend-surreal:
+    runs-on: ubuntu-latest
+    env:
+      SURREAL_VERSION: v3.0.4
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Levantar SurrealDB
+        run: |
+          curl -sSfL -o /tmp/surreal.tgz "https://github.com/surrealdb/surrealdb/releases/download/${SURREAL_VERSION}/surreal-${SURREAL_VERSION}.linux-amd64.tgz"
+          tar xzf /tmp/surreal.tgz -C /tmp
+          /tmp/surreal start --user root --pass root --bind 127.0.0.1:8000 memory > /tmp/surreal.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/health && break; sleep 1; done
+          curl -s http://127.0.0.1:8000/version
+      - run: npm run test:surreal
+      - run: node scripts/verificar-surreal.js
+        env:
+          SURREAL_NS: verificacion
+
   frontend:
     runs-on: ubuntu-latest
     defaults:

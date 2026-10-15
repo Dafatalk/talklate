@@ -26,6 +26,11 @@ Thumbs.db
 # Logs
 *.log
 
+# SurrealDB / SQLite — store local de datos (no versionar)
+.surrealdb/
+*.db
+backend/data/
+
 # Archivos temporales de Office y editores
 ~$*
 *.swp

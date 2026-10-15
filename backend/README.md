@@ -1,17 +1,19 @@
-# TalkLate - API (Node.js + Express + SQLite)
+# TalkLate - API (Node.js + Express + SurrealDB)
 
 Backend de TalkLate. Implementa las historias de usuario del Mapa de Impacto y las reglas de negocio de
 `arquitectura/modelo_datos.md` (Usuario-RN-*, Conversacion-RN-*).
 
 ## Correrlo
 
-Requiere **Node 22.5 o superior** (usa `node:sqlite`, incluido en Node).
+Requiere **Node 22.5 o superior** y **SurrealDB 3.x** como base de datos (ADR-012). Como levantar SurrealDB:
+ver [`README-surreal.md`](README-surreal.md). Para probar sin servidor, `DB_DRIVER=sqlite` usa SQLite (`node:sqlite`).
 
 ```bash
 cd backend
 npm install
-npm start          # http://localhost:3000/api/v1  (crea data/talklate.db y los datos iniciales)
-npm test           # 28 pruebas: API, seguridad y motores de traduccion
+npm start          # http://localhost:3000/api/v1  (aplica el esquema y los datos iniciales en SurrealDB)
+npm test           # pruebas: API (con SQLite en memoria), seguridad, conexion a SurrealDB y motores
+npm run test:surreal  # la suite de la API contra un SurrealDB corriendo en SURREAL_URL
 npm run coverage   # cobertura (minimo 80 %, convencion F0)
 npm run medir      # mide tiempo de traduccion y modismos adaptados (DRV-01 y DRV-02)
 ```

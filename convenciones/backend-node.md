@@ -1,4 +1,4 @@
-# Convenciones - Backend Node.js + Express + SQLite
+# Convenciones - Backend Node.js + Express + SurrealDB
 
 **Fase 0 - manual por tecnologia (agregado al decidir el stack en F3).**
 
@@ -7,7 +7,10 @@
 backend/
   src/app.js            arma la app Express: CORS, /health, /api/v1, documentacion y manejo de errores
   src/server.js         arranque
-  src/db.js             esquema SQLite, migraciones simples y datos iniciales
+  src/surreal.js        conexion a SurrealDB (token de sesion, literales seguros)
+  src/repos/            repositorio: surreal.js (ejecucion) y sqlite.js (pruebas), misma interfaz
+  src/db.js             esquema SQLite usado por las pruebas sin servidor
+  db/surreal/           esquema SurrealDB (schema.surql)
   src/routes/           una ruta por recurso (auth, catalogo, conversaciones, reportes)
   src/lib/              reglas y servicios: validaciones, auth, cifrado, log, limites, traductor y motores
   test/                 pruebas con node:test (*.test.js)

@@ -27,7 +27,7 @@ Diseño táctico,Diseño detallado,Diagrama de componentes,SI,En progreso,2026-1
 Diseño táctico,Diseño detallado,Diagrama de paquetes,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Diagrama de secuencia,SI,No planeado,,,
 Diseño táctico,Diseño detallado,Diagrama de despliegue,SI,No planeado,,,
-Diseño táctico,Diseño detallado,Modelo de fuente de información,SI,En progreso,2026-10-14,,"Esquema SQLite en backend/src/db.js, documentado en modelo_datos.md. El MER lo hace Julian."
+Diseño táctico,Diseño detallado,Modelo de fuente de información,SI,En progreso,2026-10-14,,"Esquema SurrealDB en backend/db/surreal/schema.surql (ADR-012); el de SQLite en backend/src/db.js queda para pruebas. El MER lo hace Julian."
 Diseño táctico,Línea base,Línea base del producto,SI,No planeado,,,
 Construcción,Repositorio,Repositorio de control de versiones,SI,Terminado,2026-08-15,2026-10-14,"GitHub con main y develop; issue primero, ramas feature/fix y PR desde el issue #1."
 Construcción,Calidad de código,Pruebas unitarias,SI,En progreso,2026-10-14,,28 pruebas del backend y 4 del frontend; crecen con cada HU.

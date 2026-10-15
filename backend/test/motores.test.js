@@ -33,9 +33,9 @@ test('validaciones de usuario y conversacion', () => {
   assert.throws(() => V.validarPassword('abc'));
   assert.equal(V.validarPassword('Abcdef1!'), 'Abcdef1!');
   assert.throws(() => V.validarFechaNacimiento('2999-01-01'));
-  assert.throws(() => V.validarFechaNacimiento('2018-01-01', new Date('2026-10-01')));
-  assert.equal(V.validarFechaNacimiento('2013-10-01', new Date('2026-10-01')), '2013-10-01'); // cumple 13 ese dia
-  assert.throws(() => V.validarFechaNacimiento('2013-10-02', new Date('2026-10-01')));
+  assert.throws(() => V.validarFechaNacimiento('2018-01-01', new Date(2026, 9, 1)));
+  assert.equal(V.validarFechaNacimiento('2013-10-01', new Date(2026, 9, 1)), '2013-10-01'); // cumple 13 ese dia
+  assert.throws(() => V.validarFechaNacimiento('2013-10-02', new Date(2026, 9, 1)));
   assert.equal(V.validarNombreConversacion('  Familia   Medellin '), 'Familia Medellin');
   assert.throws(() => V.validarNombreConversacion('Hola!!'));
 });

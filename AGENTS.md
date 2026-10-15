@@ -38,7 +38,7 @@ emociones, jerga e intención. Ver [`contexto.md`](contexto.md) para la visión 
 
 | Carpeta | Contenido |
 | --- | --- |
-| `backend/` | API REST `/api/v1` en Node.js 22 + Express + SQLite; traduccion con Qwen local (Ollama), Claude Sonnet de respaldo y motor de reglas |
+| `backend/` | API REST `/api/v1` en Node.js 22 + Express + SurrealDB (SQLite solo en pruebas); traduccion con Qwen local (Ollama), Claude Sonnet de respaldo y motor de reglas |
 | `frontend/` | App movil Expo (React Native) adaptada del template de UI **Luna** (`componentes/template/native-luna`) |
 | `requerimientos/` | Mapa de impacto, historias, criterios de aceptacion, requerimientos, matriz de sensibilidad, sprints y liberaciones |
 | `arquitectura/` | Modelo de datos, drivers, ADR, stack y diagramas C4 |

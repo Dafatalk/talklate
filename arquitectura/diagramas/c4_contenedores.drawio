@@ -25,7 +25,7 @@
         <mxCell id="api" value="&lt;b&gt;API TalkLate&lt;/b&gt;&lt;br&gt;[Contenedor: Node.js 22 + Express]&lt;br&gt;Modulos: auth, conversaciones y mensajes, catalogo, reportes.&lt;br&gt;Fachada traductor: Qwen -&amp;gt; Claude -&amp;gt; motor de reglas (Circuit Breaker)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="340" y="330" width="320" height="170" as="geometry" />
         </mxCell>
-        <mxCell id="db" value="&lt;b&gt;Base de datos&lt;/b&gt;&lt;br&gt;[Contenedor: SQLite con node:sqlite]&lt;br&gt;Usuarios, conversaciones, catalogo. Mensajes cifrados AES-256-GCM." style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="db" value="&lt;b&gt;Base de datos&lt;/b&gt;&lt;br&gt;[Contenedor: SurrealDB 3.x]&lt;br&gt;Usuarios, conversaciones, catalogo. Mensajes cifrados AES-256-GCM." style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="360" y="590" width="280" height="150" as="geometry" />
         </mxCell>
         <mxCell id="voz" value="&lt;b&gt;Voz del dispositivo / navegador&lt;/b&gt;&lt;br&gt;[Sistema externo - en el cliente]&lt;br&gt;Reconocimiento de voz y sintesis de voz (expo-speech)." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#FFFFFF;strokeColor=#6B6B6B;fontSize=12;" vertex="1" parent="1">
@@ -55,7 +55,7 @@
         <mxCell id="e5" value="HTTPS/JSON REST /api/v1&lt;br&gt;(JWT acceso 15 min + token de refresco)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="app" target="api">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e6" value="Lee y escribe (node:sqlite)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="api" target="db">
+        <mxCell id="e6" value="Lee y escribe (HTTP /sql)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="api" target="db">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e7" value="Traduce (HTTP local /api/chat)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="api" target="ollama">

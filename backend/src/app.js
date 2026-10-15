@@ -10,7 +10,9 @@ const log = require('./lib/log');
 const ORIGENES = (process.env.CORS_ORIGENES || 'http://localhost:8081,http://127.0.0.1:8081,http://localhost:19006')
   .split(',').map((o) => o.trim()).filter(Boolean);
 
-function crearApp(db) {
+// crearApp(repo, opciones): repo es el repositorio async (SurrealDB o SQLite).
+// opciones.saludDb: fn async opcional que informa el estado de la base para /health.
+function crearApp(repo, opciones = {}) {
   const app = express();
   app.disable('x-powered-by');
   app.use(cors({
@@ -19,8 +21,14 @@ function crearApp(db) {
   }));
   app.use(express.json({ limit: '1mb' }));
 
-  // Health check (convenciones/api-rest.md seccion 8)
-  app.get('/health', (_req, res) => res.json({ ok: true, servicio: 'talklate', version: 'v1', motores_traduccion: traductor.cadena() }));
+  // Health check (convenciones/api-rest.md seccion 8): incluye el estado de SurrealDB
+  app.get('/health', async (_req, res) => {
+    let db = { ok: true };
+    if (opciones.saludDb) {
+      try { db = await opciones.saludDb(); } catch (e) { log.error('salud_db_fallida', { detalle: e.message }); db = { ok: false }; }
+    }
+    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: traductor.cadena(), db });
+  });
 
   // Documentacion OpenAPI 3.0 (convenciones/api-rest.md seccion 9)
   const especificacion = path.join(__dirname, '..', 'openapi.yaml');
@@ -34,11 +42,11 @@ function crearApp(db) {
   }
 
   const v1 = express.Router();
-  v1.use('/auth', require('./routes/auth')(db));
-  v1.use('/usuarios', require('./routes/auth').usuariosRouter(db));
-  v1.use('/', require('./routes/catalogo')(db));
-  v1.use('/', require('./routes/conversaciones')(db));
-  v1.use('/', require('./routes/reportes')(db));
+  v1.use('/auth', require('./routes/auth')(repo));
+  v1.use('/usuarios', require('./routes/auth').usuariosRouter(repo));
+  v1.use('/', require('./routes/catalogo')(repo));
+  v1.use('/', require('./routes/conversaciones')(repo));
+  v1.use('/', require('./routes/reportes')(repo));
   app.use('/api/v1', v1);
 
   app.use((req, res) => res.status(404).json(cuerpoError(404, 'No encontramos esa ruta.', req.originalUrl)));
