@@ -23,8 +23,9 @@ El proyecto sigue el framework **SoftVerse**: fases F0 a F10 con dependencias (`
 ## 3. Planificacion agil (Scrum)
 - Prioridad por **valor para el negocio**, no por dependencia.
 - Estimacion con **tallas de ropa** (XS a XXL) convertidas a horas.
-- Sprints de **una semana**: 2 personas x 4 horas x 5 dias = 40 horas; se usa el 75 % (30 horas) y el resto es planeacion, dailies, refinamiento y retrospectiva.
-- Resultado: 26 historias, 90 horas, 3 sprints (19/10 al 06/11/2026) y 3 liberaciones (`requerimientos/plan_liberaciones.md`).
+- Sprints de **un mes**: 2 personas x 4 horas x 20 dias habiles = 160 horas; se usa el 75 % (120 horas) y el resto es planeacion, dailies, refinamiento, retrospectiva e imprevistos.
+- Resultado: 26 historias, 360 horas, 3 sprints (19/10/2026 al 08/01/2027) y 3 liberaciones (`requerimientos/plan_liberaciones.md`).
+- Cronograma de 6 meses: analisis y diseno (agosto a octubre), construccion (3 meses) y cierre (enero de 2027: pruebas con usuarios, manual de usuario y documento final).
 
 ## 4. Prueba de concepto antes del sprint 1
 Con autorizacion del mentor ("primero construir y luego justificar", reunion presencial de octubre), el 14/10/2026 se construyo una **prueba de concepto (spike)**: una version funcional de la app para validar el stack (Expo, Node, SQLite) y el motor de traduccion. Las decisiones se justificaron despues en ADR (`arquitectura/decisiones.md`). En los sprints cada historia se completa desde ese punto: revision del codigo, pruebas en celular, criterios de aceptacion, pruebas automaticas y documentacion.

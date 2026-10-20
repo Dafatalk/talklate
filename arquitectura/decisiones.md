@@ -31,7 +31,7 @@ Patrones del catalogo que **no** se usan y por que: Database per Service, API Ga
 Dos personas desarrollan; la app debe servir en iOS y Android; el template de interfaz elegido (Luna) esta hecho en Expo.
 
 ### Decision
-Expo SDK 54 con React Native, expo-router para la navegacion y NativeWind (Tailwind) para los estilos. La misma base de codigo corre en web, lo que permite probar sin celular.
+Expo con React Native, expo-router para la navegacion y NativeWind (Tailwind) para los estilos. Se empezo con el SDK 54 y el 15/10/2026 se paso al SDK 57 para que la app abra en la version actual de Expo Go (PR #31). La misma base de codigo corre en web, lo que permite probar sin celular.
 
 ### Alternativas (comparadas al justificar)
 - **Flutter:** una sola base de codigo tambien, pero obliga a aprender Dart y no aprovecha el template ya comprado.
