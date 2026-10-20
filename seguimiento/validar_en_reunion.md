@@ -3,7 +3,7 @@
 **Actualizado:** 2026-10-14, despues de corregir la revision (`revision_para_sustentacion.md`, issue #1). Ordenado de lo que mas bloquea a lo que menos.
 
 ## 1. Mapa de impacto
-- [ ] Objetivo (Why) SMART: 10 personas de prueba, conversaciones de 10 mensajes o mas, menos del 20 % de traducciones reportadas, 3 segundos o menos por traduccion, al 06/11/2026.
+- [ ] Objetivo (Why) SMART: 10 personas de prueba, conversaciones de 10 mensajes o mas, menos del 20 % de traducciones reportadas, 3 segundos o menos por traduccion, al 08/01/2027.
 - [ ] Indicador SMART de cada impacto (columna H del Excel).
 - [ ] Impactos 2 y 3 diferenciados (empezar rapido / mantener el contexto), impacto del Administrador redactado como beneficio, impacto del Interlocutor "sin instalar la app ni crear cuenta".
 - [ ] Las 6 epicas, y que el impacto 2 se abra en dos epicas (Gestion de conversaciones y Administracion de idiomas y regiones) por la historia "Consultar los idiomas disponibles".
@@ -12,8 +12,8 @@
 ## 2. Historias y planificacion
 - [ ] "Traducir mi mensaje" como historia (HU0003).
 - [ ] HU0026 nueva: "Eliminar mi cuenta" (Ley 1581, derecho al olvido).
-- [ ] Prioridad por valor y la excepcion: "Cerrar sesion" va con "Iniciar sesion" en el sprint 3.
-- [ ] Tallas (XS 1 h a XXL 12 h), capacidad de 30 horas, 3 sprints del 19/10 al 06/11/2026 y plan de liberaciones.
+- [x] Prioridad por valor sin excepciones por dependencia (indicacion del mentor): "Cerrar sesion" queda en el sprint 2.
+- [ ] Tallas (XS 4 h a XXL 48 h), sprints de un mes de 120 horas, 3 sprints del 19/10/2026 al 08/01/2027 y plan de liberaciones.
 - [ ] Criterios de aceptacion y definicion de hecho (en cada issue de GitHub).
 
 ## 3. Metodologia

@@ -59,7 +59,7 @@ multilingüe.
 
 ## Objetivo medible
 
-Ver el "Why" SMART en `requerimientos/mapa_impacto.md`: al cierre de la liberacion 3 (06/11/2026), 10 personas de prueba sostienen conversaciones de 10 mensajes o mas con alguien que habla otro idioma, con menos del 20 % de traducciones reportadas como malas y 3 segundos o menos por traduccion.
+Ver el "Why" SMART en `requerimientos/mapa_impacto.md`: al cierre de la liberacion 3 (08/01/2027), 10 personas de prueba sostienen conversaciones de 10 mensajes o mas con alguien que habla otro idioma, con menos del 20 % de traducciones reportadas como malas y 3 segundos o menos por traduccion.
 
 ## Riesgos y preguntas abiertas (capturadas durante la definición de la visión)
 

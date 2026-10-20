@@ -17,7 +17,7 @@ Severidad: **ALTA** (puede tumbar la sustentacion), **MEDIA** (pregunta incomoda
 | 2.1 Impactos SMART | Corregido: objetivo SMART e indicador por impacto | Excel columna H |
 | 2.2 a 2.4 | Corregidos | Excel |
 | 2.5 Interlocutor | Corregido: impacto "sin instalar la app ni crear cuenta" y pista en la app | Excel, `TranslatorInput` |
-| 2.6 Cerrar sesion | Corregido: sprint 3 | Excel, `planificacion_sprints.md` |
+| 2.6 Cerrar sesion | Revertido por indicacion del mentor: va en el sprint 2 por valor, sin mirar dependencias | Excel, `planificacion_sprints.md` |
 | 2.7 Traducir como HU | Para validar con Farid | `validar_en_reunion.md` |
 | 3.1 a 3.4 | Corregidos: alcance precisado y journey ajustado | `contexto.md`, `especificacion_vistas_ui.md` |
 | 4 Modelo contra base | Corregido en el `.md`; falta Excel del modelo y MER (Julian) | `modelo_datos.md` |
@@ -194,7 +194,7 @@ Los umbrales de `drivers.md` (3 segundos, glosario de prueba) no se han medido. 
 ## 8. Planificacion
 
 - **BAJA:** las tallas se estiman "para una persona", la capacidad usa 2 personas. Esta bien, pero diganlo asi si lo preguntan.
-- **MEDIA:** el plan es de 3 semanas y el codigo base ya existe; expliquen que los sprints son para terminar, probar en celular, cumplir las convenciones de los puntos 5 y 6 y documentar, o rehagan las horas con lo que realmente falta.
+- **MEDIA (resuelto: ahora son 3 sprints de un mes):** el plan era de 3 semanas y el codigo base ya existe; expliquen que los sprints son para terminar, probar en celular, cumplir las convenciones de los puntos 5 y 6 y documentar, o rehagan las horas con lo que realmente falta.
 - **BAJA:** el catalogo inicial incluye Frances y Portugues (inactivos). La vision habla de foco inicial en espanol e ingles: coherente, pero diganlo.
 
 ---
