@@ -28,6 +28,8 @@
 - [ ] Motor: Qwen local primero, Claude Sonnet de respaldo y reglas al final (Circuit Breaker). Que modelo Qwen usar.
 - [ ] Drivers: medir con Qwen antes de la sustentacion (`npm run medir`).
 - [ ] Diagramas C4 de contexto y contenedores.
+- [ ] ADR-013: arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular.
+- [ ] SurrealDB o PostgreSQL: analisis en `arquitectura/revision_recomendaciones.md` (con la arquitectura hexagonal el cambio cuesta un adaptador).
 - [ ] ADR-012: SurrealDB como fuente de verdad (reemplaza a SQLite), con esquema en ingles e instancia remota en SurrealDB Cloud; SQLite queda solo para pruebas.
 
 ## 5. Alcance

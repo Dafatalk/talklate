@@ -31,7 +31,7 @@
           </mxGeometry>
         </mxCell>
 
-        <mxCell id="llApi" value="&lt;b&gt;API&lt;/b&gt;&lt;br&gt;routes/conversaciones" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="llApi" value="&lt;b&gt;API&lt;/b&gt;&lt;br&gt;rutas + caso de uso Conversaciones" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="485" y="120" width="150" height="55" as="geometry" />
         </mxCell>
         <mxCell id="lineApi" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;strokeColor=#707070;dashed=1;dashPattern=4 4;" edge="1" parent="1">
@@ -41,7 +41,7 @@
           </mxGeometry>
         </mxCell>
 
-        <mxCell id="llFac" value="&lt;b&gt;Fachada Traductor&lt;/b&gt;&lt;br&gt;lib/traductor.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;fontColor=#000000;strokeColor=#5D82A8;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="llFac" value="&lt;b&gt;Caso de uso Traduccion&lt;/b&gt;&lt;br&gt;aplicacion/traduccion.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;fontColor=#000000;strokeColor=#5D82A8;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="725" y="120" width="150" height="55" as="geometry" />
         </mxCell>
         <mxCell id="lineFac" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;strokeColor=#707070;dashed=1;dashPattern=4 4;" edge="1" parent="1">
@@ -71,7 +71,7 @@
           </mxGeometry>
         </mxCell>
 
-        <mxCell id="llReglas" value="&lt;b&gt;Motor de reglas&lt;/b&gt;&lt;br&gt;lib/motorLocal.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;fontColor=#000000;strokeColor=#5D82A8;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="llReglas" value="&lt;b&gt;Motor de reglas&lt;/b&gt;&lt;br&gt;adaptadores/traduccion/reglas.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;fontColor=#000000;strokeColor=#5D82A8;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="1295" y="120" width="150" height="55" as="geometry" />
         </mxCell>
         <mxCell id="lineReglas" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;strokeColor=#707070;dashed=1;dashPattern=4 4;" edge="1" parent="1">

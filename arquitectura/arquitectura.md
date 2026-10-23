@@ -17,12 +17,13 @@ apunta al codigo real (`backend/src`, `frontend/`), al ADR que la sustenta y al 
 | --- | --- | --- |
 | `arquitectura.md` (este) | Sintesis y justificacion | Todas las vistas amarradas y justificadas por ADR |
 | `drivers.md` | Drivers | Requisitos que obligan decisiones (DRV-01 a DRV-08) |
-| `decisiones.md` | Decisiones | 12 ADR con contexto, alternativas y consecuencias |
+| `decisiones.md` | Decisiones | 13 ADR con contexto, alternativas y consecuencias |
 | `c4.md` | C4 Niveles 1 y 2 | Contexto del sistema y contenedores |
 | `componentes.md` | C4 Nivel 3 (API) | Componentes internos de la API TalkLate |
 | `modelo_datos.md` | Datos | Modelo de dominio, reglas y correspondencia con la base |
 | `tech_stack.md` | Stack | Tecnologia por capa y alternativas evaluadas |
 | `medicion_traduccion.md` | Evidencia | Medicion de tiempo y calidad (DRV-01, DRV-02) |
+| `revision_recomendaciones.md` | Revision critica | Analisis de las recomendaciones de la revision del 22/10/2026 y orden propuesto |
 
 ---
 
@@ -41,6 +42,25 @@ El corazon del producto -traducir conservando tono, intencion y modismos- vive e
 **subsistema de traduccion** que encadena motores con el patron **Circuit Breaker**:
 Qwen local -> Claude Sonnet -> motor de reglas (ADR-004, responde a DRV-01, DRV-02, DRV-05).
 
+Por dentro, la API sigue una **arquitectura hexagonal (puertos y adaptadores)** (ADR-013): el
+dominio y los casos de uso estan en el centro y no dependen de Express, de la base ni de los
+motores de IA; cada dependencia externa entra por un puerto (`Repositorio`, `MotorTraduccion`,
+`Notificador`, `Cifrador`) y se conecta con un adaptador. Es la respuesta a "y si manana crece?":
+no se parte en servicios, se separa bien por dentro.
+
+```mermaid
+flowchart LR
+    http["Adaptador HTTP<br/>(Express)"] --> apl
+    subgraph nucleo["Nucleo"]
+        apl["Casos de uso<br/>(aplicacion)"] --> dom["Dominio"]
+        apl --> p{{"Puertos"}}
+    end
+    q["Qwen / Claude / reglas"] -.cumplen.-> p
+    r["SurrealDB / SQLite"] -.cumplen.-> p
+    o["Correo / Cifrado"] -.cumplen.-> p
+    c["Composicion"] -.arma.-> apl
+```
+
 ---
 
 ## 2. Como la arquitectura responde a los drivers (justificacion)
@@ -50,14 +70,14 @@ se realiza, y con que evidencia se comprueba hoy.
 
 | Driver | Decision (ADR) | Mecanismo en el codigo | Evidencia |
 | --- | --- | --- | --- |
-| DRV-01 Tiempo de respuesta | ADR-002 (REST por turno), ADR-004 (motores en cadena, sin reintentos dentro de la peticion) | `lib/traductor.js`: al fallar un motor no se reintenta, se pasa al siguiente; el circuito evita esperar el timeout en cada mensaje | `npm run medir` + evento `traduccion` con `duracion_ms`; linea base en `medicion_traduccion.md` (**falta medir con Qwen**) |
-| DRV-02 Calidad cultural | ADR-004 (prompt de equivalencia cultural) | `lib/prompt.js` arma el prompt con tono y region destino; devuelve nota cultural y marca de aproximada | `npm run medir` (14/15 con reglas, pero la medicion valida es con Qwen) |
-| DRV-03 Privacidad | ADR-006 (JWT + refresco), ADR-010 (proteccion de datos) | `lib/cifrado.js` (AES-256-GCM en reposo), `lib/log.js` (JSON sin PII), aislamiento por usuario en las rutas, eliminar cuenta | `test/api.test.js`, `test/seguridad.test.js` |
-| DRV-04 Crecimiento de idiomas | ADR-003/ADR-012 (catalogo en datos), ADR-008 (LenguajeRegion N:M) | `routes/catalogo.js` + `repo.catalogo`: alta/activacion de idiomas y regiones sin tocar codigo | Prueba del administrador que activa un idioma y agrega una region |
-| DRV-05 Continuidad ante fallas | ADR-004 (Circuit Breaker con degradacion aceptable) | `lib/traductor.js`: circuito abierto 60 s por motor; `lib/motorLocal.js` como ultimo recurso | `test/motores.test.js`: Qwen falla -> Claude -> reglas |
-| DRV-06 Costo y abuso | ADR-004 (Qwen local sin costo por mensaje), ADR-010 (limites) | `lib/limites.js`: 30 msg/min por usuario, limites de registro y recuperacion | Pruebas de seguridad |
+| DRV-01 Tiempo de respuesta | ADR-002 (REST por turno), ADR-004 (motores en cadena, sin reintentos dentro de la peticion) | `aplicacion/traduccion.js`: al fallar un motor no se reintenta, se pasa al siguiente; el circuito evita esperar el timeout en cada mensaje (falta acotar el tiempo de espera de Qwen, ver `revision_recomendaciones.md`) | `npm run medir` + evento `traduccion` con `duracion_ms`; linea base en `medicion_traduccion.md` (**falta medir con Qwen**) |
+| DRV-02 Calidad cultural | ADR-004 (prompt de equivalencia cultural) | `adaptadores/traduccion/prompt.js` arma el prompt con tono y region destino; devuelve nota cultural y marca de aproximada | `npm run medir` (14/15 con reglas, pero ese glosario esta dentro del motor de reglas; la medicion valida es con Qwen y un glosario aparte) |
+| DRV-03 Privacidad | ADR-006 (JWT + refresco), ADR-010 (proteccion de datos) | `adaptadores/cifrado/aesGcm.js` (AES-256-GCM en reposo), `compartido/log.js` (JSON sin PII), aislamiento por usuario en los casos de uso, eliminar cuenta | `test/api.test.js`, `test/seguridad.test.js` |
+| DRV-04 Crecimiento de idiomas | ADR-003/ADR-012 (catalogo en datos), ADR-008 (LenguajeRegion N:M) | `aplicacion/catalogo.js` + puerto `Repositorio.catalogo`: alta/activacion de idiomas y regiones sin tocar codigo | Prueba del administrador que activa un idioma y agrega una region |
+| DRV-05 Continuidad ante fallas | ADR-004 (Circuit Breaker con degradacion aceptable) | `aplicacion/traduccion.js`: circuito abierto 60 s por motor; `adaptadores/traduccion/reglas.js` como ultimo recurso | `test/motores.test.js`: Qwen falla -> Claude -> reglas, y el caso de uso probado con motores falsos |
+| DRV-06 Costo y abuso | ADR-004 (Qwen local sin costo por mensaje), ADR-010 (limites) | `adaptadores/http/limites.js`: 30 msg/min por usuario, limites de registro y recuperacion | Pruebas de seguridad |
 | DRV-07 Multiplataforma | ADR-001 (Expo), ADR-007 (template Luna) | Una base de codigo en `frontend/`; `lib/api.ts` resuelve el host en web, Expo Go y emulador | Compila para web; **falta probar en celular fisico con Expo Go** |
-| DRV-08 Facilidad de prueba | ADR-002, ADR-012 (Repository de dos motores) | `repos/sqlite.js` corre sin servidor ni claves; misma interfaz que `repos/surreal.js` | ~98 % de cobertura (`npm run coverage`), CI contra los dos motores |
+| DRV-08 Facilidad de prueba | ADR-002, ADR-012 (Repository de dos motores), ADR-013 (puertos) | El adaptador SQLite corre sin servidor ni claves y cumple el mismo puerto que el de SurrealDB; los casos de uso se prueban con adaptadores falsos | ~97 % de cobertura (`npm run coverage`), CI contra los dos motores |
 
 ---
 
@@ -87,9 +107,10 @@ Tres contenedores (App, API, Base de datos) y su comunicacion. Diagrama completo
 ### 5.1 API TalkLate
 
 Detalle completo (20 componentes C01-C20, bounded contexts y trazabilidad REQ->componente) en
-[`componentes.md`](componentes.md). En resumen: Composicion HTTP -> Controladores (Auth,
-Conversaciones, Catalogo, Reportes) -> Subsistema de traduccion (Fachada + motores) y capa
-transversal (sesion, cifrado, limites, log) -> Repositorio.
+[`componentes.md`](componentes.md). En resumen, en capas hexagonales: Adaptador HTTP (rutas,
+sesion, limites) -> Casos de uso (cuentas, sesiones, conversaciones, traduccion, catalogo,
+reportes) -> Dominio y Puertos <- Adaptadores de salida (motores Qwen, Claude y reglas;
+repositorios SurrealDB y SQLite; notificador; cifrador), conectados por la Composicion.
 
 ### 5.2 App movil
 
@@ -190,8 +211,8 @@ El flujo central (HU0003). Muestra el Circuit Breaker (ADR-004), el cifrado al p
 sequenceDiagram
     actor U as Cliente Traductor
     participant A as App (ChatView + api.ts)
-    participant API as API (routes/conversaciones)
-    participant F as Fachada Traductor
+    participant API as API (rutas + caso de uso Conversaciones)
+    participant F as Caso de uso Traduccion
     participant Q as Qwen (Ollama)
     participant CL as Claude
     participant R as Motor de reglas
@@ -271,10 +292,11 @@ Del catalogo `../convenciones/patrones-arquitectonicos.md`:
 | Patron | Donde | ADR |
 | --- | --- | --- |
 | Request-Reply | API REST sincrona por turno | ADR-002, ADR-011 |
-| Circuit Breaker (con degradacion aceptable) | Fachada de traduccion (`lib/traductor.js`) | ADR-004 |
+| Circuit Breaker (con degradacion aceptable) | Caso de uso de traduccion (`aplicacion/traduccion.js`) | ADR-004 |
 | Token-Based Authentication | Sesion JWT + refresco rotativo | ADR-006 |
-| Repository | Acceso a datos de dos motores (`repos/`) | ADR-012 |
-| Structured Logging | Logs JSON sin PII (`lib/log.js`) | ADR-010 |
+| Repository | Puerto `Repositorio` con dos adaptadores (`adaptadores/persistencia/`) | ADR-012 |
+| Puertos y adaptadores (hexagonal) | Toda la API: dominio, casos de uso, puertos, adaptadores y composicion | ADR-013 |
+| Structured Logging | Logs JSON sin PII (`compartido/log.js`) | ADR-010 |
 
 Patrones del catalogo que **no** se usan y por que (microservicios, API Gateway, BFF, CQRS,
 Event Sourcing, Strangler Fig): ver la nota en [`decisiones.md`](decisiones.md).
@@ -299,6 +321,7 @@ Detalle completo en [`decisiones.md`](decisiones.md). Resumen de que resuelve ca
 | ADR-010 | Proteccion de datos personales | DRV-03 |
 | ADR-011 | API v1 REST + OpenAPI | - |
 | ADR-012 | SurrealDB como fuente de verdad detras de un repositorio | DRV-01, DRV-03, DRV-04, DRV-08 |
+| ADR-013 | Arquitectura hexagonal (puertos y adaptadores) dentro del monolito | DRV-04, DRV-05, DRV-08 |
 
 ---
 
@@ -306,7 +329,10 @@ Detalle completo en [`decisiones.md`](decisiones.md). Resumen de que resuelve ca
 
 | Tema | Estado | Referencia |
 | --- | --- | --- |
-| Medir tiempo y calidad **con Qwen** (no solo reglas) | pendiente, es la evidencia valida de DRV-01/DRV-02 | `medicion_traduccion.md` |
+| Medir tiempo y calidad **con Qwen** (no solo reglas) y un glosario aparte | pendiente, es la evidencia valida de DRV-01/DRV-02 | `medicion_traduccion.md`, `revision_recomendaciones.md` |
+| Tiempo de espera de Qwen (60 s) mayor que el limite de DRV-01 | ajustar | `revision_recomendaciones.md` |
+| Gestion de claves (custodia, rotacion, fuerza) | proponer politica | `revision_recomendaciones.md` |
+| SurrealDB o PostgreSQL | decidir con el mentor | ADR-012, `revision_recomendaciones.md` |
 | Desplegar API + Ollama (F10) | pendiente | seccion 8 |
 | Servicio de correo para recuperacion | pendiente (hoy el codigo vuelve en la respuesta en dev) | ADR-006 |
 | Consultas por enlaces sin indice en SurrealDB | revisar con mas datos | ADR-012 |

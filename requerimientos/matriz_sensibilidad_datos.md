@@ -6,23 +6,23 @@ Clasificaciones: **Publico**, **Interno** (solo usuarios autenticados), **Confid
 
 | Entidad | Dato | Clasificacion | Controles | Donde se implementa |
 | --- | --- | --- | --- | --- |
-| Usuario | identificador | Interno | JWT | `backend/src/lib/auth.js` |
-| Usuario | nombre, apellido | PII | JWT, solo el dueno lo ve, se borra al eliminar la cuenta | `routes/auth.js` (`/usuarios/yo`) |
-| Usuario | correo | PII | JWT; nunca se escribe en los logs; unico (Usuario-RN-1) | `lib/log.js` filtra `correo` |
-| Usuario | fecha de nacimiento | PII | Solo para validar la edad minima (13 anos); no se muestra a terceros | `lib/validaciones.js` |
-| Usuario | contrasena | Confidencial | Solo se guarda el hash (bcrypt); nunca en logs ni respuestas | `routes/auth.js` |
-| Usuario | rol | Confidencial | Solo el servidor lo asigna; RBAC en rutas de administrador | `lib/auth.js` (`requerirAdmin`) |
+| Usuario | identificador | Interno | JWT | `backend/src/aplicacion/sesiones.js` |
+| Usuario | nombre, apellido | PII | JWT, solo el dueno lo ve, se borra al eliminar la cuenta | `aplicacion/cuentas.js` (`/usuarios/yo`) |
+| Usuario | correo | PII | JWT; nunca se escribe en los logs; unico (Usuario-RN-1) | `compartido/log.js` filtra `correo` |
+| Usuario | fecha de nacimiento | PII | Solo para validar la edad minima (13 anos); no se muestra a terceros | `dominio/validaciones.js` |
+| Usuario | contrasena | Confidencial | Solo se guarda el hash (bcrypt); nunca en logs ni respuestas | `aplicacion/cuentas.js` |
+| Usuario | rol | Confidencial | Solo el servidor lo asigna; RBAC en rutas de administrador | `adaptadores/http/sesion.js` (`requerirAdmin`) |
 | Usuario | consentimiento de datos | PII | Fecha de aceptacion de la politica (Ley 1581) | `usuario.consentimiento_datos` |
-| Sesion | token de acceso | Confidencial | JWT de 15 minutos, revocable; nunca en logs | `lib/auth.js` |
+| Sesion | token de acceso | Confidencial | JWT de 15 minutos, revocable; nunca en logs | `aplicacion/sesiones.js` |
 | Sesion | token de refresco | Confidencial | 30 dias, se guarda solo su hash, se rota y se revoca al cerrar sesion | tabla `token_refresco` |
-| Recuperacion | codigo de 6 digitos | Confidencial | Hash, 15 minutos, un solo uso, limite de solicitudes; nunca en logs | `routes/auth.js` |
-| Conversacion | nombre, fechas | PII (asociado a la persona) | Solo el dueno; se borra con la cuenta | `routes/conversaciones.js` |
-| MensajeOriginal | contenido (texto o voz transcrita) | PII | **Cifrado en reposo** AES-256-GCM; solo el dueno; nunca en logs; se borra con la conversacion o la cuenta | `lib/cifrado.js` |
-| MensajeDestino | contenido traducido | PII | Igual que el mensaje original | `lib/cifrado.js` |
+| Recuperacion | codigo de 6 digitos | Confidencial | Hash, 15 minutos, un solo uso, limite de solicitudes; nunca en logs | `aplicacion/cuentas.js` |
+| Conversacion | nombre, fechas | PII (asociado a la persona) | Solo el dueno; se borra con la cuenta | `aplicacion/conversaciones.js` |
+| MensajeOriginal | contenido (texto o voz transcrita) | PII | **Cifrado en reposo** AES-256-GCM; solo el dueno; nunca en logs; se borra con la conversacion o la cuenta | `adaptadores/cifrado/aesGcm.js` |
+| MensajeDestino | contenido traducido | PII | Igual que el mensaje original | `adaptadores/cifrado/aesGcm.js` |
 | MensajeDestino | nota cultural, motor, estado | Interno | JWT | - |
-| Reporte | motivo, sugerencia | PII | Solo el autor (al crearlo) y el administrador; se borra con la cuenta | `routes/reportes.js` |
-| Lenguaje, Region, Pais, Canal, Entonacion | catalogo | Interno | JWT para leer; solo administrador para cambiar | `routes/catalogo.js` |
-| Logs | eventos | Interno | JSON, solo identificadores (nunca correo, contrasena, token, codigo ni contenido) | `lib/log.js` |
+| Reporte | motivo, sugerencia | PII | Solo el autor (al crearlo) y el administrador; se borra con la cuenta | `aplicacion/reportes.js` |
+| Lenguaje, Region, Pais, Canal, Entonacion | catalogo | Interno | JWT para leer; solo administrador para cambiar | `aplicacion/catalogo.js` |
+| Logs | eventos | Interno | JSON, solo identificadores (nunca correo, contrasena, token, codigo ni contenido) | `compartido/log.js` |
 
 ## Envio a terceros
 

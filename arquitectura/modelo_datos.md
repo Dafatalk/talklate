@@ -3,7 +3,7 @@
 **Fase 3 · Arquitectura de Software & Base de Datos**
 
 **Estado:** en construcción. Migrado íntegramente desde `Modelo de Dominio Enriquecido.xlsx`.
-**Combinaciones unicas:** propuesta por entidad (validar con Farid). **Alineado con la base de datos** (`backend/src/db.js`) el 2026-10-14: ver "Correspondencia con la base de datos" al final. El `Modelo de Dominio Enriquecido.xlsx` y el MER (Julian) deben actualizarse con estos cambios.
+**Combinaciones unicas:** propuesta por entidad (validar con Farid). **Alineado con la base de datos** (`backend/src/adaptadores/persistencia/sqlite/esquema.js`) el 2026-10-14: ver "Correspondencia con la base de datos" al final. El `Modelo de Dominio Enriquecido.xlsx` y el MER (Julian) deben actualizarse con estos cambios.
 **Gap original:** a casi todas las entidades les faltaba modelar las **combinaciones
 únicas** (constraints de unicidad, simples o compuestas) — señalado por el mentor Wider Farid
 Sánchez Garzón en la sesión del 2026-08-15 (ver `seguimiento/2026-08-15-mentoria.md` para la
@@ -357,7 +357,7 @@ Relación muchos a muchos entre Lenguaje y Región: una región puede hablar var
 
 ## Tablas de soporte (no son objetos de dominio)
 
-El mentor indicó que los reportes son dinámicos y no hacen parte del modelo de dominio inicial. Estas tablas existen solo para que el sistema funcione y se documentan para que el MER coincida con la base de datos (`backend/src/db.js`):
+El mentor indicó que los reportes son dinámicos y no hacen parte del modelo de dominio inicial. Estas tablas existen solo para que el sistema funcione y se documentan para que el MER coincida con la base de datos (`backend/src/adaptadores/persistencia/sqlite/esquema.js`):
 
 | Tabla | Para qué |
 | --- | --- |

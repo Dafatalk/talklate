@@ -2,7 +2,7 @@
 // Traduce modismos y frases hechas por su equivalente cultural (con variantes por pais destino)
 // y el resto palabra por palabra. Si quedan palabras sin traducir, marca la traduccion como aproximada.
 // Para calidad real se usa motorClaude.js (ver traductor.js).
-const { normalizar } = require('./analisis');
+const { normalizar } = require('../../dominio/analisis');
 const { restaurarAcentos } = require('./acentos');
 
 // [original, traduccion o {default, CO, MX, ES, AR, US, GB}, nota cultural opcional]
@@ -307,4 +307,20 @@ function traducirLocal(texto, origen, destino, paisDestino) {
   return { traduccion: salida, nota: nota && restaurarAcentos(nota), aproximada: sinTraducir > 0 };
 }
 
-module.exports = { traducirLocal, PARES_LOCALES: ['es>en', 'en>es'] };
+const PARES_LOCALES = ['es>en', 'en>es'];
+
+// Adaptador del puerto MotorTraduccion (ver puertos/index.js): motor de reglas sin red, ultimo de la cadena.
+function crearMotorReglas() {
+  return {
+    nombre: 'local',
+    etiqueta: () => 'local',
+    disponible: () => true,
+    soportaPar: (origen, destino) => PARES_LOCALES.includes(`${origen}>${destino}`),
+    async traducir(entrada) {
+      const pais = entrada.regionDestino && entrada.regionDestino.paisCodigo;
+      return traducirLocal(entrada.texto, entrada.origen.codigo, entrada.destino.codigo, pais);
+    },
+  };
+}
+
+module.exports = { traducirLocal, PARES_LOCALES, crearMotorReglas };

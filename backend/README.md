@@ -35,14 +35,14 @@ entonaciones (Neutral, Amigable, Alegre, Preocupado, Enojado, Formal).
    ```
    Variables: `OLLAMA_URL` (por defecto `http://localhost:11434`), `QWEN_MODEL`, `QWEN_TIMEOUT_MS`.
 2. **Claude Sonnet**, si hay `ANTHROPIC_API_KEY` (`TALKLATE_MODEL`, por defecto `claude-sonnet-5-5`).
-3. **Motor de reglas** (`src/lib/motorLocal.js`), espanol <-> ingles: cambia modismos y frases hechas por su
+3. **Motor de reglas** (`src/adaptadores/traduccion/reglas.js`), espanol <-> ingles: cambia modismos y frases hechas por su
    equivalente cultural (con variantes por pais) y el resto lo traduce palabra por palabra; si quedan palabras sin
    traducir marca la traduccion como `aproximada`. Sirve para probar sin nada instalado, no para produccion.
 
-Los dos modelos reciben el mismo prompt (`src/lib/prompt.js`): conservar intencion, tono y modismos, usar el
+Los dos modelos reciben el mismo prompt (`src/adaptadores/traduccion/prompt.js`): conservar intencion, tono y modismos, usar el
 equivalente cultural de la region destino y devolver `traduccion`, `tono`, `nota_cultural` y `region_origen`.
 Si un motor falla se pasa al siguiente y no se vuelve a intentar durante un minuto (para no esperar en cada
-mensaje). Cada traduccion guarda que motor la hizo (`qwen:qwen2.5:7b`, `claude:...` o `local`) y `/api/salud` muestra
+mensaje). Cada traduccion guarda que motor la hizo (`qwen:qwen2.5:7b`, `claude:...` o `local`) y `/health` muestra
 la cadena activa. `TRADUCTOR=qwen|claude|local` fuerza otra opcion.
 
 Con Qwen o Claude se aceptan idiomas distintos de espanol e ingles; con solo el motor de reglas no.

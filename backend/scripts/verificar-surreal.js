@@ -5,7 +5,7 @@ process.env.TALKLATE_LOGS = process.env.TALKLATE_LOGS || 'silencio';
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
 
-const repo = require('../src/repos/surreal')();
+const repo = require('../src/adaptadores/persistencia/surreal/repositorio')();
 
 let pasos = 0;
 async function paso(nombre, fn) {

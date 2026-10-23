@@ -20,6 +20,25 @@
 
 ---
 
+## 2026-10-23 - Dafatalk (Claude / Opus)
+
+- **Avances:**
+  - Revise el commit de Julian del 22/10 (documento maestro, C4 nivel 3, diagramas, bitacora): coincide con el codigo; se actualizaron sus rutas de archivos a la nueva estructura.
+  - **Arquitectura hexagonal implementada** en `backend/src` (frente 4 de la revision): `dominio/`, `aplicacion/` (un caso de uso por epica), `puertos/` (Repositorio, MotorTraduccion, Notificador, Cifrador), `adaptadores/` (http, persistencia, traduccion, correo, cifrado) y `composicion.js`. El contrato de la API no cambio.
+  - Pruebas: 34 con SQLite (cobertura ~97 %), 16 de la API contra SurrealDB 3.0.4, `verificar-surreal.js` 12/12 y `smoke-http.js` OK. El Circuit Breaker ahora se prueba con motores falsos.
+  - Docs: ADR-013 en `decisiones.md`, `componentes.md` rehecho por capas (C01-C27), `arquitectura.md`, `tech_stack.md`, `convenciones/backend-node.md` (regla de dependencias), READMEs, `drivers.md`, `modelo_datos.md` y matriz de sensibilidad.
+  - Analisis de las demas recomendaciones en `arquitectura/revision_recomendaciones.md`.
+- **Decidi:**
+  - Hexagonal dentro del monolito y no microservicios: limites claros sin costo distribuido (ADR-013).
+  - Solo `composicion.js` conoce adaptadores concretos; los casos de uso solo importan dominio y puertos.
+  - No migrar a PostgreSQL todavia: con la arquitectura hexagonal cuesta un adaptador (talla L), pero hay que decidirlo con Farid al validar ADR-012.
+- **Hallazgos:** el tiempo de espera de Qwen (60 s) incumple DRV-01 cuando Ollama falla; el glosario de `npm run medir` esta dentro del motor de reglas (la linea base de 14/15 no es evidencia) y usa regiones fuera del alcance (California, Ciudad de Mexico); la clave de cifrado no tiene politica de rotacion ni exige fuerza en produccion.
+- **Handoff / pendiente (orden propuesto):**
+  1. Medicion real con Qwen con un glosario aparte de unos 40 modismos (ES-CO / EN-US), 3 repeticiones y el equipo registrado.
+  2. Acotar el tiempo de espera de Qwen y Claude; politica de claves y rotacion (`enc:v2:<id>`).
+  3. Decidir SurrealDB o PostgreSQL con Farid.
+  4. Metricas (`/metrics`) y despliegue (Docker, F10).
+
 ## 2026-10-22 - Julian (Claude / Opus)
 
 - **Avances:** Documentacion de la arquitectura actual.

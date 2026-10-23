@@ -30,4 +30,10 @@ function leerRespuesta(bruto, tonos) {
   };
 }
 
-module.exports = { armarPrompt, leerRespuesta };
+// La region destino llega como objeto { nombre, paisCodigo }; al prompt solo le sirve el nombre
+function paraPrompt(entrada) {
+  const r = entrada.regionDestino;
+  return { ...entrada, regionDestino: r && typeof r === 'object' ? r.nombre : r };
+}
+
+module.exports = { armarPrompt, leerRespuesta, paraPrompt };
