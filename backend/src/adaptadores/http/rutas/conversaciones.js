@@ -43,6 +43,12 @@ module.exports = function rutasConversaciones({ conversaciones, sesiones }) {
     res.status(204).end();
   }));
 
+  // Mensaje por voz: el audio grabado en la app llega en base64 (el cuerpo puede pesar hasta 15 MB)
+  r.post('/conversaciones/:id/mensajes/voz', limiteMensajes, ruta(async (req, res) => {
+    const { conversacionId, ...respuesta } = await conversaciones.enviarMensajeVoz(req.usuario.id, req.params.id, cuerpo(req));
+    res.status(201).location(`/api/v1/conversaciones/${conversacionId}/mensajes/${respuesta.mensaje.id}`).json(respuesta);
+  }));
+
   r.post('/conversaciones/:id/mensajes', limiteMensajes, ruta(async (req, res) => {
     const { conversacionId, ...respuesta } = await conversaciones.enviarMensaje(req.usuario.id, req.params.id, cuerpo(req));
     res.status(201).location(`/api/v1/conversaciones/${conversacionId}/mensajes/${respuesta.mensaje.id}`).json(respuesta);

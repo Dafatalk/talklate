@@ -26,10 +26,11 @@ export type Mensaje = { id: string; remitente: 'usuario' | 'interlocutor'; canal
 export type ConversacionCompleta = ResumenConversacion & { mensajes: Mensaje[] };
 export type RespuestaMensaje = {
   mensaje: Mensaje;
-  entrega: { canal: 'Texto' | 'Voz'; reproducir_audio: boolean; idioma_codigo: string; region_origen_detectada: string | null };
+  entrega: { canal: 'Texto' | 'Voz'; reproducir_audio: boolean; idioma_codigo: string; region_origen_detectada: string | null; ritmo_voz?: number };
   configuracion: Configuracion;
   aviso: string | null;
 };
+export type RespuestaMensajeVoz = RespuestaMensaje & { transcripcion: string; prosodia: { tono_voz: string | null; descripcion: string } | null };
 export type Reporte = {
   id: string; motivo: string; sugerencia: string | null; estado: 'abierto' | 'revisado' | 'descartado'; nota_admin: string | null; fecha: string;
   original: string; traduccion: string; nota_cultural: string | null; motor: string; idioma_origen: string; idioma_destino: string; reportado_por: string;
@@ -140,6 +141,9 @@ export const api = {
   eliminar: (id: string) => pedir<null>('DELETE', `/conversaciones/${id}`),
   enviarMensaje: (id: string, b: { contenido: string; canal: 'texto' | 'voz'; remitente: 'usuario' | 'interlocutor'; idioma_origen_id?: string }) =>
     pedir<RespuestaMensaje>('POST', `/conversaciones/${id}/mensajes`, b),
+  // Mensaje grabado: audio en base64 + medidas del volumen; el servidor lo transcribe y lo traduce
+  enviarMensajeVoz: (id: string, b: { audio_base64: string; tipo: string; remitente: 'usuario' | 'interlocutor'; prosodia: Record<string, number> }) =>
+    pedir<RespuestaMensajeVoz>('POST', `/conversaciones/${id}/mensajes/voz`, b),
 
   reportar: (destinoId: string, motivo: string, sugerencia?: string) =>
     pedir<{ id: string; mensaje: string }>('POST', '/reportes', { mensaje_destino_id: destinoId, motivo, sugerencia }),

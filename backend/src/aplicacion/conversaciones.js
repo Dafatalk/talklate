@@ -5,8 +5,12 @@ const { randomUUID } = require('node:crypto');
 const { mal, reglaNegocio, noEncontrado, ErrorNegocio } = require('../dominio/errores');
 const { detectarIdioma, detectarRegionOrigen } = require('../dominio/analisis');
 const V = require('../dominio/validaciones');
+const { analizarProsodia } = require('../dominio/prosodia');
 
-function crearServicioConversaciones({ repo, traduccion, cifrador, log }) {
+const MAX_AUDIO_BYTES = 10 * 1024 * 1024; // unos minutos de audio comprimido
+const TIPOS_AUDIO = /^audio\/(m4a|mp4|x-m4a|aac|webm|ogg|wav|x-wav|mpeg|3gpp)(;.*)?$/i;
+
+function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, log }) {
   const { cifrar, descifrar } = cifrador;
 
   // --- formato (puro) ---
@@ -116,7 +120,7 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, log }) {
 
   // HU Ingresar mensaje (voz/texto), Traducir, Reconocer idioma origen, Recibir por el mismo canal,
   // Recibir y responder (interlocutor)
-  async function enviarMensaje(usuarioId, id, datos) {
+  async function enviarMensaje(usuarioId, id, datos, { prosodia = null } = {}) {
     const c = await delUsuario(usuarioId, id);
     const contenido = V.validarContenidoMensaje(datos.contenido);
     const canalEntrada = String(datos.canal || 'texto').toLowerCase();
@@ -147,6 +151,7 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, log }) {
         destino: { codigo: traduceA.idioma_codigo, nombre: traduceA.idioma_nombre },
         regionDestino: traduceA.region_nombre ? { nombre: traduceA.region_nombre, paisCodigo: traduceA.pais_codigo } : null,
         tonos: tonos.map((x) => x.nombre),
+        prosodia,
       });
     } catch (e) {
       log.error('traduccion_fallida', { conversacion_id: c.id, duracion_ms: Date.now() - inicio, detalle: e.message });
@@ -172,13 +177,45 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, log }) {
         id: origenId, contenido: contenidoCifrado, remitente, fecha_creacion: ahora, canal: canalNombre, tono: tono.nombre,
         destino_id: destinoId, contenido_traducido: traduccionCifrada, nota_cultural: t.nota, aproximada: t.aproximada ? 1 : 0, motor: t.motor, estado_entrega: 'Entregado', reportado: 0,
       }),
-      entrega: { canal: canalNombre, reproducir_audio: canalNombre === 'Voz', idioma_codigo: traduceA.idioma_codigo, region_origen_detectada: t.regionOrigen },
+      entrega: { canal: canalNombre, reproducir_audio: canalNombre === 'Voz', idioma_codigo: traduceA.idioma_codigo, region_origen_detectada: t.regionOrigen, ritmo_voz: prosodia ? prosodia.ritmoSalida : 1 },
       configuracion: configuracion(lpcs),
       aviso,
     };
   }
 
-  return { crear, listar, abrir, mensaje, renombrar, eliminar, enviarMensaje };
+  // HU Ingresar mi mensaje hablando: el audio llega grabado desde la app, se pasa a texto (puerto
+  // Transcriptor), se mide COMO se dijo (prosodia) y sigue el mismo flujo de un mensaje, por el canal Voz.
+  async function enviarMensajeVoz(usuarioId, id, datos) {
+    const c = await delUsuario(usuarioId, id); // primero se verifica que la conversacion sea del usuario
+    if (!transcriptor || !transcriptor.disponible()) throw new ErrorNegocio(503, 'La transcripcion de voz no esta configurada en el servidor. Escribe tu mensaje por ahora.');
+    const tipo = String(datos.tipo || 'audio/m4a');
+    if (!TIPOS_AUDIO.test(tipo)) throw mal('El formato de audio no es compatible.');
+    if (typeof datos.audio_base64 !== 'string' || !datos.audio_base64) throw mal('No recibimos el audio. Intenta grabar de nuevo.');
+    const audio = Buffer.from(datos.audio_base64, 'base64');
+    if (!audio.length) throw mal('No recibimos el audio. Intenta grabar de nuevo.');
+    if (audio.length > MAX_AUDIO_BYTES) throw mal('El audio es muy largo. Graba un mensaje mas corto.');
+
+    const lpcs = await repo.conversaciones.lpcDe(c.id);
+    const remitente = datos.remitente === 'interlocutor' ? 'interlocutor' : 'usuario';
+    const habla = lpcs.find((x) => x.rol === (remitente === 'usuario' ? 'origen' : 'destino'));
+    const inicio = Date.now();
+    let texto;
+    try {
+      ({ texto } = await transcriptor.transcribir({ audio, tipo, idioma: habla ? habla.idioma_codigo : undefined }));
+    } catch (e) {
+      if (e instanceof ErrorNegocio) throw e;
+      log.error('transcripcion_fallida', { conversacion_id: c.id, duracion_ms: Date.now() - inicio, detalle: e.message });
+      throw new ErrorNegocio(502, 'No pudimos entender el audio en este momento. Intenta de nuevo o escribe tu mensaje.');
+    }
+    log.info('transcripcion', { conversacion_id: c.id, duracion_ms: Date.now() - inicio, bytes: audio.length });
+    if (!texto) throw reglaNegocio('No escuchamos nada en el audio. Acercate al microfono e intenta de nuevo.');
+
+    const prosodia = analizarProsodia(datos.prosodia, texto);
+    const r = await enviarMensaje(usuarioId, id, { contenido: texto, canal: 'voz', remitente, idioma_origen_id: datos.idioma_origen_id }, { prosodia });
+    return { ...r, transcripcion: texto, prosodia: prosodia ? { tono_voz: prosodia.tono, descripcion: prosodia.descripcion } : null };
+  }
+
+  return { crear, listar, abrir, mensaje, renombrar, eliminar, enviarMensaje, enviarMensajeVoz };
 }
 
 module.exports = { crearServicioConversaciones };

@@ -19,7 +19,10 @@ function crearApp(servicios, opciones = {}) {
     origin: (origen, cb) => cb(null, !origen || ORIGENES.includes('*') || ORIGENES.includes(origen)),
     exposedHeaders: ['Location'],
   }));
-  app.use(express.json({ limit: '1mb' }));
+  // JSON de hasta 1 MB; solo el mensaje de voz (audio en base64) admite hasta 15 MB
+  const json = express.json({ limit: '1mb' });
+  const jsonVoz = express.json({ limit: '15mb' });
+  app.use((req, res, next) => (/\/mensajes\/voz$/.test(req.path) ? jsonVoz : json)(req, res, next));
 
   // Health check (convenciones/api-rest.md seccion 8): incluye el estado de SurrealDB
   app.get('/health', async (_req, res) => {
@@ -27,7 +30,7 @@ function crearApp(servicios, opciones = {}) {
     if (opciones.saludDb) {
       try { db = await opciones.saludDb(); } catch (e) { log.error('salud_db_fallida', { detalle: e.message }); db = { ok: false }; }
     }
-    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: servicios.traduccion.cadena(), db });
+    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: servicios.traduccion.cadena(), transcripcion_voz: !!(servicios.transcriptor && servicios.transcriptor.disponible()), db });
   });
 
   // Documentacion OpenAPI 3.0 (convenciones/api-rest.md seccion 9)

@@ -3,6 +3,7 @@
 // se salta por un tiempo (Circuit Breaker) para no esperar su timeout en cada mensaje.
 // No conoce Qwen, Claude ni HTTP: solo el contrato del puerto.
 const { detectarTono, detectarRegionOrigen } = require('../dominio/analisis');
+const { combinarTono } = require('../dominio/prosodia');
 const { MOTOR_TRADUCCION, asegurarPuerto } = require('../puertos');
 
 function crearServicioTraduccion({ motores, log, esperaTrasFalloMs = 60 * 1000, ahora = Date.now }) {
@@ -16,9 +17,10 @@ function crearServicioTraduccion({ motores, log, esperaTrasFalloMs = 60 * 1000, 
   // Conversacion-RN-3: el par de idiomas debe estar soportado por algun motor activo
   const soportaPar = (origen, destino) => origen !== destino && activos().some((m) => m.soportaPar(origen, destino));
 
-  // entrada: { texto, origen: {codigo, nombre}, destino: {codigo, nombre}, regionDestino?: {nombre, paisCodigo}, tonos: [nombres] }
+  // entrada: { texto, origen: {codigo, nombre}, destino: {codigo, nombre}, regionDestino?: {nombre, paisCodigo}, tonos: [nombres],
+  //           prosodia?: resultado de dominio/prosodia (solo en mensajes de voz) }
   async function traducir(entrada) {
-    const tonoLocal = detectarTono(entrada.texto);
+    const tonoLocal = combinarTono(detectarTono(entrada.texto), entrada.prosodia);
     const regionLocal = detectarRegionOrigen(entrada.texto);
     const conRegion = { ...entrada, regionOrigen: regionLocal ? regionLocal.region : null };
     const par = `${entrada.origen.codigo}>${entrada.destino.codigo}`;

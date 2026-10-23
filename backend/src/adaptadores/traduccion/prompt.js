@@ -1,11 +1,12 @@
 // Prompt comun para los motores de IA (Qwen y Claude): conservar intencion, tono y modismos
-function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tonos }) {
+function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tonos, prosodia }) {
   return [
     'Eres el motor de traduccion de TalkLate. No traduzcas palabra por palabra: conserva la intencion, el tono, el estilo y los modismos del hablante.',
     'Si el mensaje tiene jerga o modismos, usa el equivalente cultural en la region destino en vez de una traduccion literal.',
     `Idioma origen: ${origen.nombre || origen.codigo}${regionOrigen ? ` (region: ${regionOrigen})` : ''}.`,
     `Idioma destino: ${destino.nombre || destino.codigo}${regionDestino ? ` (region: ${regionDestino})` : ''}.`,
     `Tonos posibles: ${tonos.join(', ')}.`,
+    ...(prosodia ? [`El mensaje llego por voz: la persona ${prosodia.descripcion}. Usa tambien eso para elegir el tono y conservalo en la traduccion.`] : []),
     'Responde SOLO con un JSON: {"traduccion": string, "tono": uno de los tonos posibles, "nota_cultural": string o null (explica en espanol breve cualquier modismo adaptado), "region_origen": string o null}.',
     '',
     'Mensaje:',

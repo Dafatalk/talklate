@@ -33,3 +33,10 @@ test('etiqueta de la configuracion y idioma de entrega', () => {
   assert.equal(idiomaDeEntrega('usuario', c2)?.codigo, 'en');
   assert.equal(idiomaDeEntrega('interlocutor', c2)?.codigo, 'es');
 });
+
+test('resumen del volumen grabado: ignora el silencio y calcula promedio, maximo y variacion', async () => {
+  const { resumirVolumen } = await import('../lib/reglas.ts');
+  assert.equal(resumirVolumen([-160, -80, -70]), null); // solo silencio
+  const r = resumirVolumen([-160, -20, -10, -30, -90]);
+  assert.deepEqual(r, { volumen_promedio_db: -20, volumen_max_db: -10, variacion_db: 8.2 });
+});
