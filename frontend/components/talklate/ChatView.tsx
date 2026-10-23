@@ -4,16 +4,23 @@ import Header from '@/components/Header';
 import DrawerButton from '@/components/DrawerButton';
 import ThemedText from '@/components/ThemedText';
 import Icon from '@/components/Icon';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api, Configuracion, Mensaje, ResumenConversacion } from '@/lib/api';
-import { hablar, localeDe } from '@/lib/voz';
+import { detenerVoz, hablar } from '@/lib/voz';
+import { useGrabadorVoz } from '@/lib/grabacion';
 import { etiquetaConfig, idiomaDeEntrega } from '@/lib/reglas';
 import { useConversaciones } from '@/app/contexts/ConversacionesContext';
 import MessageBubble from './MessageBubble';
-import TranslatorInput, { EnvioMensaje } from './TranslatorInput';
+import TranslatorInput, { EnvioMensaje, Remitente } from './TranslatorInput';
+import BurbujaVoz, { UltimoIntercambio } from './BurbujaVoz';
 import PromptModal from './PromptModal';
 
+type Modo = 'burbuja' | 'chat';
+const CLAVE_MODO = 'talklate.modo';
 
-// Pantalla del traductor: una conversacion con sus mensajes originales y traducidos
+
+// Pantalla del traductor. Dos modos que se cambian desde la cabecera (como ChatGPT): la burbuja de voz
+// animada que representa a la IA, o el chat con los mensajes originales y traducidos.
 export default function ChatView({ id }: { id: string }) {
   const { refrescar } = useConversaciones();
   const [conv, setConv] = useState<ResumenConversacion | null>(null);
@@ -26,6 +33,21 @@ export default function ChatView({ id }: { id: string }) {
   const [reportando, setReportando] = useState<Mensaje | null>(null);
   const [errorReporte, setErrorReporte] = useState('');
   const lista = useRef<ScrollView>(null);
+  const [modo, setModo] = useState<Modo>('burbuja');
+  const [remitente, setRemitente] = useState<Remitente>('usuario');
+  const [estadoVoz, setEstadoVoz] = useState<'lista' | 'traduciendo' | 'hablando'>('lista');
+  const [ultimo, setUltimo] = useState<UltimoIntercambio>(null);
+  const grabador = useGrabadorVoz();
+
+  // Se recuerda el ultimo modo elegido en este celular
+  useEffect(() => {
+    AsyncStorage.getItem(CLAVE_MODO).then((m) => { if (m === 'chat' || m === 'burbuja') setModo(m); }).catch(() => {});
+  }, []);
+  const cambiarModo = () => {
+    const nuevo: Modo = modo === 'burbuja' ? 'chat' : 'burbuja';
+    setModo(nuevo);
+    AsyncStorage.setItem(CLAVE_MODO, nuevo).catch(() => {});
+  };
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -44,11 +66,50 @@ export default function ChatView({ id }: { id: string }) {
   useEffect(() => { cargar(); }, [cargar]);
   useEffect(() => { setTimeout(() => lista.current?.scrollToEnd({ animated: true }), 50); }, [mensajes.length]);
 
-  // El audio se reproduce en el idioma/pais en que quedo la traduccion
-  const reproducir = (m: Mensaje, config: Configuracion) => {
-    if (!m.traduccion) return;
+  // El audio se reproduce en el idioma/pais en que quedo la traduccion, con la entonacion del mensaje
+  // y, si fue hablado, a la velocidad con que hablo la persona
+  const reproducir = (m: Mensaje, config: Configuracion, opciones: { ritmo?: number; alTerminar?: () => void } = {}) => {
+    if (!m.traduccion) return opciones.alTerminar?.();
     const hacia = idiomaDeEntrega(m.remitente, config);
-    if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono);
+    if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono, opciones);
+    else opciones.alTerminar?.();
+  };
+
+  // Microfono (burbuja o chat): un toque empieza a grabar; el siguiente envia el audio, que el servidor
+  // transcribe y traduce; la traduccion se escucha con la misma entonacion.
+  const pulsarMicrofono = async () => {
+    if (!conv) return;
+    if (estadoVoz === 'hablando') { detenerVoz(); setEstadoVoz('lista'); return; }
+    if (!grabador.grabando) {
+      setAviso(null);
+      try { await grabador.iniciar(); } catch (err: any) { setAviso(err.message); }
+      return;
+    }
+    let grabacion;
+    try {
+      grabacion = await grabador.detener();
+    } catch (err: any) {
+      setAviso(err.message);
+      return;
+    }
+    if (!grabacion) { setAviso('El audio fue muy corto. Toca la burbuja, habla y vuelve a tocarla.'); return; }
+    setEstadoVoz('traduciendo');
+    setEnviando(true);
+    try {
+      const r = await api.enviarMensajeVoz(id, { ...grabacion, remitente });
+      setMensajes((ms) => [...ms, r.mensaje]);
+      setConv({ ...conv, configuracion: r.configuracion, total_mensajes: conv.total_mensajes + 1 });
+      setUltimo({ original: r.transcripcion, traduccion: r.mensaje.traduccion?.contenido || '', tono: r.mensaje.tono, remitente });
+      if (r.aviso) setAviso(r.aviso);
+      setEstadoVoz('hablando');
+      reproducir(r.mensaje, r.configuracion, { ritmo: r.entrega.ritmo_voz, alTerminar: () => setEstadoVoz('lista') });
+      refrescar();
+    } catch (err: any) {
+      setAviso(err.message);
+      setEstadoVoz('lista');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const enviar = async (e: EnvioMensaje) => {
@@ -96,7 +157,6 @@ export default function ChatView({ id }: { id: string }) {
   };
 
   const config = conv?.configuracion;
-  const origenLocale = config?.origen ? localeDe(config.origen.codigo, config.origen.pais) : (typeof navigator !== 'undefined' && navigator.language) || 'es-CO';
 
   return (
     <View className="flex-1 bg-light-primary dark:bg-dark-primary">
@@ -110,10 +170,24 @@ export default function ChatView({ id }: { id: string }) {
               {config ? <ThemedText className="text-xs opacity-60" numberOfLines={1}>{etiquetaConfig(config)}</ThemedText> : null}
             </View>,
           ]}
-          rightComponents={conv ? [<Icon key="renombrar" name="Pencil" size={20} onPress={() => setRenombrando(true)} />] : []}
+          rightComponents={conv ? [
+            <Icon key="modo" name={modo === 'burbuja' ? 'MessageSquare' : 'AudioLines'} size={20} onPress={cambiarModo} className="mr-4" />,
+            <Icon key="renombrar" name="Pencil" size={20} onPress={() => setRenombrando(true)} />,
+          ] : []}
         />
         {cargando ? (
           <View className="flex-1 items-center justify-center"><ActivityIndicator /></View>
+        ) : modo === 'burbuja' && conv ? (
+          <BurbujaVoz
+            estado={grabador.grabando ? 'escuchando' : estadoVoz}
+            nivelDb={grabador.nivelDb}
+            remitente={remitente}
+            alCambiarRemitente={setRemitente}
+            alPulsar={pulsarMicrofono}
+            ultimo={ultimo}
+            idiomaUsuario={conv.configuracion.origen?.idioma}
+            idiomaOtro={conv.configuracion.destino.idioma}
+          />
         ) : (
           <ScrollView ref={lista} className="flex-1 px-global" contentContainerStyle={{ paddingTop: 12, paddingBottom: 16 }} keyboardShouldPersistTaps="handled">
             {mensajes.length === 0 && conv ? (
@@ -130,7 +204,9 @@ export default function ChatView({ id }: { id: string }) {
           </ScrollView>
         )}
         {aviso ? <ThemedText className="px-global pb-2 text-sm text-highlight" onPress={() => setAviso(null)}>{aviso}</ThemedText> : null}
-        {conv ? <TranslatorInput enviando={enviando} localeDictado={origenLocale} alEnviar={enviar} alAvisar={setAviso} /> : null}
+        {conv && modo === 'chat' ? (
+          <TranslatorInput enviando={enviando} remitente={remitente} alCambiarRemitente={setRemitente} grabando={grabador.grabando} alPulsarMicrofono={pulsarMicrofono} alEnviar={enviar} />
+        ) : null}
       </KeyboardAvoidingView>
 
       <PromptModal

@@ -292,3 +292,17 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Mas archivos y una indireccion mas. El contrato de la API, la base y las pruebas de punta a punta no cambiaron (las mismas 16 pruebas de la API pasan con SQLite y con SurrealDB).
 - Los nombres siguen ADR-009 (dominio en espanol).
 
+
+## ADR-014: Voz en Expo Go con grabacion en el celular, Whisper en el servidor y entonacion por texto y voz
+
+**Estado:** Aceptada (23/10/2026). Reemplaza la parte de ADR-005 que usaba el dictado del teclado.
+
+**Contexto:** En Expo Go no hay reconocimiento de voz nativo; el boton "hablar" solo mostraba "Toca el microfono del teclado para dictar". Ademas la traduccion debe sonar con la misma entonacion de quien habla.
+
+**Decision:**
+- La app graba con `expo-audio` (funciona en Expo Go) y mide el volumen cada 100 ms.
+- El audio va en base64 a `POST /api/v1/conversaciones/:id/mensajes/voz`. El nuevo puerto `Transcriptor` lo pasa a texto con un adaptador Whisper (API compatible con OpenAI `/v1/audio/transcriptions`: faster-whisper/speaches o whisper.cpp locales). Variables: `TRANSCRIPCION_URL`, `TRANSCRIPCION_MODELO`.
+- `dominio/prosodia.js` saca el tono de la voz (volumen, variacion y palabras por segundo). El tono del texto manda salvo que sea Neutral; la descripcion de la prosodia va al prompt del LLM y `entrega.ritmo_voz` ajusta la velocidad de la voz de salida.
+- La interfaz tiene dos modos, como ChatGPT: la burbuja animada del template Luna (AiCircle) y el chat. El modo se recuerda en el celular.
+
+**Consecuencias:** Se necesita un servidor Whisper (se recomienda el modelo `small`; `tiny` confunde jerga como "parce"). Sin `TRANSCRIPCION_URL` el endpoint de voz responde 503 y el texto sigue funcionando.

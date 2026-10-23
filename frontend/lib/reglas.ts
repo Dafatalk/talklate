@@ -38,3 +38,14 @@ export function etiquetaConfig(c: Config): string {
 export function idiomaDeEntrega<T>(remitente: 'usuario' | 'interlocutor', config: { origen: T | null; destino: T }): T | null {
   return remitente === 'usuario' ? config.destino : config.origen;
 }
+
+// Resume el volumen medido mientras se grababa (dB entre -160 y 0, una muestra cada 100 ms) para que el
+// servidor estime COMO se dijo el mensaje. Ignora el silencio (por debajo de -60 dB).
+export function resumirVolumen(muestrasDb: number[]): { volumen_promedio_db: number; volumen_max_db: number; variacion_db: number } | null {
+  const voz = muestrasDb.filter((x) => Number.isFinite(x) && x > -60);
+  if (voz.length < 3) return null;
+  const promedio = voz.reduce((a, b) => a + b, 0) / voz.length;
+  const variacion = Math.sqrt(voz.reduce((a, b) => a + (b - promedio) ** 2, 0) / voz.length);
+  const r = (x: number) => Math.round(x * 10) / 10;
+  return { volumen_promedio_db: r(promedio), volumen_max_db: r(Math.max(...voz)), variacion_db: r(variacion) };
+}

@@ -2,12 +2,13 @@
 // los casos de uso y los adaptadores concretos: lee la configuracion (variables de entorno), elige
 // cada adaptador, verifica que cumpla su puerto y entrega los casos de uso armados al adaptador HTTP.
 const log = require('./compartido/log');
-const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR } = require('./puertos');
+const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR } = require('./puertos');
 const { crearMotorQwen } = require('./adaptadores/traduccion/qwen');
 const { crearMotorClaude } = require('./adaptadores/traduccion/claude');
 const { crearMotorReglas } = require('./adaptadores/traduccion/reglas');
 const { crearNotificadorConsola } = require('./adaptadores/correo/consola');
 const { crearCifradorAesGcm } = require('./adaptadores/cifrado/aesGcm');
+const { crearTranscriptorWhisper } = require('./adaptadores/transcripcion/whisper');
 const { crearServicioTraduccion } = require('./aplicacion/traduccion');
 const { crearServicioSesiones } = require('./aplicacion/sesiones');
 const { crearServicioCuentas } = require('./aplicacion/cuentas');
@@ -49,6 +50,11 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
   const cifrador = asegurarPuerto('cifrador', adaptadores.cifrador || crearCifradorAesGcm({ secreto: entorno.TALKLATE_CLAVE_CIFRADO, produccion: esProduccion(entorno) }), CIFRADOR);
   const notificador = asegurarPuerto('notificador', adaptadores.notificador || crearNotificadorConsola({ modo: entorno.CORREO_MODO || 'consola', produccion: esProduccion(entorno) }), NOTIFICADOR);
   const traduccion = crearTraduccion(entorno, { motores: adaptadores.motores, fetchFn: adaptadores.fetchFn });
+  // Whisper (API compatible con OpenAI): local con speaches/faster-whisper o whisper.cpp, o en la nube
+  const transcriptor = asegurarPuerto('transcriptor', adaptadores.transcriptor || crearTranscriptorWhisper({
+    url: entorno.TRANSCRIPCION_URL, modelo: entorno.TRANSCRIPCION_MODELO || undefined, apiKey: entorno.TRANSCRIPCION_API_KEY,
+    timeoutMs: Number(entorno.TRANSCRIPCION_TIMEOUT_MS) || undefined, fetchFn: adaptadores.fetchFn,
+  }), TRANSCRIPTOR);
   const sesiones = crearServicioSesiones({
     repo,
     secreto: secretoJwt(entorno),
@@ -57,9 +63,10 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
   });
   return {
     traduccion,
+    transcriptor,
     sesiones,
     cuentas: crearServicioCuentas({ repo, sesiones, notificador, log }),
-    conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, log }),
+    conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, log }),
     catalogo: crearServicioCatalogo({ repo, log }),
     reportes: crearServicioReportes({ repo, cifrador, log }),
   };

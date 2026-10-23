@@ -337,13 +337,64 @@ paths:
                 type: object
                 properties:
                   mensaje: { $ref: '#/components/schemas/Mensaje' }
-                  entrega: { type: object, properties: { canal: { type: string }, reproducir_audio: { type: boolean }, idioma_codigo: { type: string }, region_origen_detectada: { type: string, nullable: true } } }
+                  entrega: { type: object, properties: { canal: { type: string }, reproducir_audio: { type: boolean }, idioma_codigo: { type: string }, region_origen_detectada: { type: string, nullable: true }, ritmo_voz: { type: number, description: 'Velocidad para la voz de salida (1 = normal); imita a quien hablo' } } }
                   configuracion: { type: object }
                   aviso: { type: string, nullable: true }
         '400': { $ref: '#/components/responses/Error' }
         '422': { $ref: '#/components/responses/Error' }
         '429': { $ref: '#/components/responses/Error' }
         '502': { $ref: '#/components/responses/Error' }
+  /conversaciones/{id}/mensajes/voz:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    post:
+      tags: [Traduccion de mensajes]
+      summary: Ingresar un mensaje hablando (HU0001, HU0003, HU0004, HU0005)
+      description: |
+        Recibe el audio grabado en la app (base64, hasta 10 MB), lo pasa a texto con Whisper (puerto Transcriptor),
+        estima la entonacion con el texto y con la voz (volumen, variacion y velocidad) y sigue el mismo flujo de un
+        mensaje por el canal Voz. La traduccion conserva esa entonacion y `entrega.ritmo_voz` indica la velocidad
+        para la voz de salida. Responde 503 si el servidor no tiene transcripcion configurada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [audio_base64, tipo]
+              properties:
+                audio_base64: { type: string, description: Audio grabado codificado en base64 }
+                tipo: { type: string, example: audio/m4a, description: 'audio/m4a, audio/webm, audio/wav, audio/mpeg, ...' }
+                remitente: { type: string, enum: [usuario, interlocutor], default: usuario }
+                idioma_origen_id: { type: string }
+                prosodia:
+                  type: object
+                  description: Medidas tomadas al grabar (nivel en dB entre -160 y 0)
+                  properties:
+                    duracion_ms: { type: number }
+                    volumen_promedio_db: { type: number }
+                    volumen_max_db: { type: number }
+                    variacion_db: { type: number }
+      responses:
+        '201':
+          description: Mensaje transcrito y traducido (mismo cuerpo que un mensaje, mas la transcripcion)
+          headers: { Location: { schema: { type: string } } }
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transcripcion: { type: string }
+                  prosodia: { type: object, nullable: true, properties: { tono_voz: { type: string, nullable: true }, descripcion: { type: string } } }
+                  mensaje: { $ref: '#/components/schemas/Mensaje' }
+                  entrega: { type: object }
+                  configuracion: { type: object }
+                  aviso: { type: string, nullable: true }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+        '502': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
   /conversaciones/{id}/mensajes/{mensajeId}:
     parameters: [{ $ref: '#/components/parameters/id' }, { name: mensajeId, in: path, required: true, schema: { type: string } }]
     get:

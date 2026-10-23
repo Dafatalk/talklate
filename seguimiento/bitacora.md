@@ -77,3 +77,10 @@
   3. **Desplegar API + Ollama + metricas** (F10). Hoy nada corre en servidor.
   4. **Formalizar limites hexagonales** del subsistema de traduccion (port + adapters) para robustez sin microservicios.
   - Pendientes de repo: `seguimiento/follow-up/modelo_dominio/schema/` esta sin commitear (confirmar con Diego antes de subir). Servicio de correo de recuperacion sigue pendiente (ADR-006).
+
+## 23/10/2026 - Voz con burbuja animada y mapa de impacto por valor
+
+- **Voz (para Julian y Diego):** el boton hablar ya graba en Expo Go con `expo-audio` y el servidor transcribe con Whisper (ADR-014). Hay que correr `npm install` en `frontend/` y levantar un Whisper local y poner `TRANSCRIPCION_URL` en `backend/.env`.
+- La entonacion se detecta por las palabras y por la voz, y la traduccion se escucha con ese mismo tono y ritmo.
+- La pantalla cambia entre la burbuja animada (modo voz) y el chat con el icono de arriba.
+- **Mapa de impacto:** ahora esta ordenado de mayor a menor valor, igual que los sprints, como pidio el profesor. Los IDs de las historias no cambiaron.
