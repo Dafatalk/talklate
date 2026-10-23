@@ -11,7 +11,7 @@
 | Circuit Breaker (Qwen -> Claude -> reglas) | Mantener | De acuerdo, pero el tiempo de espera de Qwen (60 s) rompe DRV-01 la primera vez que falla | Ajustar el tiempo de espera |
 | Repository | Mantener | De acuerdo. Ahora es un puerto formal con dos adaptadores | Hecho |
 | Cifrado + JWT | Mantener, definir gestion de claves | De acuerdo. La clave no esta junto a los datos, pero falta politica de custodia, rotacion y fuerza de la clave | Proponer politica y rotacion |
-| SurrealDB | Reconsiderar PostgreSQL | De acuerdo en reconsiderar; con la arquitectura hexagonal el cambio cuesta un adaptador. Decidir con el mentor | Para decidir |
+| SurrealDB | Reconsiderar PostgreSQL | El equipo decidio mantener SurrealDB: es la base que recomendo el mentor y ya esta probada | **Decidido: se mantiene SurrealDB** |
 | Medicion real con Qwen | Agregar ya | De acuerdo, es lo mas urgente. Ademas el glosario actual no sirve como evidencia | Prioridad 1 |
 | Despliegue + metricas | Agregar | De acuerdo; es F10 y va al final de la construccion, pero las metricas se pueden adelantar | Planear |
 
@@ -47,7 +47,11 @@
   - Agregar el identificador de la clave al texto cifrado (`enc:v2:<id>:...`) para rotar sin perder los mensajes viejos.
   - Para despues del MVP: cifrado por sobre (envelope) con el KMS del proveedor de nube.
 
-## 5. SurrealDB - reconsiderar PostgreSQL (para decidir con el mentor)
+## 5. SurrealDB - reconsiderar PostgreSQL (decidido: se mantiene SurrealDB)
+
+> **Decision del equipo (23/10/2026):** se mantiene SurrealDB. Es la base que recomendo el mentor, ya funciona y esta probada contra una instancia real. PostgreSQL queda descartado. Los puntos debiles se atienden dentro de SurrealDB: consultas siempre con valores serializados y probados contra inyeccion, e indices para las consultas que recorren enlaces. Ver ADR-012.
+
+El analisis que se hizo antes de decidir:
 
 - **A favor de PostgreSQL:**
   - El dominio es relacional (combinaciones unicas, relaciones muchos a muchos, cascadas).
@@ -89,7 +93,7 @@
 
 1. **Medicion real con Qwen**, con el glosario nuevo (valida la tesis; bloquea DRV-01 y DRV-02).
 2. **Tiempo de espera de Qwen y gestion de claves** (pequenos; responden a lo que pidio el mentor sobre seguridad y secretos).
-3. **SurrealDB o PostgreSQL**: decidir con el mentor; si se cambia, es un adaptador nuevo.
+3. ~~SurrealDB o PostgreSQL~~: **decidido, se mantiene SurrealDB** (recomendacion del mentor). Queda revisar indices de las consultas que recorren enlaces.
 4. **Metricas y despliegue** (F10).
 
 La arquitectura hexagonal (el cuarto frente de la revision) ya quedo hecha.

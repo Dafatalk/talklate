@@ -17,7 +17,7 @@
 | ADR-009 | Identificadores del dominio en espanol (lenguaje ubicuo) | - | aceptada (excepcion: esquema de SurrealDB en ingles, ver ADR-012) |
 | ADR-010 | Proteccion de datos personales | Structured Logging (6.1) | aceptada |
 | ADR-011 | API v1 segun la convencion REST y documentada con OpenAPI | Request-Reply (2.3) | aceptada |
-| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio (esquema en ingles, instancia remota) | Repository | aceptada, **validar con el mentor** |
+| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio (esquema en ingles, instancia remota) | Repository | aceptada (base recomendada por el mentor; PostgreSQL descartado el 2026-10-23) |
 | ADR-013 | Arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular | Puertos y adaptadores | aceptada |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
@@ -216,7 +216,7 @@ Contrato claro para la app y para pruebas; cambios incompatibles van en `/api/v2
 
 ## ADR-012: SurrealDB como fuente de verdad, detras de un repositorio
 
-**Fecha:** 2026-10-15 · **Estado:** aceptada, validar con el mentor · **Reemplaza:** ADR-003 · **Responde a:** DRV-01, DRV-03, DRV-04, DRV-08
+**Fecha:** 2026-10-15 · **Estado:** aceptada (base de datos recomendada por el mentor; decision cerrada el 2026-10-23) · **Reemplaza:** ADR-003 · **Responde a:** DRV-01, DRV-03, DRV-04, DRV-08
 
 ### Contexto
 ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasar a un servidor de base de datos. Julian construyo el cambio (PR #29): el modelo de dominio tiene muchas relaciones (conversacion, lenguaje por conversacion, mensaje original y destino, reporte) y combinaciones unicas que se querian expresar directo en la base.
@@ -229,7 +229,7 @@ ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasa
 
 ### Alternativas (comparadas al justificar)
 - **Seguir con SQLite:** instalacion cero, pero es un archivo local; para varios usuarios a la vez y para produccion habia que cambiarla igual.
-- **PostgreSQL:** muy maduro y era el paso previsto en ADR-003; las relaciones se modelan con llaves foraneas y JOIN. Se eligio SurrealDB porque los enlaces entre registros siguen el modelo de dominio sin tablas intermedias de mas y el esquema con ASSERT deja reglas del dominio en la base.
+- **PostgreSQL:** muy maduro y era el paso previsto en ADR-003; las relaciones se modelan con llaves foraneas y JOIN. Se eligio SurrealDB porque es la base que recomendo el mentor y porque los enlaces entre registros siguen el modelo de dominio sin tablas intermedias de mas y el esquema con ASSERT deja reglas del dominio en la base.
 - **SDK oficial de SurrealDB:** mas comodo, pero agrega una dependencia; el endpoint HTTP basta para estas consultas.
 
 ### Consecuencias
@@ -239,6 +239,13 @@ ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasa
 - CI corre la suite de la API contra los dos motores (job `backend-surreal`).
 - En produccion son obligatorias `SURREAL_USER` y `SURREAL_PASS` (no se acepta root/root).
 - Pendiente: algunas consultas filtran recorriendo enlaces (por ejemplo mensajes de una conversacion) y no aprovechan indices; con muchos datos hay que revisarlas.
+
+### Decision final del 2026-10-23: se mantiene SurrealDB
+La revision critica del 22/10 propuso reconsiderar PostgreSQL (`revision_recomendaciones.md`, punto 5). El equipo decidio **mantener SurrealDB** porque es la base que recomendo el mentor, ya funciona y esta probada (CI contra SurrealDB real), y el esquema en ingles ya esta en la nube. PostgreSQL queda descartado.
+Los puntos debiles que senalo la revision se atienden dentro de SurrealDB:
+- **Consultas:** el adaptador nunca concatena texto del usuario; todo valor pasa por `lit`/`rid` y hay pruebas de inyeccion (comillas, saltos de linea, `"; DELETE ...`).
+- **Rendimiento:** revisar con mas datos las consultas que recorren enlaces y agregar indices donde haga falta.
+- Gracias a la arquitectura hexagonal (ADR-013), si algun dia hiciera falta cambiar de base, seria un adaptador nuevo del puerto `Repositorio`.
 
 ### Ajuste del 2026-10-15 (PR #30)
 - **Esquema en ingles:** las tablas y campos de SurrealDB estan en ingles (`user`, `conversation`, `original_message`, `translated_message`...), alineados con el modelo de dominio en ingles de `seguimiento/follow-up/modelo_dominio/`. Es una excepcion a ADR-009 solo para la base: la API, el codigo y los valores de los enumerados (`origen`/`destino`, `abierto`...) siguen en espanol, y el adaptador (`src/adaptadores/persistencia/surreal/repositorio.js`) traduce los nombres en cada consulta.

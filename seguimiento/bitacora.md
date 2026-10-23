@@ -20,6 +20,12 @@
 
 ---
 
+## 2026-10-23 (2) - Dafatalk (Claude / Opus)
+
+- **Decidi (equipo):** **se mantiene SurrealDB; no se migra a PostgreSQL.** Es la base que recomendo el profesor (Farid), ya funciona y esta probada contra una instancia real.
+- **Avances:** ADR-012 marcado como decision cerrada (con la decision final y como se atienden los puntos debiles); `revision_recomendaciones.md`, `arquitectura.md`, `tech_stack.md` y `validar_en_reunion.md` al dia.
+- **Handoff / pendiente:** Julian, ya no hace falta tu opinion sobre PostgreSQL (lo pedido en la entrada de abajo queda resuelto). Sigue pendiente revisar indices en las consultas de SurrealDB que recorren enlaces, ademas de la medicion con Qwen, el tiempo de espera de Qwen, la gestion de claves y el despliegue.
+
 ## 2026-10-23 - Dafatalk (Claude / Opus)
 
 > **Estado:** fusionado en `develop` (PR #34). Julian: lee primero la seccion **Para Julian** de esta entrada.
