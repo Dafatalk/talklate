@@ -20,6 +20,12 @@
 
 ---
 
+## 2026-10-22 (2) - Julian (Claude / Opus)
+
+- **Avances:** Instalada la skill **Archify** (diagramas HTML interactivos desde el repo) project-scoped en `.agents/skills/archify`, con symlink para Claude Code. Reinstalar con `npx skills add tt-a1i/archify`.
+- **Decidi:** NO versionar los 17 MB de la skill. Se ignora `.agents/` y `.claude/skills/` en `.gitignore`; se versiona solo `skills-lock.json` para que el equipo reproduzca la misma version.
+- **Handoff / pendiente:** Util para regenerar los diagramas de `arquitectura/` (c4, despliegue, secuencia) de forma interactiva. Falta probarla pidiendole al agente que mapee el repo.
+
 ## 2026-10-22 - Julian (Claude / Opus)
 
 - **Avances:** Documentacion de la arquitectura actual.
