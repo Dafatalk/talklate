@@ -1,0 +1,59 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="despliegue" name="Despliegue">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="titulo" value="Vista de despliegue de TalkLate" style="text;html=1;fontSize=18;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="700" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nota" value="Que corre donde. Justifica que Qwen vive en el servidor (ADR-004), SurrealDB es remoto gestionado (ADR-012) y la voz es del dispositivo (ADR-005)." style="text;html=1;fontSize=12;align=left;verticalAlign=middle;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="40" y="52" width="900" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="disp" value="Dispositivo del Cliente Traductor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#438DD5;dashed=1;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#3C7FC0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="320" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="appd" value="&lt;b&gt;App TalkLate&lt;/b&gt;&lt;br&gt;[Contenedor: Expo / React Native]&lt;br&gt;Expo Go, web o build nativo." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="170" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="vozd" value="&lt;b&gt;Voz del dispositivo&lt;/b&gt;&lt;br&gt;[Sistema externo - en el cliente]&lt;br&gt;Dictado y sintesis (expo-speech)." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#FFFFFF;strokeColor=#6B6B6B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="300" width="260" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="srv" value="Servidor de TalkLate" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#438DD5;dashed=1;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#3C7FC0;" vertex="1" parent="1">
+          <mxGeometry x="540" y="120" width="340" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="apin" value="&lt;b&gt;API TalkLate&lt;/b&gt;&lt;br&gt;[Contenedor: Node.js 22 + Express]&lt;br&gt;Puerto 3000. REST /api/v1." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;fontColor=#FFFFFF;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="570" y="170" width="280" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="oll" value="&lt;b&gt;Ollama + modelo Qwen&lt;/b&gt;&lt;br&gt;[Sistema externo]&lt;br&gt;Motor de traduccion principal." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#FFFFFF;strokeColor=#6B6B6B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="570" y="300" width="280" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cloud" value="&lt;b&gt;SurrealDB Cloud&lt;/b&gt;&lt;br&gt;[Base de datos - gestionado]&lt;br&gt;Fuente de verdad. Mensajes cifrados AES-256-GCM." style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#FFFFFF;strokeColor=#6B6B6B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="150" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="anth" value="&lt;b&gt;API de Anthropic&lt;/b&gt;&lt;br&gt;[Sistema externo]&lt;br&gt;Claude Sonnet. Respaldo, solo si hay clave." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;fontColor=#FFFFFF;strokeColor=#6B6B6B;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="320" width="240" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d1" value="HTTPS /api/v1 (JWT acceso 15 min + token de refresco)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="appd" target="apin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="API local del dispositivo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="appd" target="vozd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" value="HTTP local /api/chat" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="apin" target="oll">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" value="HTTP /sql + token de sesion" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="apin" target="cloud">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" value="HTTPS (solo si hay clave)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#707070;fontSize=11;labelBackgroundColor=#FFFFFF;dashed=1;" edge="1" parent="1" source="apin" target="anth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

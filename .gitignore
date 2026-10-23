@@ -34,3 +34,10 @@ backend/data/
 # Archivos temporales de Office y editores
 ~$*
 *.swp
+
+# Tooling de agentes / IA (local, no versionar)
+.atl/
+
+# Respaldos y duplicados de sincronizacion (iCloud crea "archivo 2.ext")
+*.bak
+* 2.*
