@@ -43,6 +43,12 @@ const NOTIFICADOR = ['enviarCodigoRecuperacion'];
  */
 const CIFRADOR = ['cifrar', 'descifrar'];
 
+/**
+ * Puerto Transcriptor (salida): pasa el audio de un mensaje de voz a texto. Lo cumple
+ * adaptadores/transcripcion/whisper.js. transcribir({ audio: Buffer, tipo, idioma? }) -> { texto }
+ */
+const TRANSCRIPTOR = ['disponible', 'transcribir'];
+
 // Verifica que un adaptador cumpla su puerto; falla al arrancar y no a mitad de una peticion.
 function asegurarPuerto(nombre, objeto, metodos) {
   const faltan = metodos.filter((m) => !objeto || (typeof objeto[m] !== 'function' && !(m === 'nombre' && typeof objeto[m] === 'string')));
@@ -55,4 +61,4 @@ function asegurarRepositorio(repo) {
   return repo;
 }
 
-module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, asegurarPuerto, asegurarRepositorio };
+module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, asegurarPuerto, asegurarRepositorio };

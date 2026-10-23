@@ -20,6 +20,12 @@
 
 ---
 
+## 2026-10-23 (2) - Dafatalk (Claude / Opus)
+
+- **Decidi (equipo):** **se mantiene SurrealDB; no se migra a PostgreSQL.** Justificacion tecnica (no solo "lo recomendo el profesor"): enlaces nativos para la cadena conversacion -> mensajes -> traducciones -> reportes, reglas del dominio en el esquema (UNIQUE, ASSERT), multimodelo para lo que viene (reportes flexibles, busqueda vectorial de modismos) y gestionada en la nube con usuarios de permisos limitados. Julian: confirma que el usuario de base del backend solo tenga permisos sobre `talklate/app`. El riesgo (tecnologia mas joven) se controla con la arquitectura hexagonal. La frase para la sustentacion esta en ADR-012.
+- **Avances:** ADR-012 marcado como decision cerrada (con la decision final y como se atienden los puntos debiles); `revision_recomendaciones.md`, `arquitectura.md`, `tech_stack.md` y `validar_en_reunion.md` al dia.
+- **Handoff / pendiente:** Julian, ya no hace falta tu opinion sobre PostgreSQL (lo pedido en la entrada de abajo queda resuelto). Sigue pendiente revisar indices en las consultas de SurrealDB que recorren enlaces, ademas de la medicion con Qwen, el tiempo de espera de Qwen, la gestion de claves y el despliegue.
+
 ## 2026-10-23 - Dafatalk (Claude / Opus)
 
 > **Estado:** fusionado en `develop` (PR #34). Julian: lee primero la seccion **Para Julian** de esta entrada.
@@ -71,3 +77,10 @@
   3. **Desplegar API + Ollama + metricas** (F10). Hoy nada corre en servidor.
   4. **Formalizar limites hexagonales** del subsistema de traduccion (port + adapters) para robustez sin microservicios.
   - Pendientes de repo: `seguimiento/follow-up/modelo_dominio/schema/` esta sin commitear (confirmar con Diego antes de subir). Servicio de correo de recuperacion sigue pendiente (ADR-006).
+
+## 23/10/2026 - Voz con burbuja animada y mapa de impacto por valor
+
+- **Voz (para Julian y Diego):** el boton hablar ya graba en Expo Go con `expo-audio` y el servidor transcribe con Whisper (ADR-014). Hay que correr `npm install` en `frontend/` y levantar un Whisper local y poner `TRANSCRIPCION_URL` en `backend/.env`.
+- La entonacion se detecta por las palabras y por la voz, y la traduccion se escucha con ese mismo tono y ritmo.
+- La pantalla cambia entre la burbuja animada (modo voz) y el chat con el icono de arriba.
+- **Mapa de impacto:** ahora esta ordenado de mayor a menor valor, igual que los sprints, como pidio el profesor. Los IDs de las historias no cambiaron.

@@ -9,6 +9,8 @@ const { crearMotores, crearTraduccion } = require('../src/composicion');
 const { detectarIdioma, detectarTono, detectarRegionOrigen } = require('../src/dominio/analisis');
 const V = require('../src/dominio/validaciones');
 const log = require('../src/compartido/log');
+const { analizarProsodia, combinarTono } = require('../src/dominio/prosodia');
+const { crearTranscriptorWhisper } = require('../src/adaptadores/transcripcion/whisper');
 
 test('el motor local adapta modismos con variantes por pais destino', () => {
   assert.equal(traducirLocal('Hay que ponerse las pilas con el trabajo', 'es', 'en', 'US').traduccion, 'We need to get cracking on the work');
@@ -143,4 +145,39 @@ test('composicion: la cadena de motores sale de TRADUCTOR (Qwen, luego Claude, l
   r = await s.traducir(ENTRADA);
   assert.equal(r.traduccion, 'We need to get cracking on the work');
   assert.equal(r.motor, 'local');
+});
+
+test('prosodia: la voz se traduce en intensidad, ritmo y tono; el texto manda si no es neutro', () => {
+  const fuertePareja = analizarProsodia({ duracion_ms: 2000, volumen_promedio_db: -12, volumen_max_db: -3, variacion_db: 3 }, 'uno dos tres cuatro cinco seis siete');
+  assert.equal(fuertePareja.intensidad, 'alta');
+  assert.equal(fuertePareja.ritmo, 'rapido');
+  assert.equal(fuertePareja.tono, 'Enojado');
+  assert.ok(fuertePareja.ritmoSalida > 1); // la voz de salida tambien va rapido
+  assert.equal(analizarProsodia({ duracion_ms: 2000, volumen_promedio_db: -15, variacion_db: 12 }, 'que bien').tono, 'Alegre');
+  const bajita = analizarProsodia({ duracion_ms: 4000, volumen_promedio_db: -45, variacion_db: 2 }, 'no se que hacer');
+  assert.equal(bajita.tono, 'Preocupado');
+  assert.equal(bajita.ritmo, 'lento');
+  assert.ok(bajita.ritmoSalida < 1);
+  assert.equal(analizarProsodia(null, 'hola'), null);
+  assert.equal(analizarProsodia({ duracion_ms: 100 }, 'hola'), null);
+  assert.equal(combinarTono('Neutral', fuertePareja), 'Enojado');
+  assert.equal(combinarTono('Amigable', fuertePareja), 'Amigable');
+  assert.equal(combinarTono('Neutral', null), 'Neutral');
+});
+
+test('adaptador Whisper: envia el audio como multipart (API compatible con OpenAI) y lee el texto', async () => {
+  let enviado;
+  const t = crearTranscriptorWhisper({ url: 'http://localhost:9000/v1/audio/transcriptions', modelo: 'small', apiKey: 'k', fetchFn: async (url, op) => { enviado = { url, op }; return { ok: true, json: async () => ({ text: ' hola parce ' }) }; } });
+  assert.equal(t.disponible(), true);
+  const r = await t.transcribir({ audio: Buffer.from('abc'), tipo: 'audio/m4a', idioma: 'es' });
+  assert.equal(r.texto, 'hola parce');
+  assert.equal(enviado.op.headers.Authorization, 'Bearer k');
+  assert.equal(enviado.op.body.get('model'), 'small');
+  assert.equal(enviado.op.body.get('language'), 'es');
+  assert.equal(enviado.op.body.get('file').name, 'mensaje.m4a');
+  const sinUrl = crearTranscriptorWhisper({});
+  assert.equal(sinUrl.disponible(), false);
+  await assert.rejects(sinUrl.transcribir({ audio: Buffer.from('a') }), (e) => e.estado === 503);
+  const falla = crearTranscriptorWhisper({ url: 'http://x', fetchFn: async () => ({ ok: false, status: 500 }) });
+  await assert.rejects(falla.transcribir({ audio: Buffer.from('a') }), /500/);
 });

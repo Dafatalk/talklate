@@ -17,7 +17,7 @@
 | ADR-009 | Identificadores del dominio en espanol (lenguaje ubicuo) | - | aceptada (excepcion: esquema de SurrealDB en ingles, ver ADR-012) |
 | ADR-010 | Proteccion de datos personales | Structured Logging (6.1) | aceptada |
 | ADR-011 | API v1 segun la convencion REST y documentada con OpenAPI | Request-Reply (2.3) | aceptada |
-| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio (esquema en ingles, instancia remota) | Repository | aceptada, **validar con el mentor** |
+| ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio (esquema en ingles, instancia remota) | Repository | aceptada (decision cerrada el 2026-10-23; PostgreSQL descartado) |
 | ADR-013 | Arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular | Puertos y adaptadores | aceptada |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
@@ -216,7 +216,7 @@ Contrato claro para la app y para pruebas; cambios incompatibles van en `/api/v2
 
 ## ADR-012: SurrealDB como fuente de verdad, detras de un repositorio
 
-**Fecha:** 2026-10-15 · **Estado:** aceptada, validar con el mentor · **Reemplaza:** ADR-003 · **Responde a:** DRV-01, DRV-03, DRV-04, DRV-08
+**Fecha:** 2026-10-15 · **Estado:** aceptada (decision cerrada el 2026-10-23) · **Reemplaza:** ADR-003 · **Responde a:** DRV-01, DRV-03, DRV-04, DRV-08
 
 ### Contexto
 ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasar a un servidor de base de datos. Julian construyo el cambio (PR #29): el modelo de dominio tiene muchas relaciones (conversacion, lenguaje por conversacion, mensaje original y destino, reporte) y combinaciones unicas que se querian expresar directo en la base.
@@ -239,6 +239,24 @@ ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasa
 - CI corre la suite de la API contra los dos motores (job `backend-surreal`).
 - En produccion son obligatorias `SURREAL_USER` y `SURREAL_PASS` (no se acepta root/root).
 - Pendiente: algunas consultas filtran recorriendo enlaces (por ejemplo mensajes de una conversacion) y no aprovechan indices; con muchos datos hay que revisarlas.
+
+### Decision final del 2026-10-23: se mantiene SurrealDB
+La revision critica del 22/10 propuso reconsiderar PostgreSQL (`revision_recomendaciones.md`, punto 5). El equipo comparo las dos opciones contra lo que pide TalkLate y decidio **mantener SurrealDB**. Las razones:
+
+1. **El dominio es una cadena de relaciones y SurrealDB las guarda como enlaces nativos.** Conversacion -> idioma de la conversacion -> mensaje original -> mensaje traducido -> reporte. Cada campo `record<...>` apunta directo al registro relacionado, y una consulta lo recorre sin JOIN. Ejemplo real del adaptador: para saber si una traduccion es del usuario se escribe `mensaje_original.lenguaje_conversacion.conversacion.usuario = $usuario` en una sola expresion (REQ-CONV-007, REQ-REP-001).
+2. **Las reglas del dominio tambien viven en la base (defensa en profundidad).** El esquema es SCHEMAFULL: las combinaciones unicas que pidio el mentor son indices `UNIQUE` (correo, nombre y codigo de idioma, region dentro del pais, un reporte por traduccion y usuario); los valores permitidos son `ASSERT` (rol, estado del reporte, remitente, estado de entrega); y hay validaciones de formato y longitud (correo con `string::is_email`, nombre de conversacion de 3 a 80 caracteres). Si un error en la API dejara pasar un dato invalido, la base lo rechaza.
+3. **Es multimodelo, y eso encaja con lo que viene sin agregar otra base.** Los reportes son dinamicos, segun el mentor (sin estructura fija): SurrealDB admite campos flexibles junto a tablas estrictas. La evolucion prevista, usar los reportes y un glosario de modismos para mejorar la traduccion, puede apoyarse en sus indices vectoriales (HNSW) y en relaciones de grafo (`RELATE`) para equivalencias entre regiones, todo en la misma base.
+4. **Gestionada y con control de acceso fino.** SurrealDB Cloud evita instalar y operar un servidor de base de datos, algo importante para un equipo de dos personas. SurrealDB permite crear usuarios con permisos limitados a un namespace o a una base; el backend usa un usuario de base propio y no el root (minimo privilegio, ADR-010; confirmar que sus permisos queden limitados a `talklate/app`).
+5. **Ya esta construida y probada.** Funciona contra una instancia real y CI corre la suite de la API contra SurrealDB en cada cambio.
+
+Ademas, es la base que recomendo el mentor. Esa recomendacion respalda la decision, pero lo que la sostiene son las razones de arriba.
+
+**Lo que se acepta a cambio (y como se maneja):**
+- Es mas joven que PostgreSQL y su comunidad es menor. Se usa la version 3.x fija en CI, y el acceso a datos queda aislado detras del puerto `Repositorio` (ADR-013): si algun dia hubiera que cambiar de base, seria un adaptador nuevo y no una reescritura.
+- No se usan consultas preparadas como en SQL: el adaptador nunca concatena texto del usuario; todo valor pasa por `lit`/`rid` y hay pruebas de inyeccion (comillas, saltos de linea, `"; DELETE ...`).
+- Las consultas que recorren enlaces no usan indices: se revisan con mas datos y se agregan indices donde haga falta.
+
+**Como explicarlo en la sustentacion:** "Elegimos SurrealDB porque nuestro dominio es una cadena de relaciones (conversacion, mensajes, traducciones, reportes) que guarda como enlaces nativos, porque nos deja poner las reglas del dominio en el propio esquema y porque, al ser multimodelo, soporta lo que viene (reportes flexibles, busqueda vectorial de modismos) sin agregar otra base. Su riesgo, ser una tecnologia mas joven, lo controlamos con la arquitectura hexagonal: la base esta detras de un puerto y se puede cambiar sin tocar las reglas."
 
 ### Ajuste del 2026-10-15 (PR #30)
 - **Esquema en ingles:** las tablas y campos de SurrealDB estan en ingles (`user`, `conversation`, `original_message`, `translated_message`...), alineados con el modelo de dominio en ingles de `seguimiento/follow-up/modelo_dominio/`. Es una excepcion a ADR-009 solo para la base: la API, el codigo y los valores de los enumerados (`origen`/`destino`, `abierto`...) siguen en espanol, y el adaptador (`src/adaptadores/persistencia/surreal/repositorio.js`) traduce los nombres en cada consulta.
@@ -274,3 +292,17 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Mas archivos y una indireccion mas. El contrato de la API, la base y las pruebas de punta a punta no cambiaron (las mismas 16 pruebas de la API pasan con SQLite y con SurrealDB).
 - Los nombres siguen ADR-009 (dominio en espanol).
 
+
+## ADR-014: Voz en Expo Go con grabacion en el celular, Whisper en el servidor y entonacion por texto y voz
+
+**Estado:** Aceptada (23/10/2026). Reemplaza la parte de ADR-005 que usaba el dictado del teclado.
+
+**Contexto:** En Expo Go no hay reconocimiento de voz nativo; el boton "hablar" solo mostraba "Toca el microfono del teclado para dictar". Ademas la traduccion debe sonar con la misma entonacion de quien habla.
+
+**Decision:**
+- La app graba con `expo-audio` (funciona en Expo Go) y mide el volumen cada 100 ms.
+- El audio va en base64 a `POST /api/v1/conversaciones/:id/mensajes/voz`. El nuevo puerto `Transcriptor` lo pasa a texto con un adaptador Whisper (API compatible con OpenAI `/v1/audio/transcriptions`: faster-whisper/speaches o whisper.cpp locales). Variables: `TRANSCRIPCION_URL`, `TRANSCRIPCION_MODELO`.
+- `dominio/prosodia.js` saca el tono de la voz (volumen, variacion y palabras por segundo). El tono del texto manda salvo que sea Neutral; la descripcion de la prosodia va al prompt del LLM y `entrega.ritmo_voz` ajusta la velocidad de la voz de salida.
+- La interfaz tiene dos modos, como ChatGPT: la burbuja animada del template Luna (AiCircle) y el chat. El modo se recuerda en el celular.
+
+**Consecuencias:** Se necesita un servidor Whisper (se recomienda el modelo `small`; `tiny` confunde jerga como "parce"). Sin `TRANSCRIPCION_URL` el endpoint de voz responde 503 y el texto sigue funcionando.

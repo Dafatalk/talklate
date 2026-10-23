@@ -15,7 +15,8 @@
     ],
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",

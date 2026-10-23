@@ -24,31 +24,20 @@ const AJUSTE_TONO: Record<string, { pitch: number; rate: number }> = {
   Neutral: { pitch: 1, rate: 1 },
 };
 
-export function hablar(texto: string, codigoIdioma: string, paisNombre?: string | null, tono = 'Neutral') {
+// La traduccion sale con la misma entonacion del mensaje: el tono ajusta tono y velocidad de la voz, y
+// "ritmo" (1 = normal) imita la velocidad con que hablo la persona en los mensajes de voz.
+export function hablar(texto: string, codigoIdioma: string, paisNombre?: string | null, tono = 'Neutral', opciones: { ritmo?: number; alTerminar?: () => void } = {}) {
   const a = AJUSTE_TONO[tono] || AJUSTE_TONO.Neutral;
+  const ritmo = opciones.ritmo && Number.isFinite(opciones.ritmo) ? opciones.ritmo : 1;
   Speech.stop();
-  Speech.speak(texto, { language: localeDe(codigoIdioma, paisNombre), pitch: a.pitch, rate: a.rate });
+  Speech.speak(texto, {
+    language: localeDe(codigoIdioma, paisNombre),
+    pitch: a.pitch,
+    rate: Math.min(1.4, Math.max(0.7, a.rate * ritmo)),
+    onDone: opciones.alTerminar,
+    onStopped: opciones.alTerminar,
+    onError: opciones.alTerminar,
+  });
 }
 
 export const detenerVoz = () => Speech.stop();
-
-// Dictado con la API de reconocimiento del navegador. En celular se usa el microfono del teclado.
-export const dictadoDisponible = () =>
-  Platform.OS === 'web' && typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
-
-export function iniciarDictado(locale: string, alTexto: (texto: string) => void, alTerminar: () => void, alError: (mensaje: string) => void) {
-  const Ctor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-  const rec = new Ctor();
-  rec.lang = locale;
-  rec.interimResults = true;
-  rec.continuous = false;
-  rec.onresult = (e: any) => {
-    let t = '';
-    for (let i = 0; i < e.results.length; i += 1) t += e.results[i][0].transcript;
-    alTexto(t);
-  };
-  rec.onerror = (e: any) => alError(e.error === 'not-allowed' ? 'Permite el uso del microfono para poder hablar.' : 'No pudimos escucharte. Intenta de nuevo.');
-  rec.onend = alTerminar;
-  rec.start();
-  return () => rec.stop();
-}

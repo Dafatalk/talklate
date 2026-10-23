@@ -27,7 +27,9 @@ let servidor, raiz, base, repo;
 test.before(async () => {
   repo = crearRepo();
   await repo.inicializar();
-  servidor = crearApp(componer({ repo })).listen(0);
+  // Transcriptor falso que cumple el puerto: el "audio" de prueba es el texto mismo
+  const transcriptor = { disponible: () => true, transcribir: async ({ audio }) => ({ texto: audio.toString('utf8') === 'silencio' ? '' : audio.toString('utf8') }) };
+  servidor = crearApp(componer({ repo, adaptadores: { transcriptor } })).listen(0);
   await new Promise((r) => servidor.once('listening', r));
   raiz = `http://127.0.0.1:${servidor.address().port}`;
   base = `${raiz}/api/v1`;
@@ -188,6 +190,36 @@ test('una persona no puede ver conversaciones de otra', async () => {
   const otro = await api('POST', '/auth/registro', { ...usuarioBase, correo: 'otro@correo.com' });
   assert.equal((await api('GET', `/conversaciones/${conversacion.id}`, null, otro.datos.token)).estado, 404);
   assert.equal((await api('GET', '/conversaciones', null, otro.datos.token)).datos.pagination.total, 0);
+});
+
+test('mensaje grabado por voz: se transcribe, la voz define el tono si el texto es neutro y se entrega por voz', async () => {
+  const en = catalogoDatos.idiomas.find((i) => i.codigo === 'en');
+  const c = await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: en.regiones[0].id }, token);
+  const audio = (t) => Buffer.from(t).toString('base64');
+  const ruta = `/conversaciones/${c.datos.id}/mensajes/voz`;
+  // voz fuerte y pareja sobre un texto neutro -> Enojado (lo decide la voz)
+  const fuerte = { duracion_ms: 2000, volumen_promedio_db: -12, volumen_max_db: -3, variacion_db: 3 };
+  const r = await api('POST', ruta, { audio_base64: audio('Necesito ir al centro manana temprano'), tipo: 'audio/m4a', prosodia: fuerte }, token);
+  assert.equal(r.estado, 201);
+  assert.equal(r.datos.transcripcion, 'Necesito ir al centro manana temprano');
+  assert.equal(r.datos.mensaje.canal, 'Voz');
+  assert.equal(r.datos.mensaje.tono, 'Enojado');
+  assert.equal(r.datos.entrega.reproducir_audio, true);
+  assert.equal(typeof r.datos.entrega.ritmo_voz, 'number');
+  assert.equal(r.datos.prosodia.tono_voz, 'Enojado');
+  assert.match(r.cabeceras.get('location'), /\/mensajes\//);
+  // si las palabras ya dicen el tono, mandan las palabras
+  const pilas = await api('POST', ruta, { audio_base64: audio('Hay que ponerse las pilas con el trabajo'), tipo: 'audio/webm;codecs=opus', prosodia: fuerte }, token);
+  assert.equal(pilas.datos.mensaje.tono, 'Preocupado');
+  // errores: sin audio, formato raro, audio vacio, conversacion ajena
+  assert.equal((await api('POST', ruta, { tipo: 'audio/m4a' }, token)).estado, 400);
+  assert.equal((await api('POST', ruta, { audio_base64: audio('hola'), tipo: 'video/mp4' }, token)).estado, 400);
+  assert.equal((await api('POST', ruta, { audio_base64: audio('silencio'), tipo: 'audio/m4a' }, token)).estado, 422);
+  const otro = await api('POST', '/auth/login', { correo: 'otro@correo.com', password: usuarioBase.password });
+  assert.equal((await api('POST', ruta, { audio_base64: audio('hola'), tipo: 'audio/m4a' }, otro.datos.token)).estado, 404);
+  const salud = await (await fetch(`${raiz}/health`)).json();
+  assert.equal(salud.transcripcion_voz, true);
+  await api('DELETE', `/conversaciones/${c.datos.id}`, null, token);
 });
 
 test('reportar una mala traduccion y revisarla como administrador', async () => {
