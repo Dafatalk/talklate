@@ -2,7 +2,7 @@
 process.env.TALKLATE_LOGS = 'silencio';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const S = require('../src/surreal');
+const S = require('../src/adaptadores/persistencia/surreal/cliente');
 
 function falso({ rechazarPrimera = false } = {}) {
   const llamadas = { signin: 0, sql: 0, auth: [] };

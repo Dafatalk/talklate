@@ -18,6 +18,7 @@
 | ADR-010 | Proteccion de datos personales | Structured Logging (6.1) | aceptada |
 | ADR-011 | API v1 segun la convencion REST y documentada con OpenAPI | Request-Reply (2.3) | aceptada |
 | ADR-012 | SurrealDB como fuente de verdad, detras de un repositorio (esquema en ingles, instancia remota) | Repository | aceptada, **validar con el mentor** |
+| ADR-013 | Arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular | Puertos y adaptadores | aceptada |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
 
@@ -49,7 +50,7 @@ Se prueba en Expo Go sin compilar. El reconocimiento de voz nativo y las notific
 Un solo cliente (la app) y un equipo pequeno. La traduccion es "bajo demanda con respuesta inmediata esperada por el usuario", el caso de uso que el catalogo asigna a Request-Reply.
 
 ### Decision
-Monolito modular en Node.js 22 con Express: rutas por recurso, reglas en `src/lib`, API REST sincrona. Mismo lenguaje (JavaScript/TypeScript) que la app.
+Monolito modular en Node.js 22 con Express: rutas por recurso y reglas separadas de HTTP (desde ADR-013, en capas hexagonales: `src/dominio`, `src/aplicacion`, `src/adaptadores`), API REST sincrona. Mismo lenguaje (JavaScript/TypeScript) que la app.
 
 ### Alternativas (comparadas al justificar)
 - **Microservicios** (traduccion aparte): el catalogo los reserva para despliegue y escalado independientes; aqui solo agregan complejidad.
@@ -68,7 +69,7 @@ Un solo lenguaje en todo el proyecto. Si crece, el modulo de traduccion se puede
 Hace falta persistir usuarios, conversaciones y mensajes con integridad referencial, y que cualquiera pueda correr el proyecto sin instalar un servidor de base de datos.
 
 ### Decision
-SQLite con `node:sqlite` (incluido en Node 22) y solo consultas parametrizadas. El esquema sigue el modelo de dominio (`backend/src/db.js`). Las pruebas usan base en memoria.
+SQLite con `node:sqlite` (incluido en Node 22) y solo consultas parametrizadas. El esquema sigue el modelo de dominio (`backend/src/adaptadores/persistencia/sqlite/esquema.js`). Las pruebas usan base en memoria.
 
 ### Alternativas (comparadas al justificar)
 - **PostgreSQL:** mejor para produccion y concurrencia; es el siguiente paso (F10).
@@ -87,7 +88,7 @@ Instalacion cero. Para produccion hay que migrar a PostgreSQL; el SQL es estanda
 El valor de TalkLate es traducir conservando tono, intencion y modismos; un traductor literal no lo logra. El equipo decidio usar **Qwen corriendo local** por ahora y volver a **Claude Sonnet** si no funciona.
 
 ### Decision
-Una fachada (`backend/src/lib/traductor.js`) prueba los motores en orden: **Qwen** servido por Ollama en el servidor de TalkLate, luego **Claude Sonnet** (API de Anthropic, si hay clave) y por ultimo un **motor de reglas** espanol/ingles con modismos y variantes por pais. Los dos modelos reciben el mismo prompt (equivalente cultural segun la region destino; devuelven tono, region de origen y nota cultural).
+Una fachada (`backend/src/aplicacion/traduccion.js`) prueba los motores en orden: **Qwen** servido por Ollama en el servidor de TalkLate, luego **Claude Sonnet** (API de Anthropic, si hay clave) y por ultimo un **motor de reglas** espanol/ingles con modismos y variantes por pais. Los dos modelos reciben el mismo prompt (equivalente cultural segun la region destino; devuelven tono, region de origen y nota cultural).
 Es el patron **Circuit Breaker** del catalogo: si un motor falla, se "abre" durante un minuto (no se le vuelve a llamar) y el sistema **degrada** al siguiente; el catalogo menciona justamente "traduccion literal como degradacion aceptable", que es el papel del motor de reglas. No se usa Retry con backoff dentro de una misma peticion porque el usuario esta esperando: se prefiere pasar de inmediato al siguiente motor.
 
 ### Alternativas (comparadas al justificar)
@@ -223,7 +224,7 @@ ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasa
 ### Decision
 - **SurrealDB 3.x** es la fuente de verdad del backend. El esquema esta en `backend/db/surreal/schema.surql` (SCHEMAFULL) y se aplica al arrancar.
 - Las relaciones son enlaces nativos (`record<...>`); las combinaciones unicas son indices `UNIQUE`; los valores permitidos (rol, estado, remitente) son `ASSERT` en el campo.
-- El acceso a datos pasa por un **repositorio** con la misma interfaz para dos motores: `src/repos/surreal.js` (ejecucion) y `src/repos/sqlite.js` (pruebas sin servidor). Las rutas no conocen el motor; `DB_DRIVER` elige cual usar.
+- El acceso a datos pasa por un **repositorio** con la misma interfaz para dos motores: `src/adaptadores/persistencia/surreal/repositorio.js` (ejecucion) y `src/adaptadores/persistencia/sqlite/repositorio.js` (pruebas sin servidor). Las rutas no conocen el motor; `DB_DRIVER` elige cual usar.
 - La conexion es por HTTP (`/sql`) sin dependencias nuevas. Se entra una vez con `/signin` y se reutiliza el token; los valores se escriben como literales serializados (`lit`, `rid`), nunca concatenando texto del usuario.
 
 ### Alternativas (comparadas al justificar)
@@ -240,6 +241,36 @@ ADR-003 dejo SQLite como base inicial y anoto que para produccion habia que pasa
 - Pendiente: algunas consultas filtran recorriendo enlaces (por ejemplo mensajes de una conversacion) y no aprovechan indices; con muchos datos hay que revisarlas.
 
 ### Ajuste del 2026-10-15 (PR #30)
-- **Esquema en ingles:** las tablas y campos de SurrealDB estan en ingles (`user`, `conversation`, `original_message`, `translated_message`...), alineados con el modelo de dominio en ingles de `seguimiento/follow-up/modelo_dominio/`. Es una excepcion a ADR-009 solo para la base: la API, el codigo y los valores de los enumerados (`origen`/`destino`, `abierto`...) siguen en espanol, y el adaptador (`src/repos/surreal.js`) traduce los nombres en cada consulta.
+- **Esquema en ingles:** las tablas y campos de SurrealDB estan en ingles (`user`, `conversation`, `original_message`, `translated_message`...), alineados con el modelo de dominio en ingles de `seguimiento/follow-up/modelo_dominio/`. Es una excepcion a ADR-009 solo para la base: la API, el codigo y los valores de los enumerados (`origen`/`destino`, `abierto`...) siguen en espanol, y el adaptador (`src/adaptadores/persistencia/surreal/repositorio.js`) traduce los nombres en cada consulta.
 - **Instancia remota:** la app usa por defecto una instancia de SurrealDB Cloud; las credenciales van en `backend/.env` (fuera del repo). Las pruebas y CI usan un SurrealDB local para no crear ni borrar datos en el remoto.
+
+## ADR-013: Arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular
+
+**Fecha:** 2026-10-23 · **Estado:** aceptada · **Complementa:** ADR-002, ADR-004, ADR-012 · **Responde a:** DRV-04, DRV-05, DRV-08
+
+### Contexto
+La revision de arquitectura del 22/10/2026 (`seguimiento/bitacora.md`) confirmo que el monolito modular es la decision correcta (ADR-002), pero senalo que su modularidad no era explicita: las rutas HTTP mezclaban reglas de negocio, acceso a datos y cifrado, y la fachada de traduccion conocia cada motor por su nombre. La pregunta "y si manana crece?" debe poder responderse sin partir el sistema en microservicios. El mentor tambien pidio revisar capas y separacion de responsabilidades.
+
+### Decision
+Organizar la API en capas de **puertos y adaptadores** (Alistair Cockburn), sin cambiar su contrato:
+- **Dominio** (`src/dominio`): validaciones, errores de negocio y analisis de texto. No depende de nada externo.
+- **Aplicacion** (`src/aplicacion`): un caso de uso por epica (cuentas, sesiones, conversaciones, traduccion, catalogo, reportes). Solo importa el dominio y los puertos.
+- **Puertos** (`src/puertos`): contratos `Repositorio`, `MotorTraduccion`, `Notificador` y `Cifrador`, verificados al arrancar.
+- **Adaptadores** (`src/adaptadores`): de entrada, HTTP con Express; de salida, SurrealDB y SQLite, Qwen, Claude y reglas, correo y AES-GCM.
+- **Composicion** (`src/composicion.js`): unico lugar que conoce los adaptadores concretos; los elige segun el entorno y arma los casos de uso.
+
+El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso de uso aplica el Circuit Breaker (ADR-004) sobre cualquier lista de motores, sin saber cuales son.
+
+### Alternativas (comparadas al justificar)
+- **Dejar el monolito como estaba:** funciona, pero las reglas viven en las rutas y cambiar un motor o la base obliga a tocar varios archivos.
+- **Microservicios (traduccion aparte):** limites claros, pero agrega red, despliegue y fallas distribuidas que un equipo de dos no necesita (ADR-002).
+- **Capas clasicas (controlador, servicio, repositorio) sin puertos:** separa responsabilidades, pero el servicio sigue dependiendo de implementaciones concretas.
+- **Clean Architecture completa con un framework de inyeccion de dependencias:** mas ceremonia y dependencias para el mismo resultado; aqui la composicion manual basta.
+
+### Consecuencias
+- Limites claros sin el costo distribuido: cambiar de base de datos (por ejemplo a PostgreSQL) o agregar un motor es escribir un adaptador nuevo; los casos de uso no cambian.
+- El caso de uso de traduccion y el Circuit Breaker se prueban con motores falsos, sin red ni HTTP (`test/motores.test.js`).
+- Un adaptador incompleto falla al arrancar (`asegurarPuerto`), no a mitad de una peticion.
+- Mas archivos y una indireccion mas. El contrato de la API, la base y las pruebas de punta a punta no cambiaron (las mismas 16 pruebas de la API pasan con SQLite y con SurrealDB).
+- Los nombres siguen ADR-009 (dominio en espanol).
 

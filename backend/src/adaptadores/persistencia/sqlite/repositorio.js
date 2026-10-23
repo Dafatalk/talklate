@@ -1,7 +1,7 @@
-// Repositorio sobre SQLite (node:sqlite). Misma interfaz async que repos/surreal.js,
-// para que rutas, lib/auth y los tests funcionen con cualquier motor.
+// Adaptador del puerto Repositorio (ver puertos/index.js) sobre SQLite (node:sqlite). Misma interfaz
+// async que el adaptador de SurrealDB, para que los casos de uso y las pruebas funcionen con cualquiera.
 // Envuelve la API sincrona en metodos async (sin sorpresas de concurrencia).
-const { transaccion } = require('../db');
+const { transaccion } = require('./esquema');
 
 module.exports = function crearRepoSqlite(db) {
   const uno = (sql, ...a) => db.prepare(sql).get(...a);

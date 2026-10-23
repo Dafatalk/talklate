@@ -2,17 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const path = require('node:path');
 const fs = require('node:fs');
-const { ErrorNegocio, cuerpoError } = require('./lib/errores');
-const traductor = require('./lib/traductor');
-const log = require('./lib/log');
+const { ErrorNegocio, cuerpoError } = require('../../dominio/errores');
+const log = require('../../compartido/log');
 
 // CORS con origenes explicitos (convenciones/seguridad.md seccion 7). Las apps nativas no envian Origin.
 const ORIGENES = (process.env.CORS_ORIGENES || 'http://localhost:8081,http://127.0.0.1:8081,http://localhost:19006')
   .split(',').map((o) => o.trim()).filter(Boolean);
 
-// crearApp(repo, opciones): repo es el repositorio async (SurrealDB o SQLite).
+// Adaptador HTTP (entrada) de la arquitectura hexagonal (ADR-013). crearApp(servicios, opciones):
+// servicios son los casos de uso ya armados por composicion.js; esta capa solo traduce HTTP.
 // opciones.saludDb: fn async opcional que informa el estado de la base para /health.
-function crearApp(repo, opciones = {}) {
+function crearApp(servicios, opciones = {}) {
   const app = express();
   app.disable('x-powered-by');
   app.use(cors({
@@ -27,11 +27,11 @@ function crearApp(repo, opciones = {}) {
     if (opciones.saludDb) {
       try { db = await opciones.saludDb(); } catch (e) { log.error('salud_db_fallida', { detalle: e.message }); db = { ok: false }; }
     }
-    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: traductor.cadena(), db });
+    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: servicios.traduccion.cadena(), db });
   });
 
   // Documentacion OpenAPI 3.0 (convenciones/api-rest.md seccion 9)
-  const especificacion = path.join(__dirname, '..', 'openapi.yaml');
+  const especificacion = path.join(__dirname, '..', '..', '..', 'openapi.yaml');
   app.get('/api/v1/openapi.yaml', (_req, res) => res.type('text/yaml').send(fs.readFileSync(especificacion, 'utf8')));
   try {
     const swaggerUi = require('swagger-ui-express');
@@ -42,11 +42,11 @@ function crearApp(repo, opciones = {}) {
   }
 
   const v1 = express.Router();
-  v1.use('/auth', require('./routes/auth')(repo));
-  v1.use('/usuarios', require('./routes/auth').usuariosRouter(repo));
-  v1.use('/', require('./routes/catalogo')(repo));
-  v1.use('/', require('./routes/conversaciones')(repo));
-  v1.use('/', require('./routes/reportes')(repo));
+  v1.use('/auth', require('./rutas/cuentas')(servicios));
+  v1.use('/usuarios', require('./rutas/cuentas').rutasUsuarios(servicios));
+  v1.use('/', require('./rutas/catalogo')(servicios));
+  v1.use('/', require('./rutas/conversaciones')(servicios));
+  v1.use('/', require('./rutas/reportes')(servicios));
   app.use('/api/v1', v1);
 
   app.use((req, res) => res.status(404).json(cuerpoError(404, 'No encontramos esa ruta.', req.originalUrl)));

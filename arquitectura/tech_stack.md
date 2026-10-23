@@ -11,7 +11,7 @@
 | App movil | Expo SDK 57, React Native 0.86, expo-router, NativeWind (Tailwind) | ADR-001, ADR-007 |
 | Interfaz | Template Luna adaptado (tema claro y oscuro) | ADR-007 |
 | Voz | Dictado del navegador o del teclado para hablar; `expo-speech` para escuchar | ADR-005 |
-| Backend | Node.js 22 y Express 4: monolito modular con API REST `/api/v1` y OpenAPI | ADR-002, ADR-011 |
+| Backend | Node.js 22 y Express 4: monolito modular en arquitectura hexagonal, API REST `/api/v1` con OpenAPI | ADR-002, ADR-011, ADR-013 |
 | Base de datos | SurrealDB 3.x en la nube (SurrealDB Cloud), detras de un repositorio; SQLite solo en pruebas | ADR-012 |
 | Traduccion e IA | Qwen local (Ollama), Claude Sonnet de respaldo y motor de reglas espanol/ingles | ADR-004 |
 | Autenticacion | JWT de acceso (15 min) y token de refresco rotativo; contrasenas con bcrypt | ADR-006 |
@@ -23,7 +23,7 @@
 | Capa | Elegida | Por que | Alternativas evaluadas |
 | --- | --- | --- | --- |
 | App movil | Expo (React Native) | Una sola base de codigo para iOS, Android y web; aprovecha el template Luna; se prueba en el celular con Expo Go. | Flutter (otro lenguaje, Dart, y no usa el template); nativo Swift y Kotlin (dos desarrollos para dos personas); web responsiva (microfono y voz limitados). |
-| Backend | Node.js con Express | Mismo lenguaje que la app; monolito modular suficiente para el alcance; la traduccion es por turno, asi que REST basta. | Microservicios (complejidad sin necesidad); WebSocket o streaming (solo para traduccion simultanea); Python FastAPI (otro lenguaje); Java Spring Boot (mas pesado). |
+| Backend | Node.js con Express, en arquitectura hexagonal | Mismo lenguaje que la app; monolito modular suficiente para el alcance; la traduccion es por turno, asi que REST basta. Los puertos y adaptadores dan limites claros sin el costo de los microservicios. | Microservicios (complejidad sin necesidad); capas clasicas sin puertos; WebSocket o streaming (solo para traduccion simultanea); Python FastAPI (otro lenguaje); Java Spring Boot (mas pesado). |
 | Base de datos | SurrealDB en la nube | Los enlaces entre registros siguen el modelo de dominio; el esquema con ASSERT y UNIQUE deja reglas del dominio en la base; no hay que instalar un servidor propio. | SQLite (archivo local, no sirve para varios usuarios ni produccion); PostgreSQL (muy maduro, relaciones con JOIN); SDK oficial de SurrealDB (dependencia extra). |
 | Traduccion | Qwen local, Claude de respaldo y reglas | Adapta modismos y tono por region y explica la adaptacion; Qwen corre en el servidor (sin costo por mensaje y sin sacar datos); si falla, sigue funcionando. | DeepL o Google Translate (literal, no explican modismos); solo Claude (costo y datos a un tercero); solo reglas (no escala); NLLB o Argos (no siguen instrucciones de tono). |
 | Voz | Dictado en el cliente y `expo-speech` | Funciona sin subir audio al servidor y sin infraestructura extra. | Whisper en el servidor (mas preciso, pero sube audio y requiere mas infraestructura); reconocimiento nativo (requiere un build propio de Expo). |
@@ -33,9 +33,12 @@
 
 ## Estructura del codigo (capas)
 
-- `backend/src/routes`: rutas HTTP por recurso (auth, catalogo, conversaciones, reportes).
-- `backend/src/lib`: reglas de negocio, validaciones, seguridad (auth, cifrado, limites) y motores de traduccion.
-- `backend/src/repos`: acceso a datos detras de una interfaz comun (`surreal.js` en ejecucion, `sqlite.js` en pruebas).
+El backend sigue una arquitectura hexagonal (puertos y adaptadores, ADR-013):
+- `backend/src/dominio`: reglas puras (validaciones, errores de negocio, analisis de idioma, tono y region).
+- `backend/src/aplicacion`: un caso de uso por epica (cuentas, sesiones, conversaciones, traduccion, catalogo, reportes).
+- `backend/src/puertos`: contratos `Repositorio`, `MotorTraduccion`, `Notificador` y `Cifrador`.
+- `backend/src/adaptadores`: HTTP (Express) de entrada; de salida SurrealDB y SQLite, Qwen, Claude y reglas, correo y cifrado.
+- `backend/src/composicion.js`: elige los adaptadores segun el entorno y arma los casos de uso.
 - `backend/db/surreal/schema.surql`: esquema de la base. `backend/openapi.yaml`: contrato de la API.
 - `frontend/app`: pantallas (expo-router); `frontend/components/talklate`: componentes de TalkLate; `frontend/lib`: cliente de la API, reglas y voz.
 - `componentes/template/native-luna/`: template original, sin cambios.

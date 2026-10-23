@@ -1,23 +1,21 @@
 process.env.TALKLATE_LOGS = 'silencio';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { cifrar, descifrar, reiniciarClave } = require('../src/lib/cifrado');
-const { crearLimite } = require('../src/lib/limites');
-const log = require('../src/lib/log');
-const { cuerpoError } = require('../src/lib/errores');
+const { crearCifradorAesGcm } = require('../src/adaptadores/cifrado/aesGcm');
+const { crearLimite } = require('../src/adaptadores/http/limites');
+const log = require('../src/compartido/log');
+const { cuerpoError } = require('../src/dominio/errores');
 
 test('cifrado AES-256-GCM: ida y vuelta, textos viejos sin cifrar y clave distinta', () => {
+  const { cifrar, descifrar } = crearCifradorAesGcm({ secreto: 'clave-de-prueba' });
   const c = cifrar('Hay que ponerse las pilas');
   assert.match(c, /^enc:v1:/);
   assert.notEqual(cifrar('hola'), cifrar('hola')); // vector aleatorio
   assert.equal(descifrar(c), 'Hay que ponerse las pilas');
   assert.equal(descifrar('texto sin cifrar'), 'texto sin cifrar');
   assert.equal(cifrar(null), null);
-  process.env.TALKLATE_CLAVE_CIFRADO = 'otra-clave';
-  reiniciarClave();
-  assert.throws(() => descifrar(c)); // con otra clave no se puede leer
-  delete process.env.TALKLATE_CLAVE_CIFRADO;
-  reiniciarClave();
+  assert.throws(() => crearCifradorAesGcm({ secreto: 'otra-clave' }).descifrar(c)); // con otra clave no se puede leer
+  assert.throws(() => crearCifradorAesGcm({ produccion: true }), /TALKLATE_CLAVE_CIFRADO/); // en produccion la clave es obligatoria
 });
 
 test('limite de uso responde 429 al pasar el maximo', () => {
@@ -43,11 +41,7 @@ test('formato de error de la convencion', () => {
 });
 
 test('en produccion sin servicio de correo se informa el fallo (Usuario-RN-7)', async () => {
-  const { enviarCodigo } = require('../src/lib/correo');
-  process.env.NODE_ENV = 'production';
-  try {
-    await assert.rejects(enviarCodigo('u1'), (e) => e.estado === 502);
-  } finally {
-    delete process.env.NODE_ENV;
-  }
+  const { crearNotificadorConsola } = require('../src/adaptadores/correo/consola');
+  await assert.rejects(crearNotificadorConsola({ produccion: true }).enviarCodigoRecuperacion('u1', '123456'), (e) => e.estado === 502);
+  assert.deepEqual(await crearNotificadorConsola().enviarCodigoRecuperacion('u1', '123456'), { devolverCodigo: true });
 });

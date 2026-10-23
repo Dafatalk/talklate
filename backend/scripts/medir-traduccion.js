@@ -4,7 +4,7 @@
 //   npm run medir -- informe.md   -> ademas lo guarda en un archivo
 process.env.TALKLATE_LOGS = process.env.TALKLATE_LOGS || 'silencio';
 const fs = require('node:fs');
-const traductor = require('../src/lib/traductor');
+const traductor = require('../src/composicion').crearTraduccion();
 
 const ES = { codigo: 'es', nombre: 'Espanol' };
 const EN = { codigo: 'en', nombre: 'Ingles' };

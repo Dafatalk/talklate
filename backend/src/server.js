@@ -1,27 +1,16 @@
-const { crearApp } = require('./app');
-const traductor = require('./lib/traductor');
-const log = require('./lib/log');
+// Arranque de la API: elige el adaptador de persistencia, compone los casos de uso y escucha HTTP.
+const { crearApp } = require('./adaptadores/http/app');
+const { componer, crearPersistencia } = require('./composicion');
+const log = require('./compartido/log');
 
-// DB_DRIVER selecciona la fuente de verdad: 'surreal' (por defecto) o 'sqlite'.
 async function main() {
-  const driver = (process.env.DB_DRIVER || 'surreal').toLowerCase();
-  let repo;
-  let saludDb;
-  if (driver === 'sqlite') {
-    const { abrir } = require('./db');
-    repo = require('./repos/sqlite')(abrir());
-    saludDb = async () => ({ ok: true, motor: 'sqlite' });
-  } else {
-    const surreal = require('./surreal');
-    repo = require('./repos/surreal')();
-    saludDb = () => surreal.estado();
-  }
-
+  const { driver, repo, saludDb } = crearPersistencia();
   await repo.inicializar(); // conecta a SurrealDB y aplica esquema + semilla (o no-op en sqlite)
+  const servicios = componer({ repo });
 
   const puerto = Number(process.env.PORT) || 3000;
-  crearApp(repo, { saludDb }).listen(puerto, '0.0.0.0', () => {
-    log.info('api_iniciada', { puerto, driver, base: '/api/v1', docs: '/api/v1/docs', motores_traduccion: traductor.cadena() });
+  crearApp(servicios, { saludDb }).listen(puerto, '0.0.0.0', () => {
+    log.info('api_iniciada', { puerto, driver, base: '/api/v1', docs: '/api/v1/docs', motores_traduccion: servicios.traduccion.cadena() });
   });
 }
 

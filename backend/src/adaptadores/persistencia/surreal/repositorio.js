@@ -1,5 +1,5 @@
 // Repositorio (adaptadores) sobre SurrealDB — fuente de verdad del backend.
-// Expone la MISMA superficie que el repositorio SQLite (repos/sqlite.js) pero async.
+// Adaptador del puerto Repositorio (ver puertos/index.js): misma superficie que el adaptador SQLite.
 //
 // Idioma: las TABLAS y CAMPOS en SurrealDB estan en INGLES; el API/dominio usan
 // claves en espanol. El adaptador traduce: en lecturas con alias `columna AS clave_es`
@@ -10,9 +10,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const bcrypt = require('bcryptjs');
 const { randomUUID } = require('node:crypto');
-const S = require('../surreal');
+const S = require('./cliente');
 
-const ESQUEMA = fs.readFileSync(path.join(__dirname, '..', '..', 'db', 'surreal', 'schema.surql'), 'utf8');
+const ESQUEMA = fs.readFileSync(path.join(__dirname, '..', '..', '..', '..', 'db', 'surreal', 'schema.surql'), 'utf8');
 
 // Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./Miami).
 // Nombres de catalogo (datos) en espanol; ambos idiomas activos.
