@@ -20,6 +20,35 @@
 
 ---
 
+## 2026-10-23 - Dafatalk (Claude / Opus)
+
+> **Estado:** fusionado en `develop` (PR #34). Julian: lee primero la seccion **Para Julian** de esta entrada.
+
+- **Avances:**
+  - Revise el commit de Julian del 22/10 (documento maestro, C4 nivel 3, diagramas, bitacora): coincide con el codigo; se actualizaron sus rutas de archivos a la nueva estructura.
+  - **Arquitectura hexagonal implementada** en `backend/src` (frente 4 de la revision): `dominio/`, `aplicacion/` (un caso de uso por epica), `puertos/` (Repositorio, MotorTraduccion, Notificador, Cifrador), `adaptadores/` (http, persistencia, traduccion, correo, cifrado) y `composicion.js`. El contrato de la API no cambio.
+  - Pruebas: 34 con SQLite (cobertura ~97 %), 16 de la API contra SurrealDB 3.0.4, `verificar-surreal.js` 12/12 y `smoke-http.js` OK. El Circuit Breaker ahora se prueba con motores falsos.
+  - Docs: ADR-013 en `decisiones.md`, `componentes.md` rehecho por capas (C01-C27), `arquitectura.md`, `tech_stack.md`, `convenciones/backend-node.md` (regla de dependencias), READMEs, `drivers.md`, `modelo_datos.md` y matriz de sensibilidad.
+  - Analisis de las demas recomendaciones en `arquitectura/revision_recomendaciones.md`.
+- **Decidi:**
+  - Hexagonal dentro del monolito y no microservicios: limites claros sin costo distribuido (ADR-013).
+  - Solo `composicion.js` conoce adaptadores concretos; los casos de uso solo importan dominio y puertos.
+  - No migrar a PostgreSQL todavia: con la arquitectura hexagonal cuesta un adaptador (talla L), pero hay que decidirlo con Farid al validar ADR-012.
+- **Hallazgos:** el tiempo de espera de Qwen (60 s) incumple DRV-01 cuando Ollama falla; el glosario de `npm run medir` esta dentro del motor de reglas (la linea base de 14/15 no es evidencia) y usa regiones fuera del alcance (California, Ciudad de Mexico); la clave de cifrado no tiene politica de rotacion ni exige fuerza en produccion.
+- **Handoff / pendiente (orden propuesto):**
+  1. Medicion real con Qwen con un glosario aparte de unos 40 modismos (ES-CO / EN-US), 3 repeticiones y el equipo registrado.
+  2. Acotar el tiempo de espera de Qwen y Claude; politica de claves y rotacion (`enc:v2:<id>`).
+  3. Decidir SurrealDB o PostgreSQL con Farid.
+  4. Metricas (`/metrics`) y despliegue (Docker, F10).
+- **Para Julian (cambios que te afectan):**
+  - **Se movieron todos los archivos de `backend/src`.** Si tienes una rama vieja, haz merge de `develop` antes de seguir. Equivalencias: `lib/traductor.js` -> `aplicacion/traduccion.js`; `lib/motorQwen|motorClaude|motorLocal.js` -> `adaptadores/traduccion/qwen|claude|reglas.js`; `lib/auth.js` -> `aplicacion/sesiones.js` + `adaptadores/http/sesion.js`; `routes/*.js` -> `adaptadores/http/rutas/*.js` (la logica paso a `aplicacion/*.js`); `repos/surreal.js` + `surreal.js` -> `adaptadores/persistencia/surreal/repositorio.js` + `cliente.js`; `repos/sqlite.js` + `db.js` -> `adaptadores/persistencia/sqlite/repositorio.js` + `esquema.js`; `lib/errores|validaciones|analisis.js` -> `dominio/`; `lib/log.js` -> `compartido/log.js`; `lib/cifrado.js` -> `adaptadores/cifrado/aesGcm.js`; `lib/correo.js` -> `adaptadores/correo/consola.js`; `app.js` -> `adaptadores/http/app.js`.
+  - **Regla nueva** (`convenciones/backend-node.md`): un caso de uso (`aplicacion/`) solo importa `dominio/` y `puertos/`; nunca Express, la base ni un adaptador. Solo `composicion.js` conoce los adaptadores concretos.
+  - **Tu adaptador de SurrealDB no cambio por dentro** (esquema en ingles, `tokens.consumir`, token de sesion); solo se movio de carpeta y ahora se verifica contra el puerto `Repositorio` al arrancar. Si agregas un metodo al repositorio, agregalo tambien en `puertos/index.js` y en el adaptador SQLite.
+  - **Tus documentos** (`arquitectura.md`, `componentes.md`, diagrama de secuencia) se actualizaron a la nueva estructura; `componentes.md` quedo renumerado por capas (C01-C27).
+  - **Archify:** sirve para regenerar los diagramas con la estructura hexagonal (capas: dominio, aplicacion, puertos, adaptadores).
+  - **Necesito tu opinion** sobre SurrealDB o PostgreSQL antes de la reunion con Farid (`arquitectura/revision_recomendaciones.md`, punto 5), y si puedes correr la medicion con Qwen en tu equipo (punto 6).
+
+
 ## 2026-10-22 (2) - Julian (Claude / Opus)
 
 - **Avances:** Instalada la skill **Archify** (diagramas HTML interactivos desde el repo) project-scoped en `.agents/skills/archify`, con symlink para Claude Code. Reinstalar con `npx skills add tt-a1i/archify`.

@@ -5,7 +5,7 @@ process.env.QWEN_MODEL = process.env.QWEN_MODEL || 'qwen2.5:7b'; // el mismo mod
 process.env.QWEN_TIMEOUT_MS = process.env.QWEN_TIMEOUT_MS || '180000';
 process.env.TALKLATE_LOGS = process.env.TALKLATE_LOGS || 'silencio';
 
-const traductor = require('../src/lib/traductor');
+const traductor = require('../src/composicion').crearTraduccion();
 const TONOS = ['Neutral', 'Amigable', 'Alegre', 'Preocupado', 'Enojado', 'Formal'];
 
 const casos = [

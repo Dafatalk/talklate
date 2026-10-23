@@ -13,7 +13,7 @@
 //
 // Las sentencias se arman inlineando literales ya serializados (lit/rid) para
 // evitar inyeccion y los limites del paso de variables por query-string.
-const log = require('./lib/log');
+const log = require('../../../compartido/log');
 
 // El backend trabaja SIEMPRE contra la instancia remota (SurrealDB Cloud). No se usa
 // ninguna instancia local. Se puede sobreescribir con SURREAL_URL si hiciera falta.

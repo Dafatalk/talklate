@@ -35,7 +35,7 @@ Los manuales por tecnología (7 y 8) se agregaron al decidir el stack en F3.
 4. **Indentación**: 2 espacios (JavaScript, TypeScript, JSON, YAML), definida en `.editorconfig`.
 5. **Longitud de línea**: 120 caracteres máximo.
 6. **Secretos**: Nunca en código, variables de entorno ni archivos del repo.
-7. **Logs**: Estructurados en JSON (`backend/src/lib/log.js`). Nunca loguear datos personales, contraseñas ni tokens.
+7. **Logs**: Estructurados en JSON (`backend/src/compartido/log.js`). Nunca loguear datos personales, contraseñas ni tokens.
 8. **Tests**: Cobertura mínima 80% en lógica de negocio. Todo PR debe incluir tests.
 
 ---

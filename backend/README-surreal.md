@@ -10,22 +10,24 @@ de la v3 (`string::is_email`); con la 2.x no carga, y el backend lo revisa al ar
 ## Arquitectura
 
 ```
-rutas / lib/auth  ->  repositorio (interfaz async)  ->  SurrealDB (HTTP /sql)
-                                                    \->  SQLite (node:sqlite, tests)
+casos de uso (src/aplicacion)  ->  puerto Repositorio (src/puertos)
+                                      ^ lo cumplen:
+                                      |- adaptador SurrealDB (HTTP /sql)
+                                      |- adaptador SQLite (node:sqlite, pruebas)
 ```
 
-- `src/surreal.js` — conexión HTTP a SurrealDB (`/sql`), sin dependencias nuevas
-  (usa el `fetch` global de Node 22). Serializa literales de forma segura y mapea
-  record ids ⇄ ids de negocio.
-- `src/repos/surreal.js` — **los adaptadores**: cada operación del dominio mapeada
-  a SurrealQL (usuarios, auth, catálogo, conversaciones, mensajes, reportes).
-- `src/repos/sqlite.js` — misma interfaz sobre SQLite (para `npm test`).
-- `db/surreal/schema.surql` — esquema operativo SCHEMAFULL (se aplica idempotente
-  al arrancar).
-- `src/server.js` — elige driver con `DB_DRIVER` y conecta antes de escuchar.
+El backend sigue una arquitectura hexagonal (ADR-013): los casos de uso solo conocen el
+puerto `Repositorio`; la composicion (`src/composicion.js`) elige el adaptador con `DB_DRIVER`.
 
-El idioma origen/destino, cifrado de mensajes, JWT, rate limiting y reglas de
-negocio no cambiaron: solo se movió el acceso a datos detrás del repositorio.
+- `src/adaptadores/persistencia/surreal/cliente.js`: conexion HTTP a SurrealDB (`/sql`), sin dependencias nuevas
+  (usa el `fetch` global de Node 22). Serializa literales de forma segura y mapea
+  record ids a ids de negocio.
+- `src/adaptadores/persistencia/surreal/repositorio.js`: el adaptador del puerto; cada operacion del dominio mapeada
+  a SurrealQL (usuarios, auth, catalogo, conversaciones, mensajes, reportes).
+- `src/adaptadores/persistencia/sqlite/`: el mismo puerto sobre SQLite (para `npm test`).
+- `db/surreal/schema.surql`: esquema operativo SCHEMAFULL (se aplica idempotente
+  al arrancar).
+- `src/server.js` + `src/composicion.js`: eligen el adaptador con `DB_DRIVER` y conectan antes de escuchar.
 
 ## Configuración (variables de entorno)
 
@@ -79,7 +81,7 @@ CI corre las dos: `backend` (SQLite) y `backend-surreal` (levanta SurrealDB 3.0.
 
 - **Idioma:** las tablas y campos del esquema están en **inglés** (`user`, `country`,
   `original_message`, …); el API/dominio siguen en español y el adaptador
-  (`src/repos/surreal.js`) traduce EN↔ES en cada operación. Los **valores de enum** se
+  (`src/adaptadores/persistencia/surreal/repositorio.js`) traduce EN↔ES en cada operación. Los **valores de enum** se
   mantienen en español (origen/destino, usuario/interlocutor, Pendiente…, abierto…)
   porque la lógica de negocio y el API los usan tal cual.
 - `ns/db` se crean solos al conectar (`DEFINE NAMESPACE/DATABASE IF NOT EXISTS`).

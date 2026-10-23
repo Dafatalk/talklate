@@ -144,7 +144,7 @@ const LENGUAJES = [['Espanol', 'es', 1], ['Ingles', 'en', 1]];
 const ENTONACIONES = ['Neutral', 'Amigable', 'Alegre', 'Preocupado', 'Enojado', 'Formal'];
 const CANALES = ['Texto', 'Voz'];
 
-function abrir(ruta = process.env.TALKLATE_DB || path.join(__dirname, '..', 'data', 'talklate.db')) {
+function abrir(ruta = process.env.TALKLATE_DB || path.join(__dirname, '..', '..', '..', '..', 'data', 'talklate.db')) {
   if (ruta !== ':memory:') fs.mkdirSync(path.dirname(ruta), { recursive: true });
   const db = new DatabaseSync(ruta);
   db.exec(ESQUEMA);

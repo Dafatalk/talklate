@@ -24,6 +24,6 @@ Un driver es un requisito que obliga a tomar decisiones de arquitectura. Cada AD
 | DRV-03 | ADR-006, ADR-010 | `backend/test/api.test.js` y `seguridad.test.js`: aislamiento entre usuarios, cifrado en base, consentimiento, eliminar cuenta, logs sin PII |
 | DRV-04 | ADR-003, ADR-008 | Prueba del administrador que activa un idioma y agrega una region |
 | DRV-05 | ADR-004 (Circuit Breaker) | `backend/test/motores.test.js`: Qwen falla -> Claude -> reglas |
-| DRV-06 | ADR-004, ADR-010 | Limites de uso en `src/lib/limites.js` |
+| DRV-06 | ADR-004, ADR-010 | Limites de uso en `src/adaptadores/http/limites.js` |
 | DRV-07 | ADR-001 | Compila para web; falta probar en celular fisico con Expo Go |
 | DRV-08 | ADR-002, ADR-003 | 28 pruebas del backend con cerca de 98 % de cobertura de lineas (`npm run coverage`), pruebas del frontend y CI |

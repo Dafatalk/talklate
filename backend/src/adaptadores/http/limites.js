@@ -1,5 +1,5 @@
 // Limites de uso en memoria (convenciones/seguridad.md seccion 7: rate limiting, en especial sobre la traduccion)
-const { ErrorNegocio } = require('./errores');
+const { ErrorNegocio } = require('../../dominio/errores');
 
 function crearLimite({ maximo, ventanaMs, mensaje, clave }) {
   const registros = new Map();
