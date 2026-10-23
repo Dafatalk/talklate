@@ -332,7 +332,7 @@ Detalle completo en [`decisiones.md`](decisiones.md). Resumen de que resuelve ca
 | Medir tiempo y calidad **con Qwen** (no solo reglas) y un glosario aparte | pendiente, es la evidencia valida de DRV-01/DRV-02 | `medicion_traduccion.md`, `revision_recomendaciones.md` |
 | Tiempo de espera de Qwen (60 s) mayor que el limite de DRV-01 | ajustar | `revision_recomendaciones.md` |
 | Gestion de claves (custodia, rotacion, fuerza) | proponer politica | `revision_recomendaciones.md` |
-| SurrealDB o PostgreSQL | decidido: se mantiene SurrealDB (base recomendada por el mentor) | ADR-012 |
+| SurrealDB o PostgreSQL | decidido: se mantiene SurrealDB (enlaces nativos, reglas en el esquema, multimodelo) | ADR-012 |
 | Desplegar API + Ollama (F10) | pendiente | seccion 8 |
 | Servicio de correo para recuperacion | pendiente (hoy el codigo vuelve en la respuesta en dev) | ADR-006 |
 | Consultas por enlaces sin indice en SurrealDB | revisar con mas datos | ADR-012 |

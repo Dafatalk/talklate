@@ -29,7 +29,7 @@
 - [ ] Drivers: medir con Qwen antes de la sustentacion (`npm run medir`).
 - [ ] Diagramas C4 de contexto y contenedores.
 - [ ] ADR-013: arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular.
-- [x] SurrealDB o PostgreSQL: se mantiene **SurrealDB**, la base que recomendo el mentor (decision del 23/10/2026, ADR-012).
+- [x] SurrealDB o PostgreSQL: se mantiene **SurrealDB** (decision del 23/10/2026; justificacion tecnica en ADR-012).
 - [ ] ADR-012: SurrealDB como fuente de verdad (reemplaza a SQLite), con esquema en ingles e instancia remota en SurrealDB Cloud; SQLite queda solo para pruebas.
 
 ## 5. Alcance
