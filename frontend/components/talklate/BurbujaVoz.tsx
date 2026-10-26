@@ -23,7 +23,7 @@ type Props = {
 
 const TEXTO_ESTADO: Record<EstadoBurbuja, string> = {
   lista: 'Toca la burbuja y habla',
-  escuchando: 'Te escucho... toca otra vez para traducir',
+  escuchando: 'Te escucho... cuando termines de hablar traduzco solo',
   traduciendo: 'Traduciendo con tu misma entonacion...',
   hablando: 'Escucha la traduccion (toca para detenerla)',
 };
@@ -34,6 +34,8 @@ const TEXTO_ESTADO: Record<EstadoBurbuja, string> = {
 export default function BurbujaVoz({ estado, nivelDb, remitente, alCambiarRemitente, alPulsar, ultimo, idiomaUsuario, idiomaOtro }: Props) {
   const escala = useRef(new Animated.Value(1)).current;
   const pulso = useRef(new Animated.Value(0)).current;
+  const giro = useRef(new Animated.Value(0)).current;
+  const onda = useRef(new Animated.Value(0)).current;
 
   // La burbuja crece con el volumen mientras escucha
   useEffect(() => {
@@ -41,16 +43,30 @@ export default function BurbujaVoz({ estado, nivelDb, remitente, alCambiarRemite
     Animated.timing(escala, { toValue: 1 + nivel * 0.18, duration: 120, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
   }, [estado, nivelDb, escala]);
 
-  // Pulso suave mientras traduce
+  // Mientras traduce la burbuja gira (los colores dan vueltas), como la IA "pensando"
   useEffect(() => {
-    if (estado !== 'traduciendo') { pulso.stopAnimation(); pulso.setValue(0); return; }
-    const anim = Animated.loop(Animated.sequence([
-      Animated.timing(pulso, { toValue: 1, duration: 700, useNativeDriver: true }),
-      Animated.timing(pulso, { toValue: 0, duration: 700, useNativeDriver: true }),
-    ]));
+    if (estado !== 'traduciendo') { giro.stopAnimation(); giro.setValue(0); return; }
+    const anim = Animated.loop(Animated.timing(giro, { toValue: 1, duration: 1100, easing: Easing.linear, useNativeDriver: true }));
     anim.start();
     return () => anim.stop();
-  }, [estado, pulso]);
+  }, [estado, giro]);
+
+  // Mientras escucha salen ondas desde la burbuja; mientras habla, la burbuja respira
+  useEffect(() => {
+    if (estado !== 'escuchando' && estado !== 'hablando') { onda.stopAnimation(); onda.setValue(0); pulso.stopAnimation(); pulso.setValue(0); return; }
+    const anims = estado === 'escuchando'
+      ? Animated.loop(Animated.timing(onda, { toValue: 1, duration: 1400, easing: Easing.out(Easing.quad), useNativeDriver: true }))
+      : Animated.loop(Animated.sequence([
+        Animated.timing(pulso, { toValue: 1, duration: 600, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(pulso, { toValue: 0, duration: 600, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      ]));
+    onda.setValue(0);
+    anims.start();
+    return () => anims.stop();
+  }, [estado, onda, pulso]);
+
+  const rotacion = giro.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const respiro = pulso.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] });
 
   const activa = estado === 'escuchando' || estado === 'hablando';
   const icono = estado === 'escuchando' ? 'Square' : estado === 'hablando' ? 'Volume2' : 'Mic';
@@ -73,18 +89,33 @@ export default function BurbujaVoz({ estado, nivelDb, remitente, alCambiarRemite
               source={require('@/assets/lottie/speaking.json')}
             />
           ) : null}
-          <Animated.View style={{ transform: [{ scale: escala }], opacity: pulso.interpolate({ inputRange: [0, 1], outputRange: [1, 0.6] }) }}>
+          {estado === 'escuchando' ? [0, 0.5].map((desfase) => {
+            const v = Animated.modulo(Animated.add(onda, desfase), 1);
+            return (
+              <Animated.View
+                key={desfase}
+                pointerEvents="none"
+                style={{ position: 'absolute', width: 150, height: 150, borderRadius: 75, borderWidth: 3, borderColor: '#3DE3E0',
+                  opacity: v.interpolate({ inputRange: [0, 1], outputRange: [0.7, 0] }),
+                  transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }] }}
+              />
+            );
+          }) : null}
+          <Animated.View style={{ transform: [{ scale: Animated.multiply(escala, respiro) }] }}>
             <Pressable onPress={alPulsar} disabled={estado === 'traduciendo'} accessibilityRole="button" accessibilityLabel={TEXTO_ESTADO[estado]}>
-              <LinearGradient
-                colors={['#D883E4', '#016BF0', '#3DE3E0', '#E57DDF']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={{ width: 150, height: 150, borderRadius: 75, alignItems: 'center', justifyContent: 'center', ...shadowPresets.large }}
-              >
+              <View style={{ width: 150, height: 150, alignItems: 'center', justifyContent: 'center' }}>
+                <Animated.View style={{ position: 'absolute', transform: [{ rotate: rotacion }] }}>
+                  <LinearGradient
+                    colors={['#D883E4', '#016BF0', '#3DE3E0', '#E57DDF']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 0, y: 1 }}
+                    style={{ width: 150, height: 150, borderRadius: 75, ...shadowPresets.large }}
+                  />
+                </Animated.View>
                 <View className="w-[128px] h-[128px] rounded-full bg-light-secondary dark:bg-dark-primary items-center justify-center">
                   {estado === 'traduciendo' ? <ActivityIndicator size="large" /> : <Icon name={icono} size={38} strokeWidth={1.3} />}
                 </View>
-              </LinearGradient>
+              </View>
             </Pressable>
           </Animated.View>
         </View>

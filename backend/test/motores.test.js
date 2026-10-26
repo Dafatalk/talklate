@@ -181,3 +181,39 @@ test('adaptador Whisper: envia el audio como multipart (API compatible con OpenA
   const falla = crearTranscriptorWhisper({ url: 'http://x', fetchFn: async () => ({ ok: false, status: 500 }) });
   await assert.rejects(falla.transcribir({ audio: Buffer.from('a') }), /500/);
 });
+
+test('voz natural: Azure pone la emocion en SSML y OpenAI la pide como instruccion', async () => {
+  const { crearSintetizadorAzure, ssml } = require('../src/adaptadores/sintesis/azure');
+  const { crearSintetizadorOpenAI } = require('../src/adaptadores/sintesis/openai');
+  const { crearServicioVoz } = require('../src/aplicacion/voz');
+  const enojo = ssml({ texto: 'No <puedo> creerlo', idioma: 'en', pais: 'Estados Unidos', tono: 'Enojado', ritmo: 1 });
+  assert.equal(enojo.voz, 'en-US-JennyNeural');
+  assert.match(enojo.xml, /style="angry"/);
+  assert.match(enojo.xml, /No &lt;puedo&gt; creerlo/);
+  assert.match(enojo.xml, /rate="\+12%"/);
+  const neutral = ssml({ texto: 'hola', idioma: 'es', pais: 'Colombia', tono: 'Neutral' });
+  assert.equal(neutral.voz, 'es-CO-SalomeNeural');
+  assert.doesNotMatch(neutral.xml, /express-as/);
+  let pedido;
+  const az = crearSintetizadorAzure({ clave: 'k', region: 'eastus', fetchFn: async (url, op) => { pedido = { url, op }; return { ok: true, arrayBuffer: async () => new ArrayBuffer(3) }; } });
+  const r = await az.sintetizar({ texto: 'que bien', idioma: 'es', pais: 'Mexico', tono: 'Alegre' });
+  assert.equal(r.audio.length, 3);
+  assert.match(pedido.url, /eastus\.tts\.speech\.microsoft\.com/);
+  assert.match(pedido.op.body, /cheerful/);
+  assert.equal(crearSintetizadorAzure({}).disponible(), false);
+  let cuerpo;
+  const oa = crearSintetizadorOpenAI({ url: 'http://x/v1/audio/speech', apiKey: 'k', fetchFn: async (_u, op) => { cuerpo = JSON.parse(op.body); return { ok: true, arrayBuffer: async () => new ArrayBuffer(2) }; } });
+  await oa.sintetizar({ texto: 'hola', idioma: 'es', pais: 'Colombia', tono: 'Alegre', ritmo: 1 });
+  assert.equal(cuerpo.model, 'gpt-4o-mini-tts');
+  assert.match(cuerpo.instructions, /alegria/);
+  assert.match(cuerpo.instructions, /colombiano/);
+  // el servicio pasa al siguiente motor si uno falla, y sin motores responde 503
+  const avisos = [];
+  const voz = crearServicioVoz({ log: { advertencia: (e) => avisos.push(e) }, sintetizadores: [
+    { nombre: 'malo', disponible: () => true, sintetizar: async () => { throw new Error('caido'); } },
+    { nombre: 'bueno', disponible: () => true, sintetizar: async () => ({ audio: Buffer.from('a'), tipo: 'audio/mpeg' }) },
+  ] });
+  assert.equal((await voz.sintetizar({ texto: 'hola', idioma: 'es' })).motor, 'bueno');
+  assert.deepEqual(avisos, ['sintesis_fallida']);
+  await assert.rejects(crearServicioVoz({ log: {} }).sintetizar({ texto: 'hola', idioma: 'es' }), (e) => e.estado === 503);
+});

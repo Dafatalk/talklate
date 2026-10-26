@@ -144,6 +144,11 @@ export const api = {
   // Mensaje grabado: audio en base64 + medidas del volumen; el servidor lo transcribe y lo traduce
   enviarMensajeVoz: (id: string, b: { audio_base64: string; tipo: string; remitente: 'usuario' | 'interlocutor'; prosodia: Record<string, number> }) =>
     pedir<RespuestaMensajeVoz>('POST', `/conversaciones/${id}/mensajes/voz`, b),
+  // Voz natural con la emocion del tono (Azure / OpenAI en el servidor); devuelve la URL completa del mp3
+  sintetizarVoz: async (b: { texto: string; idioma: string; pais?: string | null; tono: string; ritmo?: number }) => {
+    const r = await pedir<{ url: string; motor: string; voz?: string }>('POST', '/voz', b);
+    return { ...r, url: apiBase().replace(/\/api\/v1$/, '') + r.url };
+  },
 
   reportar: (destinoId: string, motivo: string, sugerencia?: string) =>
     pedir<{ id: string; mensaje: string }>('POST', '/reportes', { mensaje_destino_id: destinoId, motivo, sugerencia }),

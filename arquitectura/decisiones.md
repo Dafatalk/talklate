@@ -306,3 +306,19 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - La interfaz tiene dos modos, como ChatGPT: la burbuja animada del template Luna (AiCircle) y el chat. El modo se recuerda en el celular.
 
 **Consecuencias:** Se necesita un servidor Whisper (se recomienda el modelo `small`; `tiny` confunde jerga como "parce"). Sin `TRANSCRIPCION_URL` el endpoint de voz responde 503 y el texto sigue funcionando.
+
+## ADR-015: Voz natural con emocion en el servidor (puerto Sintetizador)
+
+**Estado:** Aceptada (26/10/2026). Complementa ADR-014.
+
+**Contexto:** La voz del celular (expo-speech) suena robotica y casi no cambia con la emocion; subir o bajar el tono no alcanza para que se note enojo o alegria.
+
+**Decision:**
+- Nuevo puerto `Sintetizador` con dos adaptadores, elegidos con `VOZ_MOTOR` (auto, azure, openai, ninguno):
+  - **Azure Speech** (voces neuronales, capa gratis de 500 mil caracteres al mes). La emocion va en SSML con `mstts:express-as` (angry, cheerful, sad, friendly) mas prosodia de respaldo para voces sin estilos. La voz se elige por idioma y pais (ej. es-CO-SalomeNeural, en-US-JennyNeural).
+  - **API compatible con OpenAI** (`/v1/audio/speech`). Con `gpt-4o-mini-tts` la emocion y el acento van como instruccion en lenguaje natural; tambien sirve un Kokoro-FastAPI local.
+- `dominio/voz.js` define como suena cada tono (estilo, prosodia e instruccion); los adaptadores solo lo traducen a su API.
+- `POST /api/v1/voz` devuelve una URL de mp3 que vence en 5 minutos (`GET /voz/audio/:id`, id aleatorio de 128 bits), para que el reproductor del celular la abra sin guardar archivos.
+- Si no hay motor configurado o falla, la app vuelve a la voz del celular con tono y velocidad ajustados.
+
+**Consecuencias:** La voz suena natural y con emocion cuando hay clave de Azure o de OpenAI; sin ellas todo sigue funcionando con la voz del celular. Los audios viven solo en memoria del servidor (no se guardan).

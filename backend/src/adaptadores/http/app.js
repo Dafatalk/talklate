@@ -30,7 +30,7 @@ function crearApp(servicios, opciones = {}) {
     if (opciones.saludDb) {
       try { db = await opciones.saludDb(); } catch (e) { log.error('salud_db_fallida', { detalle: e.message }); db = { ok: false }; }
     }
-    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: servicios.traduccion.cadena(), transcripcion_voz: !!(servicios.transcriptor && servicios.transcriptor.disponible()), db });
+    res.status(db.ok === false ? 503 : 200).json({ ok: db.ok !== false, servicio: 'talklate', version: 'v1', motores_traduccion: servicios.traduccion.cadena(), transcripcion_voz: !!(servicios.transcriptor && servicios.transcriptor.disponible()), voz_natural: servicios.voz ? servicios.voz.motores() : [], db });
   });
 
   // Documentacion OpenAPI 3.0 (convenciones/api-rest.md seccion 9)
@@ -50,6 +50,7 @@ function crearApp(servicios, opciones = {}) {
   v1.use('/', require('./rutas/catalogo')(servicios));
   v1.use('/', require('./rutas/conversaciones')(servicios));
   v1.use('/', require('./rutas/reportes')(servicios));
+  if (servicios.voz) v1.use('/', require('./rutas/voz')(servicios));
   app.use('/api/v1', v1);
 
   app.use((req, res) => res.status(404).json(cuerpoError(404, 'No encontramos esa ruta.', req.originalUrl)));
