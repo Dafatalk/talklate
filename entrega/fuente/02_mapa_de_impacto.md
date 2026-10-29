@@ -7,7 +7,7 @@
 
 ## Why - Objetivo
 
-Objetivo (SMART): al cierre de la liberacion 3 (08/01/2027), al menos 10 personas de prueba sostienen cada una una conversacion de 10 mensajes o mas con alguien que habla otro idioma (espanol-ingles), con menos del 20 % de traducciones reportadas como malas y un tiempo por traduccion de 3 segundos o menos (p95). Vision: ver contexto.md.
+Objetivo (SMART): al cierre de la liberacion 3 (08/01/2027), al menos 10 personas de prueba sostienen cada una una conversacion de 10 mensajes o mas con alguien que habla otro idioma (espanol-ingles), con menos del 20 % de traducciones reportadas como malas y un tiempo por traduccion de 3 segundos o menos (p95). Vision: ver el documento 1 (Vision y contexto).
 
 ## Actores
 
