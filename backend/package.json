@@ -13,7 +13,9 @@
     "test:surreal": "TEST_DB_DRIVER=surreal node --test test/api.test.js",
     "coverage": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=80 --test-coverage-functions=80 test/*.test.js",
     "medir": "node scripts/medir-traduccion.js",
-    "medir:voz": "node --env-file-if-exists=.env scripts/medir-voz.js"
+    "medir:voz": "node --env-file-if-exists=.env scripts/medir-voz.js",
+    "arch:check": "depcruise src",
+    "arch:graph": "depcruise src --output-type mermaid"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -22,5 +24,8 @@
     "jsonwebtoken": "^9.0.2",
     "swagger-ui-express": "^5.0.1",
     "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "dependency-cruiser": "^16.0.0"
   }
 }
