@@ -89,3 +89,10 @@
 
 - **Voz natural (ADR-015):** la traduccion ya no suena robotica si se configura Azure Speech (`AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`) o una API de voz compatible con OpenAI (`VOZ_URL`, `VOZ_API_KEY`). El enojo, la alegria y la preocupacion se notan en la voz. Sin clave, se usa la voz del celular como antes.
 - **Flujo de la burbuja:** toda conversacion abre en la burbuja. Al tocarla escucha (salen ondas), al dejar de hablar ~1.5 s traduce sola (la burbuja gira), luego suena la traduccion y vuelve a quedar lista. El chat sigue a un toque en la cabecera.
+
+## 29/10/2026 - VoiceStudio como voz local con emocion
+
+- Se agrego VoiceStudio como primer motor de voz (ADR-016). Con IndexTTS 2 la emocion se manda como vector (enojo, alegria, tristeza...), corre local y gratis en la Mac M5.
+- Si VoiceStudio falla, se usa Azure u OpenAI (si hay claves) y si no, la voz del celular.
+- Guia para montar todo en la Mac y medir: `backend/VOICESTUDIO_MAC.md`. Comando de medicion: `npm run medir:voz`.
+- Pendiente: medir en la Mac y confirmar el id del motor y los campos de la API (ver la guia, seccion 7).

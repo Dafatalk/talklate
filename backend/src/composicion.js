@@ -11,6 +11,7 @@ const { crearCifradorAesGcm } = require('./adaptadores/cifrado/aesGcm');
 const { crearTranscriptorWhisper } = require('./adaptadores/transcripcion/whisper');
 const { crearSintetizadorAzure } = require('./adaptadores/sintesis/azure');
 const { crearSintetizadorOpenAI } = require('./adaptadores/sintesis/openai');
+const { crearSintetizadorVoiceStudio } = require('./adaptadores/sintesis/voicestudio');
 const { crearServicioVoz } = require('./aplicacion/voz');
 const { crearServicioTraduccion } = require('./aplicacion/traduccion');
 const { crearServicioSesiones } = require('./aplicacion/sesiones');
@@ -35,13 +36,16 @@ function crearMotores(entorno = process.env, { fetchFn } = {}) {
   return [qwen(), claude(), reglas];
 }
 
-// Voz natural segun VOZ_MOTOR (ADR-015): auto (Azure -> OpenAI compatible), azure, openai o ninguno
+// Voz natural segun VOZ_MOTOR (ADR-015, ADR-016): auto (VoiceStudio local -> Azure -> OpenAI compatible),
+// voicestudio, azure, openai o ninguno
 // (ninguno = la app usa la voz del celular)
 function crearSintetizadores(entorno = process.env, { fetchFn } = {}) {
   const modo = (entorno.VOZ_MOTOR || 'auto').toLowerCase();
   const azure = () => crearSintetizadorAzure({ clave: entorno.AZURE_SPEECH_KEY, region: entorno.AZURE_SPEECH_REGION, fetchFn });
   const openai = () => crearSintetizadorOpenAI({ url: entorno.VOZ_URL, modelo: entorno.VOZ_MODELO || undefined, voz: entorno.VOZ_NOMBRE || undefined, apiKey: entorno.VOZ_API_KEY, fetchFn });
-  const lista = modo === 'ninguno' ? [] : modo === 'azure' ? [azure()] : modo === 'openai' ? [openai()] : [azure(), openai()];
+  const voicestudio = () => crearSintetizadorVoiceStudio({ url: entorno.VOICESTUDIO_URL, motor: entorno.VOICESTUDIO_MOTOR || undefined, perfil: entorno.VOICESTUDIO_PERFIL || undefined, apiKey: entorno.VOICESTUDIO_API_KEY, timeoutMs: Number(entorno.VOICESTUDIO_TIMEOUT_MS) || undefined, fetchFn });
+  const porModo = { ninguno: [], azure: [azure()], openai: [openai()], voicestudio: [voicestudio()] };
+  const lista = porModo[modo] || [voicestudio(), azure(), openai()];
   return lista.map((s) => asegurarPuerto(`sintetizador.${s.nombre}`, s, SINTETIZADOR));
 }
 

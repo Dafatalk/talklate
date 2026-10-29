@@ -217,3 +217,31 @@ test('voz natural: Azure pone la emocion en SSML y OpenAI la pide como instrucci
   assert.deepEqual(avisos, ['sintesis_fallida']);
   await assert.rejects(crearServicioVoz({ log: {} }).sintetizar({ texto: 'hola', idioma: 'es' }), (e) => e.estado === 503);
 });
+
+test('voz natural: VoiceStudio manda el vector de emocion a IndexTTS 2 y la instruccion a otros motores', async () => {
+  const { crearSintetizadorVoiceStudio } = require('../src/adaptadores/sintesis/voicestudio');
+  let pedido;
+  const fetchFn = async (url, op) => { pedido = { url, op }; return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) }; };
+  const idx = crearSintetizadorVoiceStudio({ url: 'http://127.0.0.1:3900/', perfil: 'demo', apiKey: 'k', fetchFn });
+  assert.equal(idx.disponible(), true);
+  const r = await idx.sintetizar({ texto: 'Estoy furioso', idioma: 'es', tono: 'Enojado', ritmo: 1 });
+  assert.equal(pedido.url, 'http://127.0.0.1:3900/generate');
+  assert.equal(r.tipo, 'audio/wav');
+  assert.equal(pedido.op.headers.Authorization, 'Bearer k');
+  assert.equal(pedido.op.body.get('engine'), 'indextts2');
+  assert.equal(pedido.op.body.get('language'), 'es');
+  assert.equal(pedido.op.body.get('profile_id'), 'demo');
+  assert.deepEqual(JSON.parse(pedido.op.body.get('emo_vector')), [0, 0.85, 0, 0, 0.1, 0, 0, 0]);
+  await idx.sintetizar({ texto: 'hola', idioma: 'es', tono: 'Neutral' });
+  assert.equal(pedido.op.body.get('emo_vector'), null); // neutral: sin emocion forzada
+  const cosy = crearSintetizadorVoiceStudio({ url: 'http://127.0.0.1:3900', motor: 'cosyvoice', fetchFn });
+  const c = await cosy.sintetizar({ texto: 'que bien', idioma: 'es', tono: 'Alegre' });
+  assert.equal(pedido.url, 'http://127.0.0.1:3900/v1/audio/speech');
+  assert.equal(c.tipo, 'audio/mpeg');
+  const cuerpo = JSON.parse(pedido.op.body);
+  assert.equal(cuerpo.model, 'cosyvoice');
+  assert.match(cuerpo.instruct, /alegria/);
+  assert.equal(crearSintetizadorVoiceStudio({}).disponible(), false);
+  const malo = crearSintetizadorVoiceStudio({ url: 'http://x', fetchFn: async () => ({ ok: false, status: 503 }) });
+  await assert.rejects(malo.sintetizar({ texto: 'a', idioma: 'es', tono: 'Neutral' }), /503/);
+});
