@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
+    "sha256": "f15c2db5f9578e450439187f49b9650a734dc87c5bfebcd8dabd69b2727fde84",
+    "bytes": 6172
+  },
+  "artifact": {
+    "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+    "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
+    "bytes": 840151
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.finalize.json",
+    "summaryReceipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.finalize-summary.json",
+    "browserCheckReceipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-23T01:38:45.349Z",
+    "source": "network",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 5874,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "routesOverSuggestedBends": 1
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [],
+      "detours": [
+        {
+          "relationship": {
+            "id": "comp-casos",
+            "from": "composicion",
+            "to": "casos",
+            "label": "compone e inyecta",
+            "collectionIndex": 3,
+            "artifactIndex": 4
+          },
+          "bends": 3,
+          "stretch": 1
+        }
+      ],
+      "truncated": false
+    },
+    "hints": [
+      "composicion → casos needs 3 bends: move node composicion or casos so they share a row or column with matching centers, or sit diagonally with a clear corner."
+    ],
+    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
+  }
+}
