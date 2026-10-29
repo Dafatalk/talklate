@@ -96,3 +96,14 @@
 - Si VoiceStudio falla, se usa Azure u OpenAI (si hay claves) y si no, la voz del celular.
 - Guia para montar todo en la Mac y medir: `backend/VOICESTUDIO_MAC.md`. Comando de medicion: `npm run medir:voz`.
 - Pendiente: medir en la Mac y confirmar el id del motor y los campos de la API (ver la guia, seccion 7).
+
+## 29/10/2026 - Carpeta de entrega
+
+- Toda la documentacion para la entrega quedo en `entrega/`, numerada en orden de lectura (01 vision a 17 politica de datos), con indice en `entrega/README.md`.
+- Los documentos de la entrega ya incluyen la voz: Whisper (entrada), prosodia, voz con emocion (VoiceStudio, Azure, OpenAI), ADR-014 a ADR-016 y RNF-010.
+- Se quitaron las notas de trabajo internas ("validar con...", pendientes de revision) y los textos quedaron sin tildes.
+- Diagramas actualizados con Whisper y VoiceStudio: draw.io de contexto, contenedores y despliegue.
+- **Archify:** se actualizo el diagrama hexagonal que subio Julian (`.archify/architecture-talklate-hexagonal-20261022-203500/`) con la voz: 6 puertos (se suman Transcriptor y Sintetizador), adaptadores de transcripcion y sintesis, Whisper, VoiceStudio y Azure/OpenAI, citando el codigo de develop (135d4d4). Se agrego la vista general con el flujo de voz (`.archify/architecture-talklate-voz-20261029-180000/`). Las dos pasan `finalize` (validate, deliver, check y browser-check) y estan copiadas en `entrega/diagramas/`.
+- `npm run arch:check` marca 2 dependencias de librerias en la capa de aplicacion (bcryptjs en `cuentas.js` y jsonwebtoken en `sesiones.js`) que hay que mover detras de un puerto; CI no corre ese chequeo todavia.
+- Se regenero `backend/package-lock.json`: faltaba dependency-cruiser y `npm ci` fallaba en CI.
+- Las carpetas de trabajo (`requerimientos/`, `arquitectura/`) siguen siendo la fuente que se edita; `entrega/` es la version para entregar.

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TalkLate - Arquitectura con voz (Whisper, Qwen y VoiceStudio)",
+    "locale": "es",
+    "output": "entrega/diagramas/arquitectura_talklate.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "usuario", "type": "external", "label": "Cliente Traductor", "sublabel": "e Interlocutor (sin cuenta)", "pos": [40, 250], "size": [150, 64] },
+    { "id": "admin", "type": "external", "label": "Administrador", "sublabel": "idiomas y reportes", "pos": [40, 420], "size": [150, 64] },
+    { "id": "app", "type": "frontend", "label": "App TalkLate", "sublabel": "Expo: burbuja de voz y chat", "pos": [290, 250], "size": [170, 64], "tag": "expo-audio" },
+    { "id": "api", "type": "backend", "label": "API TalkLate", "sublabel": "Node 22 + Express, hexagonal", "pos": [560, 250], "size": [180, 64], "tag": "puertos y adaptadores" },
+    { "id": "whisper", "type": "backend", "label": "Whisper", "sublabel": "voz a texto :9000", "pos": [860, 90], "size": [170, 64] },
+    { "id": "qwen", "type": "backend", "label": "Ollama + Qwen", "sublabel": "traduccion cultural :11434", "pos": [860, 250], "size": [170, 64] },
+    { "id": "voicestudio", "type": "backend", "label": "VoiceStudio", "sublabel": "IndexTTS 2, emocion :3900", "pos": [860, 410], "size": [170, 64] },
+    { "id": "db", "type": "database", "label": "SurrealDB Cloud", "sublabel": "mensajes cifrados AES-256-GCM", "pos": [560, 560], "size": [180, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Servidor de TalkLate (Mac M5, 32 GB)", "wraps": ["api", "whisper", "qwen", "voicestudio"] }
+  ],
+  "connections": [
+    { "id": "usuario-app", "from": "usuario", "to": "app", "label": "habla o escribe", "variant": "emphasis" },
+    { "id": "admin-app", "from": "admin", "to": "app", "label": "gestiona" },
+    { "id": "app-api", "from": "app", "to": "api", "label": "HTTPS /api/v1 + JWT", "variant": "emphasis" },
+    { "id": "api-whisper", "from": "api", "to": "whisper", "label": "1. transcribe" },
+    { "id": "api-qwen", "from": "api", "to": "qwen", "label": "2. traduce", "variant": "emphasis" },
+    { "id": "api-voicestudio", "from": "api", "to": "voicestudio", "label": "3. voz con emocion" },
+    { "id": "api-db", "from": "api", "to": "db", "label": "guarda cifrado", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Entonacion", "items": ["Prosodia: volumen, variacion y palabras por segundo", "Tono de la voz + tono de las palabras", "El tono viaja al prompt y a la voz"] },
+    { "dot": "emerald", "title": "Respaldo de traduccion", "items": ["Qwen -> Claude Sonnet -> motor de reglas", "Circuit Breaker: 60 s por motor"] },
+    { "dot": "amber", "title": "Respaldo de voz", "items": ["VoiceStudio -> Azure Speech -> OpenAI", "Ultimo recurso: voz del celular"] },
+    { "dot": "rose", "title": "Seguridad", "items": ["JWT 15 min + refresco rotativo", "Audio sin guardar; voz en memoria 5 min"] }
+  ]
+}
