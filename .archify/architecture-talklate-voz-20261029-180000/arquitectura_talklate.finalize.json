@@ -5,16 +5,16 @@
   "status": "pass",
   "type": "architecture",
   "quality": "showcase",
-  "startedAt": "2026-10-23T01:38:45.261Z",
+  "startedAt": "2026-10-29T22:47:14.228Z",
   "specification": {
-    "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-    "sha256": "f15c2db5f9578e450439187f49b9650a734dc87c5bfebcd8dabd69b2727fde84",
-    "bytes": 6172
+    "path": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
+    "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
+    "bytes": 3008
   },
   "artifact": {
-    "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
-    "bytes": 840151
+    "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
+    "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
+    "bytes": 846096
   },
   "stages": {
     "validate": {
@@ -23,16 +23,14 @@
       "durationMs": null,
       "execution": "embedded-in-deliver",
       "command": [
-        "/opt/homebrew/Cellar/node/25.9.0_2/bin/node",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.agents/skills/archify/bin/archify.mjs",
+        "/opt/node22/bin/node",
+        "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
         "deliver",
         "architecture",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+        "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
+        "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "--quality",
         "showcase",
-        "--repo-root",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate",
         "--json"
       ],
       "receipt": {
@@ -40,8 +38,8 @@
         "ok": true,
         "command": "validate",
         "specification": {
-          "sha256": "f15c2db5f9578e450439187f49b9650a734dc87c5bfebcd8dabd69b2727fde84",
-          "bytes": 6172
+          "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
+          "bytes": 3008
         },
         "validation": {
           "checksPassed": 9,
@@ -56,35 +54,33 @@
     "deliver": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 329,
+      "durationMs": 562,
       "command": [
-        "/opt/homebrew/Cellar/node/25.9.0_2/bin/node",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.agents/skills/archify/bin/archify.mjs",
+        "/opt/node22/bin/node",
+        "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
         "deliver",
         "architecture",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+        "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
+        "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "--quality",
         "showcase",
-        "--repo-root",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate",
         "--json"
       ],
       "receipt": {
         "schemaVersion": 1,
-        "receiptId": "f5a316ab-ab67-4212-8f2b-5e73c930b427",
+        "receiptId": "018656b4-0a11-4a32-b33a-ec37efc67215",
         "ok": true,
         "command": "deliver",
         "type": "architecture",
-        "input": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-        "output": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+        "input": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
+        "output": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "specification": {
-          "sha256": "f15c2db5f9578e450439187f49b9650a734dc87c5bfebcd8dabd69b2727fde84",
-          "bytes": 6172
+          "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
+          "bytes": 3008
         },
         "artifact": {
-          "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
-          "bytes": 840151
+          "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
+          "bytes": 846096
         },
         "validation": {
           "checksPassed": 9,
@@ -93,12 +89,6 @@
           "compositionStatus": "pass",
           "errors": 0,
           "warnings": 0
-        },
-        "evidence": {
-          "verified": true,
-          "repository": "https://github.com/Dafatalk/talklate",
-          "revision": "fd3662353f271861dbd6652435f86573b76d953d",
-          "references": 13
         },
         "update": {
           "status": "unavailable",
@@ -116,20 +106,20 @@
     "check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 139,
+      "durationMs": 204,
       "command": [
-        "/opt/homebrew/Cellar/node/25.9.0_2/bin/node",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.agents/skills/archify/bin/archify.mjs",
+        "/opt/node22/bin/node",
+        "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
         "check",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+        "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "--require-provenance"
       ],
       "receipt": {
         "ok": true,
-        "file": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+        "file": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "artifact": {
-          "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
-          "bytes": 840151
+          "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
+          "bytes": 846096
         },
         "checks": [
           {
@@ -196,16 +186,16 @@
             "containerBorderRuns": 0,
             "labelRouteClearanceIssues": 0,
             "labelCanvasOverflowIssues": 0,
-            "minLabelRouteClearance": 12,
+            "minLabelRouteClearance": 21.1,
             "desktopReadabilityIssues": 0,
             "viewportHeightIssues": 0,
-            "minProjectedNodeTextPx": 6.371066666666667,
-            "maxBends": 3,
-            "routesOverSuggestedBends": 1,
+            "minProjectedNodeTextPx": 7.5,
+            "maxBends": 2,
+            "routesOverSuggestedBends": 0,
             "maxStretch": 1,
             "routesOverSuggestedStretch": 0,
-            "minSegmentPx": 24,
-            "minInteriorSegmentPx": 25,
+            "minSegmentPx": 32,
+            "minInteriorSegmentPx": 146,
             "shortSegmentCount": 0,
             "shortEndpointSegmentCount": 0,
             "shortInteriorSegmentCount": 0,
@@ -219,69 +209,60 @@
           },
           "routeReview": {
             "crossings": [],
-            "detours": [
-              {
-                "relationship": {
-                  "id": "comp-casos",
-                  "from": "composicion",
-                  "to": "casos",
-                  "label": "compone e inyecta",
-                  "collectionIndex": 3,
-                  "artifactIndex": 4
-                },
-                "bends": 3,
-                "stretch": 1
-              }
-            ]
+            "detours": []
           },
           "leadingSpace": {
             "measured": true,
-            "emptyTopPx": 110,
-            "emptyTopRatio": 0.138,
-            "occupiedTop": 110,
+            "emptyTopPx": 60,
+            "emptyTopRatio": 0.087,
+            "occupiedTop": 60,
             "viewBoxTop": 0,
-            "canvasHeight": 795,
-            "typicalNodeHeight": 62,
+            "canvasHeight": 692,
+            "typicalNodeHeight": 64,
             "reviewSuggested": false
           },
           "desktopReadability": {
             "budgetBasis": "recognized-declared-wide",
             "readerContract": "declared-wide-v1",
-            "availableDiagramWidth": 1346,
-            "actualBudgetPx": 1346,
-            "actualReaderWidth": 1376,
-            "desiredReaderWidth": 1530,
+            "availableDiagramWidth": 1031.25,
+            "actualBudgetPx": 1031.25,
+            "actualReaderWidth": 1061.25,
+            "desiredReaderWidth": 1061.25,
             "viewportCap": 1376,
-            "limit": "viewport-cap",
+            "limit": "source-size",
             "requestedTargetPx": 7.5,
-            "requestedTargetMet": false,
+            "requestedTargetMet": true,
             "hardFloorPx": 6,
             "hardFloorMet": true,
             "minimumOwner": {
-              "kind": "node",
-              "id": "casos"
+              "kind": "edge",
+              "id": "usuario-app",
+              "from": "usuario",
+              "to": "app"
             },
-            "minimumSourceTextPx": 7.1,
-            "minimumProjectedTextPx": 6.371066666666667,
-            "semanticTextCount": 39
+            "minimumSourceTextPx": 8,
+            "minimumProjectedTextPx": 7.5,
+            "semanticTextCount": 24
           },
           "issues": []
         },
         "provenance": "current",
-        "deliveryReceiptId": "f5a316ab-ab67-4212-8f2b-5e73c930b427"
+        "deliveryReceiptId": "018656b4-0a11-4a32-b33a-ec37efc67215"
       }
     },
     "browser-check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 5263,
+      "durationMs": 2445,
       "command": [
-        "/opt/homebrew/Cellar/node/25.9.0_2/bin/node",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.agents/skills/archify/bin/archify.mjs",
+        "/opt/node22/bin/node",
+        "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
         "browser-check",
-        "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+        "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "--json",
-        "--require-provenance"
+        "--require-provenance",
+        "--out-dir",
+        "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000"
       ],
       "execution": "in-process",
       "receipt": {
@@ -292,11 +273,11 @@
         "status": "pass",
         "visualReview": "not-requested",
         "provenance": "current",
-        "deliveryReceiptId": "f5a316ab-ab67-4212-8f2b-5e73c930b427",
+        "deliveryReceiptId": "018656b4-0a11-4a32-b33a-ec37efc67215",
         "artifact": {
-          "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-          "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
-          "bytes": 840151
+          "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
+          "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
+          "bytes": 846096
         },
         "state": {
           "detail": "read",
@@ -304,7 +285,7 @@
         },
         "chrome": {
           "status": "available",
-          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+          "executable": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
         },
         "diagnostics": [],
         "containment": {
@@ -327,25 +308,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1376,
-              "diagramWidth": 1346,
+              "readerWidth": 1216,
+              "diagramWidth": 1186,
               "pageComposition": {
                 "bodyPaddingPx": 12,
-                "headerPx": 78,
+                "headerPx": 52,
                 "diagramChromePx": 78,
-                "svgPx": 713,
+                "svgPx": 746,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 6.371066666666667,
-              "minimumProjectedNonEdgeTextPx": 6.371066666666667,
-              "minimumProjectedEdgeTextPx": 7.1786666666666665,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
+              "minimumProjectedEdgeTextPx": 8,
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -368,34 +351,36 @@
               "innerWidth": 1600,
               "innerHeight": 1000,
               "scrollWidth": 1600,
-              "scrollHeight": 1029,
+              "scrollHeight": 1000,
               "overflowX": false,
-              "overflowY": true,
-              "verticalScrollAccepted": true,
-              "overflowDisposition": "readable-vertical-scroll",
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
               "readerLayout": "adaptive",
-              "readerOverflow": "authored",
+              "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1530,
-              "diagramWidth": 1500,
+              "readerWidth": 1270,
+              "diagramWidth": 1240,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 86,
+                "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 795,
+                "svgPx": 780,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -427,25 +412,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1604,
-              "diagramWidth": 1574,
+              "readerWidth": 1397,
+              "diagramWidth": 1367,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 86,
+                "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 834,
+                "svgPx": 860,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -477,25 +464,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1920,
-              "diagramWidth": 1870,
+              "readerWidth": 1840,
+              "diagramWidth": 1650,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 94,
-                "diagramChromePx": 94,
-                "svgPx": 991,
+                "headerPx": 68,
+                "diagramChromePx": 138,
+                "svgPx": 1038,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -506,8 +495,8 @@
               "dockStageGap": 10,
               "requiredDockStageGap": 10,
               "viewerChromeStageOk": true,
-              "viewerChromeReserve": 44,
-              "viewerChromeActive": true,
+              "viewerChromeReserve": 0,
+              "viewerChromeActive": false,
               "viewerChromeOk": true,
               "resolvedTheme": "light"
             }
@@ -580,25 +569,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1376,
-              "diagramWidth": 1346,
+              "readerWidth": 1216,
+              "diagramWidth": 1186,
               "pageComposition": {
                 "bodyPaddingPx": 12,
-                "headerPx": 78,
+                "headerPx": 52,
                 "diagramChromePx": 78,
-                "svgPx": 713,
+                "svgPx": 746,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 6.371066666666667,
-              "minimumProjectedNonEdgeTextPx": 6.371066666666667,
-              "minimumProjectedEdgeTextPx": 7.1786666666666665,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
+              "minimumProjectedEdgeTextPx": 8,
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -621,34 +612,36 @@
               "innerWidth": 1600,
               "innerHeight": 1000,
               "scrollWidth": 1600,
-              "scrollHeight": 1029,
+              "scrollHeight": 1000,
               "overflowX": false,
-              "overflowY": true,
-              "verticalScrollAccepted": true,
-              "overflowDisposition": "readable-vertical-scroll",
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
               "readerLayout": "adaptive",
-              "readerOverflow": "authored",
+              "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1530,
-              "diagramWidth": 1500,
+              "readerWidth": 1270,
+              "diagramWidth": 1240,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 86,
+                "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 795,
+                "svgPx": 780,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -680,25 +673,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1604,
-              "diagramWidth": 1574,
+              "readerWidth": 1397,
+              "diagramWidth": 1367,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 86,
+                "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 834,
+                "svgPx": 860,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -730,25 +725,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1920,
-              "diagramWidth": 1870,
+              "readerWidth": 1840,
+              "diagramWidth": 1650,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 94,
-                "diagramChromePx": 94,
-                "svgPx": 991,
+                "headerPx": 68,
+                "diagramChromePx": 138,
+                "svgPx": 1038,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -759,8 +756,8 @@
               "dockStageGap": 10,
               "requiredDockStageGap": 10,
               "viewerChromeStageOk": true,
-              "viewerChromeReserve": 44,
-              "viewerChromeActive": true,
+              "viewerChromeReserve": 0,
+              "viewerChromeActive": false,
               "viewerChromeOk": true,
               "resolvedTheme": "light"
             }
@@ -785,25 +782,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1376,
-              "diagramWidth": 1346,
+              "readerWidth": 1216,
+              "diagramWidth": 1186,
               "pageComposition": {
                 "bodyPaddingPx": 12,
-                "headerPx": 78,
+                "headerPx": 52,
                 "diagramChromePx": 78,
-                "svgPx": 713,
+                "svgPx": 746,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 6.371066666666667,
-              "minimumProjectedNonEdgeTextPx": 6.371066666666667,
-              "minimumProjectedEdgeTextPx": 7.1786666666666665,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
+              "minimumProjectedEdgeTextPx": 8,
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -826,34 +825,36 @@
               "innerWidth": 1600,
               "innerHeight": 1000,
               "scrollWidth": 1600,
-              "scrollHeight": 1029,
+              "scrollHeight": 1000,
               "overflowX": false,
-              "overflowY": true,
-              "verticalScrollAccepted": true,
-              "overflowDisposition": "readable-vertical-scroll",
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
               "readerLayout": "adaptive",
-              "readerOverflow": "authored",
+              "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1530,
-              "diagramWidth": 1500,
+              "readerWidth": 1270,
+              "diagramWidth": 1240,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 86,
+                "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 795,
+                "svgPx": 780,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -885,25 +886,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1604,
-              "diagramWidth": 1574,
+              "readerWidth": 1397,
+              "diagramWidth": 1367,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 86,
+                "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 834,
+                "svgPx": 860,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -935,25 +938,27 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1920,
-              "diagramWidth": 1870,
+              "readerWidth": 1840,
+              "diagramWidth": 1650,
               "pageComposition": {
                 "bodyPaddingPx": 64,
-                "headerPx": 94,
-                "diagramChromePx": 94,
-                "svgPx": 991,
+                "headerPx": 68,
+                "diagramChromePx": 138,
+                "svgPx": 1038,
                 "cardsPx": 0,
-                "viewBoxHeight": 795
+                "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1500,
-              "minimumProjectedNodeTextPx": 7.1,
-              "minimumProjectedNonEdgeTextPx": 7.1,
+              "viewBoxWidth": 1100,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "cuentas · conversaciones · traducción…",
-              "minimumProjectedNodeTextDetail": "context",
+              "minimumProjectedNodeText": "habla o escribe",
+              "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
-                "kind": "node",
-                "id": "casos"
+                "kind": "edge",
+                "id": "usuario-app",
+                "from": "usuario",
+                "to": "app"
               },
               "minimumRequiredNodeTextPx": 6,
               "readabilityOk": true,
@@ -964,8 +969,8 @@
               "dockStageGap": 10,
               "requiredDockStageGap": 10,
               "viewerChromeStageOk": true,
-              "viewerChromeReserve": 44,
-              "viewerChromeActive": true,
+              "viewerChromeReserve": 0,
+              "viewerChromeActive": false,
               "viewerChromeOk": true,
               "resolvedTheme": "light"
             }
@@ -977,7 +982,8 @@
           "contactSheet": null
         },
         "sidecars": {
-          "receipt": "talklate-hexagonal.browser-check.json",
+          "directory": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000",
+          "receipt": "arquitectura_talklate.browser-check.json",
           "files": []
         }
       }
@@ -989,20 +995,20 @@
   },
   "diagnostics": [],
   "evidence": {
-    "receipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.finalize.json",
-    "summaryReceipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.finalize-summary.json",
-    "browserCheckReceipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.browser-check.json"
+    "receipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.finalize.json",
+    "summaryReceipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.finalize-summary.json",
+    "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.browser-check.json"
   },
   "visualReview": "not-requested",
-  "finishedAt": "2026-10-23T01:38:51.135Z",
-  "durationMs": 5874,
+  "finishedAt": "2026-10-29T22:47:17.562Z",
+  "durationMs": 3334,
   "update": {
     "status": "current",
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-10-23T01:38:45.349Z",
-    "source": "network",
+    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "source": "cache",
     "noticeRequired": false,
     "noticeText": null
   }

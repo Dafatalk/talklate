@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
+    "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
+    "bytes": 3008
+  },
+  "artifact": {
+    "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
+    "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
+    "bytes": 846096
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.finalize.json",
+    "summaryReceipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.finalize-summary.json",
+    "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 3334,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

@@ -21,6 +21,7 @@ real (`backend/src`, `frontend/`).
 | `11_decisiones_de_arquitectura_ADR.md` | Decisiones | 16 ADR con contexto, alternativas y consecuencias |
 | `12_modelo_de_datos.md` | Datos | Modelo de dominio, reglas y correspondencia con la base |
 | `diagramas/arquitectura_talklate.html` | Vista general interactiva | Diagrama de arquitectura (Archify) con el flujo de voz |
+| `diagramas/arquitectura_hexagonal.html` | Vista interactiva del backend | Nucleo, 6 puertos y adaptadores (Archify) |
 
 ## 1. Estilo arquitectonico
 

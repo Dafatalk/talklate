@@ -6,14 +6,14 @@
   "type": "architecture",
   "quality": "showcase",
   "specification": {
-    "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-    "sha256": "f15c2db5f9578e450439187f49b9650a734dc87c5bfebcd8dabd69b2727fde84",
-    "bytes": 6172
+    "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
+    "sha256": "2a8edc5454277f5258033f5e3d21b816fd75eb2581ed4ae01cabd8dc22107e25",
+    "bytes": 8949
   },
   "artifact": {
-    "path": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
-    "bytes": 840151
+    "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+    "sha256": "dff44dc3d7357fcd1bc4a95df95f4a72325606faab11566da3462de9f60bee88",
+    "bytes": 875121
   },
   "gates": {
     "validate": "pass",
@@ -28,22 +28,22 @@
     "truncated": false
   },
   "evidence": {
-    "receipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.finalize.json",
-    "summaryReceipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.finalize-summary.json",
-    "browserCheckReceipt": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.browser-check.json"
+    "receipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4/talklate-hexagonal.finalize.json",
+    "summaryReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4/talklate-hexagonal.finalize-summary.json",
+    "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4/talklate-hexagonal.browser-check.json"
   },
   "update": {
     "status": "current",
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-10-23T01:38:45.349Z",
-    "source": "network",
+    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "source": "cache",
     "noticeRequired": false,
     "noticeText": null
   },
   "visualReview": "not-requested",
-  "durationMs": 5874,
+  "durationMs": 3873,
   "browserCheck": {
     "requested": true,
     "ran": true

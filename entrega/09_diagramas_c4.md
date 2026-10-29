@@ -10,7 +10,7 @@ La arquitectura de TalkLate en notacion C4:
 - **Nivel 2 - Contenedores:** las piezas que forman TalkLate y como se comunican.
 - **Nivel 3 - Componentes:** el interior de la API TalkLate, en `10_componentes.md`.
 
-Fuentes editables en `diagramas/` (`c4_contexto.drawio`, `c4_contenedores.drawio`). Vista general interactiva con el flujo de voz: `diagramas/arquitectura_talklate.html`. La justificacion de cada vista esta en `07_arquitectura.md`.
+Fuentes editables en `diagramas/` (`c4_contexto.drawio`, `c4_contenedores.drawio`). Vistas interactivas (Archify): `diagramas/arquitectura_talklate.html` (general, con el flujo de voz) y `diagramas/arquitectura_hexagonal.html` (backend por puertos y adaptadores). La justificacion de cada vista esta en `07_arquitectura.md`.
 
 ---
 

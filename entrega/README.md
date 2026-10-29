@@ -33,8 +33,9 @@ Esta carpeta reune los documentos de analisis, requisitos y arquitectura de Talk
 
 | Archivo | Contenido |
 | --- | --- |
-| `arquitectura_talklate.html` | Vista general interactiva: app, API hexagonal, Whisper, Qwen, VoiceStudio y SurrealDB (abrir en el navegador) |
-| `arquitectura_talklate.architecture.json` | Fuente del diagrama anterior en formato Archify |
+| `arquitectura_talklate.html` | Vista general interactiva (Archify): app, API, Whisper, Qwen, VoiceStudio y SurrealDB, con el flujo de voz (abrir en el navegador) |
+| `arquitectura_hexagonal.html` | Vista interactiva (Archify) del backend hexagonal: nucleo, 6 puertos, adaptadores y sistemas externos, con enlaces al codigo |
+| `arquitectura_talklate.architecture.json` | Fuente Archify de la vista general (la del hexagonal esta en `.archify/` en la raiz del repo) |
 | `c4_contexto.drawio` | C4 nivel 1 (editable en draw.io) |
 | `c4_contenedores.drawio` | C4 nivel 2 (editable en draw.io) |
 | `despliegue.drawio` | Vista de despliegue (editable en draw.io) |

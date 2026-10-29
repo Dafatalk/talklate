@@ -2,51 +2,60 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "TalkLate — Arquitectura hexagonal (backend)",
-    "subtitle": "Puertos y adaptadores (ADR-013): el núcleo depende de contratos, no de tecnología",
+    "title": "TalkLate — Arquitectura hexagonal (backend) con voz",
+    "subtitle": "Puertos y adaptadores (ADR-013): el núcleo depende de contratos, no de tecnología; la voz entra por Transcriptor y sale por Sintetizador (ADR-014 a ADR-016)",
     "output": ".archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
     "locale": "es",
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/Dafatalk/talklate",
       "provider": "github",
-      "revision": "fd3662353f271861dbd6652435f86573b76d953d"
+      "revision": "135d4d489b0e02cfe8dfa50177d24e91f7aa7e6c"
     }
   },
   "components": [
     { "id": "composicion", "type": "backend", "label": "Composición", "sublabel": "composicion.js", "tag": "raíz", "pos": [250, 110], "size": [164, 64],
-      "sources": [{ "path": "backend/src/composicion.js", "line": 47, "label": "componer()" }] },
+      "sources": [{ "path": "backend/src/composicion.js", "line": 65, "label": "componer()" }, { "path": "backend/src/composicion.js", "line": 42, "label": "crearSintetizadores()" }] },
 
-    { "id": "app", "type": "external", "label": "App TalkLate", "sublabel": "Expo / React Native", "pos": [40, 370], "size": [150, 60],
-      "sources": [{ "path": "frontend/lib/api.ts", "label": "cliente HTTP" }] },
+    { "id": "app", "type": "external", "label": "App TalkLate", "sublabel": "Expo · burbuja de voz", "pos": [40, 370], "size": [150, 60],
+      "sources": [{ "path": "frontend/lib/api.ts", "label": "cliente HTTP" }, { "path": "frontend/lib/grabacion.ts", "label": "grabación" }] },
 
     { "id": "http", "type": "backend", "label": "Adaptador HTTP", "sublabel": "Express · /api/v1", "tag": "entrada", "pos": [250, 370], "size": [160, 64],
-      "sources": [{ "path": "backend/src/adaptadores/http/app.js", "line": 15, "label": "crearApp()" }] },
+      "sources": [{ "path": "backend/src/adaptadores/http/app.js", "line": 15, "label": "crearApp()" }, { "path": "backend/src/adaptadores/http/rutas/voz.js", "label": "rutas de voz" }] },
 
-    { "id": "casos", "type": "backend", "label": "Casos de uso", "sublabel": "cuentas · conversaciones · traducción…", "pos": [480, 370], "size": [172, 64],
-      "sources": [{ "path": "backend/src/aplicacion/traduccion.js", "line": 8, "label": "aplicacion/" }] },
+    { "id": "casos", "type": "backend", "label": "Casos de uso", "sublabel": "conversaciones · traducción · voz…", "pos": [480, 370], "size": [176, 64],
+      "sources": [{ "path": "backend/src/aplicacion/traduccion.js", "line": 9, "label": "traducción" }, { "path": "backend/src/aplicacion/conversaciones.js", "line": 188, "label": "mensaje de voz" }, { "path": "backend/src/aplicacion/voz.js", "line": 10, "label": "voz" }] },
 
-    { "id": "dominio", "type": "backend", "label": "Dominio", "sublabel": "análisis · validaciones · errores", "tag": "puro", "pos": [480, 180], "size": [172, 62],
-      "sources": [{ "path": "backend/src/dominio/analisis.js", "label": "dominio/" }] },
+    { "id": "dominio", "type": "backend", "label": "Dominio", "sublabel": "análisis · prosodia · voz · reglas", "tag": "puro", "pos": [480, 180], "size": [176, 62],
+      "sources": [{ "path": "backend/src/dominio/analisis.js", "label": "análisis" }, { "path": "backend/src/dominio/prosodia.js", "line": 10, "label": "prosodia" }, { "path": "backend/src/dominio/voz.js", "line": 36, "label": "expresión" }] },
 
-    { "id": "puertos", "type": "backend", "label": "Puertos", "sublabel": "contratos de salida", "tag": "4 contratos", "pos": [760, 355], "size": [160, 96],
-      "sources": [{ "path": "backend/src/puertos/index.js", "line": 47, "label": "asegurarPuerto()" }] },
+    { "id": "puertos", "type": "backend", "label": "Puertos", "sublabel": "contratos de salida", "tag": "6 contratos", "pos": [760, 110], "size": [160, 712],
+      "sources": [{ "path": "backend/src/puertos/index.js", "line": 59, "label": "asegurarPuerto()" }] },
 
-    { "id": "persistencia", "type": "backend", "label": "Adaptador persistencia", "sublabel": "surreal · sqlite", "pos": [1010, 170], "size": [182, 62],
+    { "id": "persistencia", "type": "backend", "label": "Adaptador persistencia", "sublabel": "surreal · sqlite", "pos": [1010, 110], "size": [184, 62],
       "sources": [{ "path": "backend/src/adaptadores/persistencia/surreal/repositorio.js", "label": "surreal" }, { "path": "backend/src/adaptadores/persistencia/sqlite/repositorio.js", "label": "sqlite" }] },
 
-    { "id": "traduccion", "type": "backend", "label": "Adaptador traducción", "sublabel": "qwen → claude → reglas", "pos": [1010, 360], "size": [184, 62],
+    { "id": "transcripcion", "type": "backend", "label": "Adaptador transcripción", "sublabel": "whisper", "pos": [1010, 230], "size": [184, 62],
+      "sources": [{ "path": "backend/src/adaptadores/transcripcion/whisper.js", "line": 8, "label": "whisper" }] },
+
+    { "id": "traduccion", "type": "backend", "label": "Adaptador traducción", "sublabel": "qwen → claude → reglas", "pos": [1010, 350], "size": [184, 62],
       "sources": [{ "path": "backend/src/adaptadores/traduccion/qwen.js", "label": "qwen" }, { "path": "backend/src/adaptadores/traduccion/claude.js", "label": "claude" }, { "path": "backend/src/adaptadores/traduccion/reglas.js", "line": 313, "label": "reglas" }] },
 
-    { "id": "cifrado", "type": "backend", "label": "Adaptador cifrado", "sublabel": "AES-256-GCM", "pos": [1010, 520], "size": [182, 62],
+    { "id": "sintesis", "type": "backend", "label": "Adaptador síntesis", "sublabel": "voicestudio → azure → openai", "pos": [1010, 500], "size": [184, 62],
+      "sources": [{ "path": "backend/src/adaptadores/sintesis/voicestudio.js", "line": 9, "label": "voicestudio" }, { "path": "backend/src/adaptadores/sintesis/azure.js", "line": 16, "label": "azure" }, { "path": "backend/src/adaptadores/sintesis/openai.js", "line": 8, "label": "openai" }] },
+
+    { "id": "cifrado", "type": "backend", "label": "Adaptador cifrado", "sublabel": "AES-256-GCM", "pos": [1010, 640], "size": [184, 62],
       "sources": [{ "path": "backend/src/adaptadores/cifrado/aesGcm.js", "line": 9, "label": "aesGcm" }] },
 
-    { "id": "correo", "type": "backend", "label": "Adaptador notificador", "sublabel": "consola / correo", "pos": [1010, 665], "size": [184, 62],
+    { "id": "correo", "type": "backend", "label": "Adaptador notificador", "sublabel": "consola / correo", "pos": [1010, 760], "size": [184, 62],
       "sources": [{ "path": "backend/src/adaptadores/correo/consola.js", "label": "consola" }] },
 
-    { "id": "db", "type": "database", "label": "SurrealDB / SQLite", "sublabel": "persistencia", "pos": [1300, 170], "size": [160, 58] },
-    { "id": "ollama", "type": "external", "label": "Ollama · Qwen", "sublabel": "LLM local", "pos": [1300, 330], "size": [150, 58] },
-    { "id": "claudeapi", "type": "external", "label": "Claude API", "sublabel": "Anthropic", "pos": [1300, 440], "size": [150, 58] }
+    { "id": "db", "type": "database", "label": "SurrealDB / SQLite", "sublabel": "persistencia", "pos": [1300, 112], "size": [160, 58] },
+    { "id": "whisper", "type": "external", "label": "Whisper", "sublabel": "voz a texto local", "pos": [1300, 232], "size": [150, 58] },
+    { "id": "ollama", "type": "external", "label": "Ollama · Qwen", "sublabel": "LLM local", "pos": [1300, 322], "size": [150, 58] },
+    { "id": "claudeapi", "type": "external", "label": "Claude API", "sublabel": "Anthropic", "pos": [1300, 404], "size": [150, 58] },
+    { "id": "voicestudio", "type": "external", "label": "VoiceStudio", "sublabel": "IndexTTS 2 local", "pos": [1300, 486], "size": [150, 58] },
+    { "id": "nube", "type": "external", "label": "Azure / OpenAI", "sublabel": "voz de respaldo", "pos": [1300, 568], "size": [150, 58] }
   ],
   "boundaries": [
     { "kind": "region", "label": "Núcleo (dominio + aplicación + puertos)", "wraps": ["dominio", "casos", "puertos"] }
@@ -58,16 +67,22 @@
     { "id": "comp-casos", "from": "composicion", "to": "casos", "label": "compone e inyecta", "variant": "dashed", "fromSide": "right", "toSide": "top" },
     { "id": "casos-puertos", "from": "casos", "to": "puertos", "label": "depende de" },
     { "id": "persistencia-puertos", "from": "persistencia", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
+    { "id": "transcripcion-puertos", "from": "transcripcion", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
     { "id": "traduccion-puertos", "from": "traduccion", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
+    { "id": "sintesis-puertos", "from": "sintesis", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
     { "id": "cifrado-puertos", "from": "cifrado", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
     { "id": "correo-puertos", "from": "correo", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
     { "id": "persistencia-db", "from": "persistencia", "to": "db", "label": "persiste", "fromSide": "right", "toSide": "left" },
+    { "id": "transcripcion-whisper", "from": "transcripcion", "to": "whisper", "label": "multipart", "fromSide": "right", "toSide": "left" },
     { "id": "traduccion-ollama", "from": "traduccion", "to": "ollama", "label": "HTTP", "fromSide": "right", "toSide": "left" },
-    { "id": "traduccion-claude", "from": "traduccion", "to": "claudeapi", "label": "HTTPS", "variant": "security", "fromSide": "right", "toSide": "left" }
+    { "id": "traduccion-claude", "from": "traduccion", "to": "claudeapi", "label": "HTTPS", "variant": "security", "fromSide": "right", "toSide": "left" },
+    { "id": "sintesis-voicestudio", "from": "sintesis", "to": "voicestudio", "label": "emo_vector", "fromSide": "right", "toSide": "left" },
+    { "id": "sintesis-nube", "from": "sintesis", "to": "nube", "label": "HTTPS", "variant": "security", "fromSide": "right", "toSide": "left" }
   ],
   "cards": [
-    { "dot": "emerald", "title": "Núcleo", "items": ["dominio/ es puro: análisis, validaciones, errores — sin red ni BD", "aplicacion/ (casos de uso) depende solo de puertos, no de tecnología"] },
-    { "dot": "cyan", "title": "Puertos y adaptadores", "items": ["4 contratos: MotorTraducción, Repositorio, Notificador, Cifrador", "asegurarPuerto() valida el contrato al arrancar, no en mitad de una petición"] },
-    { "dot": "violet", "title": "Composición", "items": ["composicion.js elige cada adaptador por variables de entorno", "persistencia surreal|sqlite · traductor qwen→claude→reglas"] }
+    { "dot": "emerald", "title": "Núcleo", "items": ["dominio/ es puro: análisis, prosodia de la voz, expresión de cada tono, validaciones", "aplicacion/ (casos de uso) depende solo de puertos, no de tecnología"] },
+    { "dot": "cyan", "title": "Puertos y adaptadores", "items": ["6 contratos: Repositorio, MotorTraducción, Transcriptor, Sintetizador, Notificador, Cifrador", "asegurarPuerto() valida el contrato al arrancar, no en mitad de una petición"] },
+    { "dot": "amber", "title": "Flujo de voz", "items": ["Whisper transcribe; la prosodia (volumen y ritmo) ajusta el tono", "La traducción sale con la emoción: VoiceStudio → Azure → OpenAI → voz del celular"] },
+    { "dot": "violet", "title": "Composición", "items": ["composicion.js elige cada adaptador por variables de entorno", "TRADUCTOR, TRANSCRIPCION_URL y VOZ_MOTOR"] }
   ]
 }

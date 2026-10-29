@@ -15,7 +15,7 @@
     { "id": "whisper", "type": "backend", "label": "Whisper", "sublabel": "voz a texto :9000", "pos": [860, 90], "size": [170, 64] },
     { "id": "qwen", "type": "backend", "label": "Ollama + Qwen", "sublabel": "traduccion cultural :11434", "pos": [860, 250], "size": [170, 64] },
     { "id": "voicestudio", "type": "backend", "label": "VoiceStudio", "sublabel": "IndexTTS 2, emocion :3900", "pos": [860, 410], "size": [170, 64] },
-    { "id": "db", "type": "database", "label": "SurrealDB", "sublabel": "mensajes cifrados AES-256-GCM", "pos": [560, 430], "size": [180, 64] }
+    { "id": "db", "type": "database", "label": "SurrealDB Cloud", "sublabel": "mensajes cifrados AES-256-GCM", "pos": [560, 560], "size": [180, 64] }
   ],
   "boundaries": [
     { "kind": "region", "label": "Servidor de TalkLate (Mac M5, 32 GB)", "wraps": ["api", "whisper", "qwen", "voicestudio"] }
