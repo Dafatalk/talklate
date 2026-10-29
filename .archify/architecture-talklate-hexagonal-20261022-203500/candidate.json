@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TalkLate — Arquitectura hexagonal (backend)",
+    "subtitle": "Puertos y adaptadores (ADR-013): el núcleo depende de contratos, no de tecnología",
+    "output": ".archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+    "locale": "es",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Dafatalk/talklate",
+      "provider": "github",
+      "revision": "fd3662353f271861dbd6652435f86573b76d953d"
+    }
+  },
+  "components": [
+    { "id": "composicion", "type": "backend", "label": "Composición", "sublabel": "composicion.js", "tag": "raíz", "pos": [250, 110], "size": [164, 64],
+      "sources": [{ "path": "backend/src/composicion.js", "line": 47, "label": "componer()" }] },
+
+    { "id": "app", "type": "external", "label": "App TalkLate", "sublabel": "Expo / React Native", "pos": [40, 370], "size": [150, 60],
+      "sources": [{ "path": "frontend/lib/api.ts", "label": "cliente HTTP" }] },
+
+    { "id": "http", "type": "backend", "label": "Adaptador HTTP", "sublabel": "Express · /api/v1", "tag": "entrada", "pos": [250, 370], "size": [160, 64],
+      "sources": [{ "path": "backend/src/adaptadores/http/app.js", "line": 15, "label": "crearApp()" }] },
+
+    { "id": "casos", "type": "backend", "label": "Casos de uso", "sublabel": "cuentas · conversaciones · traducción…", "pos": [480, 370], "size": [172, 64],
+      "sources": [{ "path": "backend/src/aplicacion/traduccion.js", "line": 8, "label": "aplicacion/" }] },
+
+    { "id": "dominio", "type": "backend", "label": "Dominio", "sublabel": "análisis · validaciones · errores", "tag": "puro", "pos": [480, 180], "size": [172, 62],
+      "sources": [{ "path": "backend/src/dominio/analisis.js", "label": "dominio/" }] },
+
+    { "id": "puertos", "type": "backend", "label": "Puertos", "sublabel": "contratos de salida", "tag": "4 contratos", "pos": [760, 355], "size": [160, 96],
+      "sources": [{ "path": "backend/src/puertos/index.js", "line": 47, "label": "asegurarPuerto()" }] },
+
+    { "id": "persistencia", "type": "backend", "label": "Adaptador persistencia", "sublabel": "surreal · sqlite", "pos": [1010, 170], "size": [182, 62],
+      "sources": [{ "path": "backend/src/adaptadores/persistencia/surreal/repositorio.js", "label": "surreal" }, { "path": "backend/src/adaptadores/persistencia/sqlite/repositorio.js", "label": "sqlite" }] },
+
+    { "id": "traduccion", "type": "backend", "label": "Adaptador traducción", "sublabel": "qwen → claude → reglas", "pos": [1010, 360], "size": [184, 62],
+      "sources": [{ "path": "backend/src/adaptadores/traduccion/qwen.js", "label": "qwen" }, { "path": "backend/src/adaptadores/traduccion/claude.js", "label": "claude" }, { "path": "backend/src/adaptadores/traduccion/reglas.js", "line": 313, "label": "reglas" }] },
+
+    { "id": "cifrado", "type": "backend", "label": "Adaptador cifrado", "sublabel": "AES-256-GCM", "pos": [1010, 520], "size": [182, 62],
+      "sources": [{ "path": "backend/src/adaptadores/cifrado/aesGcm.js", "line": 9, "label": "aesGcm" }] },
+
+    { "id": "correo", "type": "backend", "label": "Adaptador notificador", "sublabel": "consola / correo", "pos": [1010, 665], "size": [184, 62],
+      "sources": [{ "path": "backend/src/adaptadores/correo/consola.js", "label": "consola" }] },
+
+    { "id": "db", "type": "database", "label": "SurrealDB / SQLite", "sublabel": "persistencia", "pos": [1300, 170], "size": [160, 58] },
+    { "id": "ollama", "type": "external", "label": "Ollama · Qwen", "sublabel": "LLM local", "pos": [1300, 330], "size": [150, 58] },
+    { "id": "claudeapi", "type": "external", "label": "Claude API", "sublabel": "Anthropic", "pos": [1300, 440], "size": [150, 58] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Núcleo (dominio + aplicación + puertos)", "wraps": ["dominio", "casos", "puertos"] }
+  ],
+  "connections": [
+    { "id": "app-http", "from": "app", "to": "http", "label": "HTTP", "variant": "emphasis" },
+    { "id": "http-casos", "from": "http", "to": "casos", "label": "invoca" },
+    { "id": "casos-dominio", "from": "casos", "to": "dominio", "label": "usa", "fromSide": "top", "toSide": "bottom" },
+    { "id": "comp-casos", "from": "composicion", "to": "casos", "label": "compone e inyecta", "variant": "dashed", "fromSide": "right", "toSide": "top" },
+    { "id": "casos-puertos", "from": "casos", "to": "puertos", "label": "depende de" },
+    { "id": "persistencia-puertos", "from": "persistencia", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
+    { "id": "traduccion-puertos", "from": "traduccion", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
+    { "id": "cifrado-puertos", "from": "cifrado", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
+    { "id": "correo-puertos", "from": "correo", "to": "puertos", "label": "implementa", "variant": "dashed", "fromSide": "left", "toSide": "right" },
+    { "id": "persistencia-db", "from": "persistencia", "to": "db", "label": "persiste", "fromSide": "right", "toSide": "left" },
+    { "id": "traduccion-ollama", "from": "traduccion", "to": "ollama", "label": "HTTP", "fromSide": "right", "toSide": "left" },
+    { "id": "traduccion-claude", "from": "traduccion", "to": "claudeapi", "label": "HTTPS", "variant": "security", "fromSide": "right", "toSide": "left" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Núcleo", "items": ["dominio/ es puro: análisis, validaciones, errores — sin red ni BD", "aplicacion/ (casos de uso) depende solo de puertos, no de tecnología"] },
+    { "dot": "cyan", "title": "Puertos y adaptadores", "items": ["4 contratos: MotorTraducción, Repositorio, Notificador, Cifrador", "asegurarPuerto() valida el contrato al arrancar, no en mitad de una petición"] },
+    { "dot": "violet", "title": "Composición", "items": ["composicion.js elige cada adaptador por variables de entorno", "persistencia surreal|sqlite · traductor qwen→claude→reglas"] }
+  ]
+}

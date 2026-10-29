@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "f5a316ab-ab67-4212-8f2b-5e73c930b427",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
+  "output": "/Users/juliandiaz/Library/Mobile Documents/com~apple~CloudDocs/UCO/TalkLate/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
+  "specification": {
+    "sha256": "f15c2db5f9578e450439187f49b9650a734dc87c5bfebcd8dabd69b2727fde84",
+    "bytes": 6172
+  },
+  "artifact": {
+    "sha256": "a5956f2166b5b0b6577723912d2f250a4c64de08b76b025e302810c210fd6694",
+    "bytes": 840151
+  }
+}
