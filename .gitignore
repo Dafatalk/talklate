@@ -37,6 +37,7 @@ backend/data/
 
 # Tooling de agentes / IA (local, no versionar)
 .atl/
+.codegraph/
 
 # Skills de agentes instaladas localmente (17 MB). Reinstalar con: npx skills add tt-a1i/archify
 # Se versiona solo skills-lock.json para que el equipo reproduzca la misma version.
