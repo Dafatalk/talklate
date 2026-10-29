@@ -59,7 +59,7 @@ Monolito modular en Node.js 22 con Express: rutas por recurso y reglas separadas
 
 ### Alternativas (comparadas al justificar)
 - **Microservicios** (traduccion aparte): el catalogo los reserva para despliegue y escalado independientes; aqui solo agregan complejidad.
-- **WebSocket o streaming:** el catalogo lo menciona para tiempo real estricto; como la traduccion es por turno (ver `contexto.md`), REST basta. Si se pasa a traduccion simultanea, se revisa.
+- **WebSocket o streaming:** el catalogo lo menciona para tiempo real estricto; como la traduccion es por turno (documento 1, Vision y contexto), REST basta. Si se pasa a traduccion simultanea, se revisa.
 - **Python (FastAPI):** buena opcion para IA, pero agrega otro lenguaje; la IA se consume por HTTP (Ollama, Anthropic), no se entrena aqui.
 - **Java (Spring Boot):** robusto, pero mucho mas pesado para este alcance.
 
@@ -127,7 +127,7 @@ Sin costos extra y sin subir audio. En la practica el dictado del teclado no fun
 **Fecha:** 2026-10-14 · **Estado:** aceptada · **Responde a:** DRV-03 · **Patron:** Token-Based Authentication
 
 ### Contexto
-Usuario-RN-5 y RN-10, y `convenciones/seguridad.md`: "tokens con expiracion (access corto, refresh mas largo)". El catalogo advierte que los JWT "no son revocables sin infraestructura adicional".
+Usuario-RN-5 y RN-10, y la convencion de seguridad del proyecto: "tokens con expiracion (access corto, refresh mas largo)". El catalogo advierte que los JWT "no son revocables sin infraestructura adicional".
 
 ### Decision
 Token de acceso JWT de 15 minutos y token de refresco de 30 dias guardado solo como hash, que se rota en cada uso. Esa es la "infraestructura adicional": al cerrar sesion se revocan el token de acceso (lista de revocados) y el de refresco; al cambiar la contrasena se cierran las demas sesiones. Contrasenas con bcrypt, limite de intentos y codigo de recuperacion de un solo uso.
@@ -175,7 +175,7 @@ Al implementar aparecieron diferencias con el modelo de dominio enriquecido.
 La regla transversal 1 de F0 pedia identificadores en ingles, pero todo el descubrimiento (modelo de dominio, reglas de negocio, historias) esta en espanol: Usuario, Conversacion, MensajeOriginal, Conversacion-RN-2...
 
 ### Decision
-Usar en el codigo los mismos nombres del modelo de dominio, en espanol (lenguaje ubicuo de Domain-Driven Design): tablas `conversacion`, `mensaje_original`; funciones `traducir`, `validarNombreConversacion`. Los terminos tecnicos y de librerias quedan en ingles. Se actualizo la regla en `convenciones/README.md`.
+Usar en el codigo los mismos nombres del modelo de dominio, en espanol (lenguaje ubicuo de Domain-Driven Design): tablas `conversacion`, `mensaje_original`; funciones `traducir`, `validarNombreConversacion`. Los terminos tecnicos y de librerias quedan en ingles. La regla de nombres de las convenciones del proyecto quedo actualizada.
 
 ### Alternativas (comparadas al justificar)
 - **Todo en ingles:** es la practica comun, pero obliga a traducir cada concepto y rompe la trazabilidad con el modelo de dominio y las reglas de negocio.
@@ -189,10 +189,10 @@ Excepcion (2026-10-15): el esquema de SurrealDB usa nombres en ingles para aline
 **Fecha:** 2026-10-14 · **Estado:** aceptada · **Responde a:** DRV-03 · **Patron:** Structured Logging
 
 ### Contexto
-TalkLate guarda conversaciones personales (PII segun `convenciones/seguridad.md`) y opera en Colombia (Ley 1581 de 2012).
+TalkLate guarda conversaciones personales (PII segun la convencion de seguridad del proyecto) y opera en Colombia (Ley 1581 de 2012).
 
 ### Decision
-- Matriz de sensibilidad (`requerimientos/matriz_sensibilidad_datos.md`).
+- Matriz de sensibilidad de datos (documento 16).
 - Consentimiento obligatorio al registrarse y politica de tratamiento de datos.
 - Eliminar la cuenta con todos sus datos (derecho al olvido).
 - Contenido de mensajes **cifrado en reposo** con AES-256-GCM (clave por variable de entorno).
@@ -210,7 +210,7 @@ Busquedas por contenido de mensajes no son posibles en la base (hoy no se necesi
 **Fecha:** 2026-10-14 · **Estado:** aceptada · **Patron:** Request-Reply
 
 ### Contexto
-`convenciones/api-rest.md` define versionado, formato de error, codigos, paginacion, health check y OpenAPI.
+La convencion REST del proyecto define versionado, formato de error, codigos, paginacion, health check y OpenAPI.
 
 ### Decision
 Base `/api/v1`; errores `{ statusCode, error, message, timestamp, path }`; `201` con `Location`; `204` al eliminar; `422` para reglas de negocio; listas `{ data, pagination }`; `GET /health`; contrato en `backend/openapi.yaml` con Swagger UI en `/api/v1/docs`.

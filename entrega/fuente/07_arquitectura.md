@@ -25,6 +25,8 @@ real (`backend/src`, `frontend/`).
 
 ## 1. Estilo arquitectonico
 
+![Vista general de la arquitectura de TalkLate con el flujo de voz (Archify)](diagramas/img/archify_general.png)
+
 TalkLate es una arquitectura **cliente-servidor** de tres contenedores:
 
 - **App movil** multiplataforma en Expo / React Native, una sola base de codigo para iOS,
@@ -54,6 +56,8 @@ motores de IA; cada dependencia externa entra por un puerto (`Repositorio`, `Mot
 `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`) y se conecta con un adaptador. Las
 reglas de dependencia entre capas se verifican con dependency-cruiser
 (`npm run arch:check`). Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
+
+![Backend hexagonal: nucleo, 6 puertos y adaptadores (Archify)](diagramas/img/archify_hexagonal.png)
 
 ```mermaid
 flowchart LR
@@ -273,7 +277,7 @@ sequenceDiagram
     participant VS as VoiceStudio (IndexTTS 2)
 
     U->>A: Toca la burbuja y habla
-    Note over A: Ondas mientras escucha;<br/>mide el volumen cada 100 ms
+    Note over A: Ondas mientras escucha,<br/>mide el volumen cada 100 ms
     Note over A: 1.5 s de silencio: fin de la frase
     A->>API: POST /conversaciones/:id/mensajes/voz (audio + volumen)
     Note over A: La burbuja gira (traduciendo)
@@ -289,7 +293,7 @@ sequenceDiagram
     alt VoiceStudio responde
         VS-->>V: audio wav
     else falla o no esta configurado
-        Note over V: Azure Speech -> OpenAI;<br/>si ninguno, la app usa la voz del celular
+        Note over V: Azure Speech -> OpenAI,<br/>si ninguno, la app usa la voz del celular
     end
     V-->>A: URL del audio (vence en 5 min)
     A->>U: Reproduce la traduccion con la misma emocion

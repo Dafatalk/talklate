@@ -107,3 +107,4 @@
 - `npm run arch:check` marca 2 dependencias de librerias en la capa de aplicacion (bcryptjs en `cuentas.js` y jsonwebtoken en `sesiones.js`) que hay que mover detras de un puerto; CI no corre ese chequeo todavia.
 - Se regenero `backend/package-lock.json`: faltaba dependency-cruiser y `npm ci` fallaba en CI.
 - Las carpetas de trabajo (`requerimientos/`, `arquitectura/`) siguen siendo la fuente que se edita; `entrega/` es la version para entregar.
+- **Documentos en Word y PDF:** la entrega ya no se muestra en Markdown. `entrega/TalkLate_Documento_Completo.pdf` (84 paginas, con portada e indice) y los 17 documentos por separado en `entrega/documentos/` (Word y PDF), con tablas con formato y diagramas como figuras numeradas. Los textos quedan en `entrega/fuente/` y se regeneran con `entrega/fuente/herramientas/`.
