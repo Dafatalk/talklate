@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TalkLate - Arquitectura con voz</title>
+<style>
+  :root {
+    --bg: #f7f8fb; --panel: #ffffff; --text: #18202c; --muted: #5b6676; --line: #d5dbe4;
+    --edge: #7a8699; --emph: #2563eb; --sec: #c2410c;
+    --front: #dbeafe; --front-b: #2563eb; --back: #dcfce7; --back-b: #15803d;
+    --data: #fef3c7; --data-b: #b45309; --ext: #eef1f5; --ext-b: #64748b;
+    --region: #eef4ff; --region-b: #93a7cf;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141b; --panel: #161d27; --text: #e6ebf2; --muted: #9aa6b6; --line: #2a3442;
+      --edge: #8391a6; --emph: #60a5fa; --sec: #fb923c;
+      --front: #172b4d; --front-b: #60a5fa; --back: #12301f; --back-b: #4ade80;
+      --data: #3a2a0e; --data-b: #fbbf24; --ext: #1f2733; --ext-b: #94a3b8;
+      --region: #141f33; --region-b: #3b5079;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 28px 16px 40px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 20px; }
+  .lienzo { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; overflow-x: auto; }
+  svg { display: block; width: 100%; min-width: 760px; height: auto; }
+  svg text { fill: var(--text); font-family: inherit; }
+  .sub { fill: var(--muted); font-size: 11px; }
+  .lbl { font-size: 13px; font-weight: 600; }
+  .tag { font-size: 10px; fill: var(--muted); }
+  .elab { font-size: 11px; fill: var(--text); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; }
+  .n-front { fill: var(--front); stroke: var(--front-b); }
+  .n-back { fill: var(--back); stroke: var(--back-b); }
+  .n-data { fill: var(--data); stroke: var(--data-b); }
+  .n-ext { fill: var(--ext); stroke: var(--ext-b); }
+  .region { fill: var(--region); stroke: var(--region-b); stroke-dasharray: 6 5; }
+  .rlab { font-size: 12px; font-weight: 600; fill: var(--muted); }
+  .e { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+  .e.emph { stroke: var(--emph); stroke-width: 2.2; }
+  .e.sec { stroke: var(--sec); stroke-dasharray: 5 4; }
+  .flujo { stroke-dasharray: 6 8; animation: fluir 1.6s linear infinite; }
+  @keyframes fluir { to { stroke-dashoffset: -28; } }
+  @media (prefers-reduced-motion: reduce) { .flujo { animation: none; } }
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 16px; }
+  .tarjeta { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .tarjeta h2 { font-size: 14px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+  .tarjeta ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+  .punto { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .pie { color: var(--muted); font-size: 12px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>TalkLate - Arquitectura con voz</h1>
+  <p class="lead">Un mensaje hablado recorre tres motores locales en el servidor de TalkLate: Whisper lo transcribe, Qwen lo traduce conservando el matiz cultural y VoiceStudio lo dice con la misma emocion.</p>
+
+  <div class="lienzo">
+    <svg viewBox="0 0 1080 540" role="img" aria-label="Diagrama de arquitectura de TalkLate">
+      <defs>
+        <marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--edge)"/></marker>
+        <marker id="fe" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--emph)"/></marker>
+        <marker id="fs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--sec)"/></marker>
+      </defs>
+
+      <!-- Limite del servidor -->
+      <rect class="region" x="570" y="40" width="495" height="470" rx="14"/>
+      <text class="rlab" x="586" y="62">Servidor de TalkLate (Mac M5, 32 GB)</text>
+
+      <!-- Relaciones -->
+      <path class="e emph flujo" d="M170,282 L270,282" marker-end="url(#fe)"/>
+      <text class="elab" x="220" y="272" text-anchor="middle">habla o escribe</text>
+
+      <path class="e" d="M170,452 L230,452 L230,300 L270,300" marker-end="url(#f)"/>
+      <text class="elab" x="230" y="380" text-anchor="middle">gestiona</text>
+
+      <path class="e emph flujo" d="M440,282 L600,282" marker-end="url(#fe)"/>
+      <text class="elab" x="520" y="272" text-anchor="middle">HTTPS /api/v1 + JWT</text>
+
+      <path class="e" d="M780,266 L810,266 L810,122 L880,122" marker-end="url(#f)"/>
+      <text class="elab" x="810" y="186" text-anchor="middle">1. transcribe</text>
+
+      <path class="e emph flujo" d="M780,282 L880,282" marker-end="url(#fe)"/>
+      <text class="elab" x="850" y="272" text-anchor="middle">2. traduce</text>
+
+      <path class="e" d="M780,298 L810,298 L810,442 L880,442" marker-end="url(#f)"/>
+      <text class="elab" x="810" y="380" text-anchor="middle">3. voz con emocion</text>
+
+      <path class="e sec" d="M690,314 L690,430" marker-end="url(#fs)"/>
+      <text class="elab" x="682" y="376" text-anchor="end">guarda cifrado</text>
+
+      <!-- Nodos -->
+      <g>
+        <rect class="n-ext" x="30" y="250" width="140" height="64" rx="10"/>
+        <text class="lbl" x="100" y="278" text-anchor="middle">Cliente Traductor</text>
+        <text class="sub" x="100" y="296" text-anchor="middle">e Interlocutor (sin cuenta)</text>
+      </g>
+      <g>
+        <rect class="n-ext" x="30" y="420" width="140" height="64" rx="10"/>
+        <text class="lbl" x="100" y="448" text-anchor="middle">Administrador</text>
+        <text class="sub" x="100" y="466" text-anchor="middle">idiomas y reportes</text>
+      </g>
+      <g>
+        <rect class="n-front" x="270" y="250" width="170" height="64" rx="10"/>
+        <text class="lbl" x="355" y="274" text-anchor="middle">App TalkLate</text>
+        <text class="sub" x="355" y="291" text-anchor="middle">Expo: burbuja de voz y chat</text>
+        <text class="tag" x="355" y="306" text-anchor="middle">expo-audio</text>
+      </g>
+      <g>
+        <rect class="n-back" x="600" y="250" width="180" height="64" rx="10"/>
+        <text class="lbl" x="690" y="274" text-anchor="middle">API TalkLate</text>
+        <text class="sub" x="690" y="291" text-anchor="middle">Node 22 + Express, hexagonal</text>
+        <text class="tag" x="690" y="306" text-anchor="middle">puertos y adaptadores</text>
+      </g>
+      <g>
+        <rect class="n-back" x="880" y="90" width="170" height="64" rx="10"/>
+        <text class="lbl" x="965" y="118" text-anchor="middle">Whisper</text>
+        <text class="sub" x="965" y="136" text-anchor="middle">voz a texto :9000</text>
+      </g>
+      <g>
+        <rect class="n-back" x="880" y="250" width="170" height="64" rx="10"/>
+        <text class="lbl" x="965" y="278" text-anchor="middle">Ollama + Qwen</text>
+        <text class="sub" x="965" y="296" text-anchor="middle">traduccion cultural :11434</text>
+      </g>
+      <g>
+        <rect class="n-back" x="880" y="410" width="170" height="64" rx="10"/>
+        <text class="lbl" x="965" y="438" text-anchor="middle">VoiceStudio</text>
+        <text class="sub" x="965" y="456" text-anchor="middle">IndexTTS 2, emocion :3900</text>
+      </g>
+      <g>
+        <rect class="n-data" x="600" y="430" width="180" height="64" rx="10"/>
+        <text class="lbl" x="690" y="458" text-anchor="middle">SurrealDB</text>
+        <text class="sub" x="690" y="476" text-anchor="middle">mensajes cifrados AES-256-GCM</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="tarjetas">
+    <section class="tarjeta">
+      <h2><span class="punto" style="background:#06b6d4"></span>Entonacion</h2>
+      <ul><li>Prosodia: volumen, variacion y palabras por segundo</li><li>Tono de la voz + tono de las palabras</li><li>El tono viaja al prompt y a la voz</li></ul>
+    </section>
+    <section class="tarjeta">
+      <h2><span class="punto" style="background:#10b981"></span>Respaldo de traduccion</h2>
+      <ul><li>Qwen -> Claude Sonnet -> motor de reglas</li><li>Circuit Breaker: 60 s por motor</li></ul>
+    </section>
+    <section class="tarjeta">
+      <h2><span class="punto" style="background:#f59e0b"></span>Respaldo de voz</h2>
+      <ul><li>VoiceStudio -> Azure Speech -> OpenAI</li><li>Ultimo recurso: voz del celular</li></ul>
+    </section>
+    <section class="tarjeta">
+      <h2><span class="punto" style="background:#f43f5e"></span>Seguridad</h2>
+      <ul><li>JWT 15 min + refresco rotativo</li><li>Audio sin guardar; voz en memoria 5 min</li></ul>
+    </section>
+  </div>
+
+  <p class="pie">Fuente del diagrama: <code>arquitectura_talklate.architecture.json</code> (formato Archify). Detalle y justificacion en <code>07_arquitectura.md</code>.</p>
+</main>
+</body>
+</html>

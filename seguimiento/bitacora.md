@@ -96,3 +96,11 @@
 - Si VoiceStudio falla, se usa Azure u OpenAI (si hay claves) y si no, la voz del celular.
 - Guia para montar todo en la Mac y medir: `backend/VOICESTUDIO_MAC.md`. Comando de medicion: `npm run medir:voz`.
 - Pendiente: medir en la Mac y confirmar el id del motor y los campos de la API (ver la guia, seccion 7).
+
+## 29/10/2026 - Carpeta de entrega
+
+- Toda la documentacion para la entrega quedo en `entrega/`, numerada en orden de lectura (01 vision a 17 politica de datos), con indice en `entrega/README.md`.
+- Los documentos de la entrega ya incluyen la voz: Whisper (entrada), prosodia, voz con emocion (VoiceStudio, Azure, OpenAI), ADR-014 a ADR-016 y RNF-010.
+- Se quitaron las notas de trabajo internas ("validar con...", pendientes de revision) y los textos quedaron sin tildes.
+- Diagramas actualizados con Whisper y VoiceStudio: draw.io de contexto, contenedores y despliegue, y la vista general `entrega/diagramas/arquitectura_talklate.html` con su fuente en formato Archify (`arquitectura_talklate.architecture.json`). Para regenerarla con la skill Archify: `node <ruta-de-archify>/bin/archify.mjs finalize architecture entrega/diagramas/arquitectura_talklate.architecture.json entrega/diagramas/arquitectura_talklate.html --quality showcase`.
+- Las carpetas de trabajo (`requerimientos/`, `arquitectura/`) siguen siendo la fuente que se edita; `entrega/` es la version para entregar.

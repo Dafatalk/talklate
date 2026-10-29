@@ -10,6 +10,7 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 
 | Ruta | Contenido |
 | --- | --- |
+| `entrega/` | **Documentacion para entregar**, numerada en orden de lectura (vision, requisitos, drivers, arquitectura, ADR, datos, sprints) — ver `entrega/README.md` |
 | `contexto.md` | Visión de producto (F1) |
 | `requerimientos/` | Mapa de impacto y requerimientos funcionales (F2) |
 | `arquitectura/` | Stack técnico y modelo de datos (F3) |
