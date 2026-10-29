@@ -17,7 +17,7 @@ Un driver es un requisito que obliga a tomar decisiones de arquitectura. Cada dr
 | DRV-05 | Continuidad ante fallas de IA | Si falla un motor de traduccion o de voz, el servicio sigue con el siguiente | RNF-005 |
 | DRV-06 | Costo y abuso | Motores locales (Qwen, Whisper, VoiceStudio) sin costo por mensaje; 30 mensajes por minuto por usuario | RNF-006 |
 | DRV-07 | Una base de codigo para varias plataformas | Mismo codigo para iOS, Android y web | RNF-007 |
-| DRV-08 | Facilidad de prueba y mantenimiento | Reglas probadas sin internet ni claves; cobertura de 80 % o mas; capas validadas automaticamente | RNF-008, RNF-009 |
+| DRV-08 | Facilidad de prueba y mantenimiento | Reglas probadas sin internet ni claves; cobertura de 80 % o mas; reglas de dependencia entre capas verificables con dependency-cruiser | RNF-008, RNF-009 |
 
 ## 2. Como se responde y como se comprueba
 
@@ -30,4 +30,4 @@ Un driver es un requisito que obliga a tomar decisiones de arquitectura. Cada dr
 | DRV-05 | ADR-004 (Circuit Breaker), ADR-015 (cadena de voz) | `backend/test/motores.test.js` | Cumple: Qwen -> Claude -> reglas; VoiceStudio -> Azure -> OpenAI -> voz del celular |
 | DRV-06 | ADR-004, ADR-010, ADR-016 | Limites en `src/adaptadores/http/limites.js` y pruebas de seguridad | Cumple |
 | DRV-07 | ADR-001 (Expo) | Compilacion web y ejecucion en Expo Go | Cumple en web y en Expo Go |
-| DRV-08 | ADR-002, ADR-003, ADR-013 (hexagonal) | `npm run coverage`, `npm run arch:check` (dependency-cruiser) y CI en cada pull request | Cumple: 40 pruebas del backend, cobertura de lineas cercana al 96 % |
+| DRV-08 | ADR-002, ADR-003, ADR-013 (hexagonal) | `npm run coverage` y CI en cada pull request; `npm run arch:check` (dependency-cruiser) para las capas | Cumple en pruebas: 40 pruebas del backend, cobertura de lineas cercana al 96 %. `arch:check` marca 2 dependencias de librerias en la capa de aplicacion (bcryptjs y jsonwebtoken) que se mueven a un puerto |

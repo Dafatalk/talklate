@@ -17,8 +17,8 @@ archivos, el Bounded Context al que pertenece y el ADR que lo justifica
 monolito modular (ADR-013): el dominio y los casos de uso estan en el centro y no dependen de
 Express, de la base de datos ni de los motores de IA; cada dependencia externa entra por un puerto
 y se conecta con un adaptador. La composicion (`src/composicion.js`) es el unico lugar que conoce
-los adaptadores concretos. Las reglas de dependencia se validan con dependency-cruiser
-(`backend/.dependency-cruiser.cjs`, `npm run arch:check`).
+los adaptadores concretos. Las reglas de dependencia se verifican con dependency-cruiser
+(`backend/.dependency-cruiser.cjs`, `npm run arch:check`). Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
 
 ---
 

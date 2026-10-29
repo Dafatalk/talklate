@@ -51,8 +51,8 @@ Por dentro, la API sigue una **arquitectura hexagonal (puertos y adaptadores)** 
 dominio y los casos de uso estan en el centro y no dependen de Express, de la base ni de los
 motores de IA; cada dependencia externa entra por un puerto (`Repositorio`, `MotorTraduccion`,
 `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`) y se conecta con un adaptador. Las
-reglas de dependencia entre capas se validan en cada cambio con dependency-cruiser
-(`npm run arch:check`).
+reglas de dependencia entre capas se verifican con dependency-cruiser
+(`npm run arch:check`). Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
 
 ```mermaid
 flowchart LR
@@ -84,7 +84,7 @@ Por cada driver: que se decidio (ADR), con que mecanismo del codigo se realiza y
 | DRV-05 Continuidad ante fallas | ADR-004 (Circuit Breaker), ADR-015 (cadena de voz) | Circuito abierto 60 s por motor; motor de reglas y voz del celular como ultimo recurso | `test/motores.test.js` |
 | DRV-06 Costo y abuso | ADR-004, ADR-010, ADR-016 | Qwen, Whisper y VoiceStudio locales sin costo por mensaje; `adaptadores/http/limites.js`: 30 mensajes por minuto, limites de registro, recuperacion y voz | Pruebas de seguridad |
 | DRV-07 Multiplataforma | ADR-001 (Expo), ADR-007 (template Luna) | Una base de codigo en `frontend/`; grabacion con `expo-audio`, que funciona en Expo Go | Compilacion web y Expo Go |
-| DRV-08 Facilidad de prueba | ADR-002, ADR-012, ADR-013 | Adaptador SQLite sin servidor ni claves; casos de uso probados con adaptadores falsos; dependency-cruiser valida las capas | `npm run coverage` (cercana al 96 %), `npm run arch:check`, CI contra SQLite y SurrealDB |
+| DRV-08 Facilidad de prueba | ADR-002, ADR-012, ADR-013 | Adaptador SQLite sin servidor ni claves; casos de uso probados con adaptadores falsos; dependency-cruiser verifica las capas | `npm run coverage` (cercana al 96 %), `npm run arch:check`, CI contra SQLite y SurrealDB |
 
 ---
 

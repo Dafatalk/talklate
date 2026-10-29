@@ -294,7 +294,7 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Un adaptador incompleto falla al arrancar (`asegurarPuerto`), no a mitad de una peticion.
 - Mas archivos y una indireccion mas. El contrato de la API, la base y las pruebas de punta a punta no cambiaron (las mismas 16 pruebas de la API pasan con SQLite y con SurrealDB).
 - Los nombres siguen ADR-009 (dominio en espanol).
-- Las reglas de dependencia entre capas se validan automaticamente con dependency-cruiser (`backend/.dependency-cruiser.cjs`, `npm run arch:check`): dominio puro, aplicacion sin adaptadores, puertos como contratos y adaptadores que no se cruzan entre categorias.
+- Las reglas de dependencia entre capas se verifican con dependency-cruiser (`backend/.dependency-cruiser.cjs`, `npm run arch:check`): dominio puro, aplicacion sin adaptadores, puertos como contratos y adaptadores que no se cruzan entre categorias. Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
 
 
 ## ADR-014: Voz en Expo Go con grabacion en el celular, Whisper en el servidor y entonacion por texto y voz
