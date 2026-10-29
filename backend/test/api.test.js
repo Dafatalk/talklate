@@ -29,7 +29,9 @@ test.before(async () => {
   await repo.inicializar();
   // Transcriptor falso que cumple el puerto: el "audio" de prueba es el texto mismo
   const transcriptor = { disponible: () => true, transcribir: async ({ audio }) => ({ texto: audio.toString('utf8') === 'silencio' ? '' : audio.toString('utf8') }) };
-  servidor = crearApp(componer({ repo, adaptadores: { transcriptor } })).listen(0);
+  // Sintetizador falso: devuelve el tono como "audio" para revisar que llega bien
+  const sintetizadores = [{ nombre: 'falso', disponible: () => true, sintetizar: async ({ texto, tono }) => ({ audio: Buffer.from(`${tono}:${texto}`), tipo: 'audio/mpeg', voz: 'voz-falsa' }) }];
+  servidor = crearApp(componer({ repo, adaptadores: { transcriptor, sintetizadores } })).listen(0);
   await new Promise((r) => servidor.once('listening', r));
   raiz = `http://127.0.0.1:${servidor.address().port}`;
   base = `${raiz}/api/v1`;
@@ -287,4 +289,25 @@ test('eliminar mi cuenta borra todos mis datos (derecho al olvido)', async () =>
   assert.equal((await api('POST', '/auth/login', { correo: usuarioBase.correo, password: 'Nueva123!' })).estado, 401);
   const admin = await api('POST', '/auth/login', ADMIN);
   assert.equal((await api('DELETE', '/usuarios/yo', { password: ADMIN.password }, admin.datos.token)).estado, 409); // unico admin
+});
+
+test('voz natural: sintetiza con la emocion del mensaje y entrega el audio por una URL que vence', async () => {
+  const token = (await api('POST', '/auth/login', ADMIN)).datos.token;
+  const sin = await api('POST', '/voz', { texto: 'hola', idioma: 'es', tono: 'Enojado' });
+  assert.equal(sin.estado, 401);
+  const r = await api('POST', '/voz', { texto: 'Estoy muy molesto', idioma: 'es', pais: 'Colombia', tono: 'Enojado', ritmo: 1.1 }, token);
+  assert.equal(r.estado, 201);
+  assert.equal(r.datos.motor, 'falso');
+  assert.match(r.datos.url, /^\/api\/v1\/voz\/audio\/[0-9a-f]{32}$/);
+  const audio = await fetch(raiz + r.datos.url);
+  assert.equal(audio.status, 200);
+  assert.match(audio.headers.get('content-type'), /audio\/mpeg/);
+  assert.equal(await audio.text(), 'Enojado:Estoy muy molesto');
+  assert.equal((await fetch(`${base}/voz/audio/noexiste`)).status, 404);
+  assert.equal((await api('POST', '/voz', { texto: '', idioma: 'es' }, token)).estado, 400);
+  assert.equal((await api('POST', '/voz', { texto: 'hola', idioma: 'espanol' }, token)).estado, 400);
+  const otroTono = await api('POST', '/voz', { texto: 'hola', idioma: 'en', tono: 'Inventado' }, token);
+  assert.equal(otroTono.datos.tono, 'Neutral');
+  const salud = await (await fetch(`${raiz}/health`)).json();
+  assert.deepEqual(salud.voz_natural, ['falso']);
 });

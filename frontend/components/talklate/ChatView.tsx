@@ -4,7 +4,6 @@ import Header from '@/components/Header';
 import DrawerButton from '@/components/DrawerButton';
 import ThemedText from '@/components/ThemedText';
 import Icon from '@/components/Icon';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api, Configuracion, Mensaje, ResumenConversacion } from '@/lib/api';
 import { detenerVoz, hablar } from '@/lib/voz';
 import { useGrabadorVoz } from '@/lib/grabacion';
@@ -16,7 +15,6 @@ import BurbujaVoz, { UltimoIntercambio } from './BurbujaVoz';
 import PromptModal from './PromptModal';
 
 type Modo = 'burbuja' | 'chat';
-const CLAVE_MODO = 'talklate.modo';
 
 
 // Pantalla del traductor. Dos modos que se cambian desde la cabecera (como ChatGPT): la burbuja de voz
@@ -39,15 +37,22 @@ export default function ChatView({ id }: { id: string }) {
   const [ultimo, setUltimo] = useState<UltimoIntercambio>(null);
   const grabador = useGrabadorVoz();
 
-  // Se recuerda el ultimo modo elegido en este celular
+  // Toda conversacion se abre en la burbuja (la IA); el chat queda a un toque en la cabecera
+  const cambiarModo = () => setModo(modo === 'burbuja' ? 'chat' : 'burbuja');
+
+  // Fin de la frase: cuando la persona ya hablo y luego hay ~1.5 s de silencio, se traduce solo
+  // (tambien se puede tocar la burbuja). Tope de 30 s por mensaje.
+  const yaHablo = useRef(false);
+  const silencioDesde = useRef<number | null>(null);
   useEffect(() => {
-    AsyncStorage.getItem(CLAVE_MODO).then((m) => { if (m === 'chat' || m === 'burbuja') setModo(m); }).catch(() => {});
-  }, []);
-  const cambiarModo = () => {
-    const nuevo: Modo = modo === 'burbuja' ? 'chat' : 'burbuja';
-    setModo(nuevo);
-    AsyncStorage.setItem(CLAVE_MODO, nuevo).catch(() => {});
-  };
+    if (!grabador.grabando) { yaHablo.current = false; silencioDesde.current = null; return; }
+    const nivel = grabador.nivelDb;
+    if (nivel === null) return;
+    if (nivel > -42) { yaHablo.current = true; silencioDesde.current = null; }
+    else if (yaHablo.current && nivel < -50) silencioDesde.current = silencioDesde.current ?? Date.now();
+    const callado = silencioDesde.current !== null && Date.now() - silencioDesde.current > 1500;
+    if (callado || grabador.duracionMs > 30000) { yaHablo.current = false; silencioDesde.current = null; pulsarMicrofono(); }
+  });
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -77,7 +82,13 @@ export default function ChatView({ id }: { id: string }) {
 
   // Microfono (burbuja o chat): un toque empieza a grabar; el siguiente envia el audio, que el servidor
   // transcribe y traduce; la traduccion se escucha con la misma entonacion.
+  const ocupado = useRef(false);
   const pulsarMicrofono = async () => {
+    if (!conv || ocupado.current) return;
+    ocupado.current = true;
+    try { await manejarMicrofono(); } finally { ocupado.current = false; }
+  };
+  const manejarMicrofono = async () => {
     if (!conv) return;
     if (estadoVoz === 'hablando') { detenerVoz(); setEstadoVoz('lista'); return; }
     if (!grabador.grabando) {
@@ -92,7 +103,7 @@ export default function ChatView({ id }: { id: string }) {
       setAviso(err.message);
       return;
     }
-    if (!grabacion) { setAviso('El audio fue muy corto. Toca la burbuja, habla y vuelve a tocarla.'); return; }
+    if (!grabacion) { setAviso('El audio fue muy corto. Toca la burbuja y habla.'); return; }
     setEstadoVoz('traduciendo');
     setEnviando(true);
     try {

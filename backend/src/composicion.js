@@ -2,13 +2,16 @@
 // los casos de uso y los adaptadores concretos: lee la configuracion (variables de entorno), elige
 // cada adaptador, verifica que cumpla su puerto y entrega los casos de uso armados al adaptador HTTP.
 const log = require('./compartido/log');
-const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR } = require('./puertos');
+const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR } = require('./puertos');
 const { crearMotorQwen } = require('./adaptadores/traduccion/qwen');
 const { crearMotorClaude } = require('./adaptadores/traduccion/claude');
 const { crearMotorReglas } = require('./adaptadores/traduccion/reglas');
 const { crearNotificadorConsola } = require('./adaptadores/correo/consola');
 const { crearCifradorAesGcm } = require('./adaptadores/cifrado/aesGcm');
 const { crearTranscriptorWhisper } = require('./adaptadores/transcripcion/whisper');
+const { crearSintetizadorAzure } = require('./adaptadores/sintesis/azure');
+const { crearSintetizadorOpenAI } = require('./adaptadores/sintesis/openai');
+const { crearServicioVoz } = require('./aplicacion/voz');
 const { crearServicioTraduccion } = require('./aplicacion/traduccion');
 const { crearServicioSesiones } = require('./aplicacion/sesiones');
 const { crearServicioCuentas } = require('./aplicacion/cuentas');
@@ -30,6 +33,16 @@ function crearMotores(entorno = process.env, { fetchFn } = {}) {
   if (modo === 'qwen') return [qwen(), reglas];
   if (modo === 'claude') return [claude(), reglas];
   return [qwen(), claude(), reglas];
+}
+
+// Voz natural segun VOZ_MOTOR (ADR-015): auto (Azure -> OpenAI compatible), azure, openai o ninguno
+// (ninguno = la app usa la voz del celular)
+function crearSintetizadores(entorno = process.env, { fetchFn } = {}) {
+  const modo = (entorno.VOZ_MOTOR || 'auto').toLowerCase();
+  const azure = () => crearSintetizadorAzure({ clave: entorno.AZURE_SPEECH_KEY, region: entorno.AZURE_SPEECH_REGION, fetchFn });
+  const openai = () => crearSintetizadorOpenAI({ url: entorno.VOZ_URL, modelo: entorno.VOZ_MODELO || undefined, voz: entorno.VOZ_NOMBRE || undefined, apiKey: entorno.VOZ_API_KEY, fetchFn });
+  const lista = modo === 'ninguno' ? [] : modo === 'azure' ? [azure()] : modo === 'openai' ? [openai()] : [azure(), openai()];
+  return lista.map((s) => asegurarPuerto(`sintetizador.${s.nombre}`, s, SINTETIZADOR));
 }
 
 function crearTraduccion(entorno = process.env, opciones = {}) {
@@ -61,9 +74,11 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
     duracionAccesoSeg: Number(entorno.DURACION_ACCESO_SEG) || undefined,
     duracionRefrescoMs: (Number(entorno.DURACION_REFRESCO_DIAS) || 30) * 24 * 60 * 60 * 1000,
   });
+  const voz = crearServicioVoz({ sintetizadores: adaptadores.sintetizadores || crearSintetizadores(entorno, { fetchFn: adaptadores.fetchFn }), log });
   return {
     traduccion,
     transcriptor,
+    voz,
     sesiones,
     cuentas: crearServicioCuentas({ repo, sesiones, notificador, log }),
     conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, log }),
@@ -83,4 +98,4 @@ function crearPersistencia(entorno = process.env) {
   return { driver, repo: require('./adaptadores/persistencia/surreal/repositorio')(), saludDb: () => cliente.estado() };
 }
 
-module.exports = { componer, crearMotores, crearTraduccion, crearPersistencia };
+module.exports = { crearSintetizadores, componer, crearMotores, crearTraduccion, crearPersistencia };

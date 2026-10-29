@@ -84,3 +84,8 @@
 - La entonacion se detecta por las palabras y por la voz, y la traduccion se escucha con ese mismo tono y ritmo.
 - La pantalla cambia entre la burbuja animada (modo voz) y el chat con el icono de arriba.
 - **Mapa de impacto:** ahora esta ordenado de mayor a menor valor, igual que los sprints, como pidio el profesor. Los IDs de las historias no cambiaron.
+
+## 26/10/2026 - Voz natural con emocion y flujo de la burbuja
+
+- **Voz natural (ADR-015):** la traduccion ya no suena robotica si se configura Azure Speech (`AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`) o una API de voz compatible con OpenAI (`VOZ_URL`, `VOZ_API_KEY`). El enojo, la alegria y la preocupacion se notan en la voz. Sin clave, se usa la voz del celular como antes.
+- **Flujo de la burbuja:** toda conversacion abre en la burbuja. Al tocarla escucha (salen ondas), al dejar de hablar ~1.5 s traduce sola (la burbuja gira), luego suena la traduccion y vuelve a quedar lista. El chat sigue a un toque en la cabecera.

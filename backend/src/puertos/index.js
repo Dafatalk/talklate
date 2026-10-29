@@ -49,6 +49,12 @@ const CIFRADOR = ['cifrar', 'descifrar'];
  */
 const TRANSCRIPTOR = ['disponible', 'transcribir'];
 
+/**
+ * Puerto Sintetizador (salida): convierte la traduccion en voz natural con emocion (ADR-015). Lo cumplen
+ * adaptadores/sintesis/{azure,openai}.js. sintetizar({ texto, idioma, pais, tono, ritmo }) -> { audio: Buffer, tipo, voz }
+ */
+const SINTETIZADOR = ['nombre', 'disponible', 'sintetizar'];
+
 // Verifica que un adaptador cumpla su puerto; falla al arrancar y no a mitad de una peticion.
 function asegurarPuerto(nombre, objeto, metodos) {
   const faltan = metodos.filter((m) => !objeto || (typeof objeto[m] !== 'function' && !(m === 'nombre' && typeof objeto[m] === 'string')));
@@ -61,4 +67,4 @@ function asegurarRepositorio(repo) {
   return repo;
 }
 
-module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, asegurarPuerto, asegurarRepositorio };
+module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, asegurarPuerto, asegurarRepositorio };

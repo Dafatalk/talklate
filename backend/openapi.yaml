@@ -467,6 +467,53 @@ paths:
         '201': { description: Creado, headers: { Location: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/Idioma' } } } }
         '400': { $ref: '#/components/responses/Error' }
         '409': { $ref: '#/components/responses/Error' }
+  /voz:
+    post:
+      tags: [Traduccion de mensajes]
+      summary: Voz natural con la emocion del mensaje (HU0004)
+      description: |
+        Convierte la traduccion en voz neuronal (Azure Speech o API compatible con OpenAI, ADR-015) con la emocion
+        del tono (enojo, alegria, tristeza...). Devuelve una URL de audio mp3 que vence en 5 minutos.
+        Responde 503 si no hay motor de voz configurado; la app usa entonces la voz del celular.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [texto, idioma]
+              properties:
+                texto: { type: string, maxLength: 1000 }
+                idioma: { type: string, example: es }
+                pais: { type: string, nullable: true, example: Colombia }
+                tono: { type: string, enum: [Neutral, Alegre, Enojado, Amigable, Preocupado, Formal] }
+                ritmo: { type: number, example: 1 }
+      responses:
+        '201':
+          description: Audio listo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  url: { type: string, example: /api/v1/voz/audio/0123abcd }
+                  tipo: { type: string, example: audio/mpeg }
+                  motor: { type: string, example: azure }
+                  voz: { type: string, example: es-CO-SalomeNeural }
+                  tono: { type: string }
+        '400': { description: Texto o idioma invalido }
+        '401': { description: Sin sesion }
+        '503': { description: No hay motor de voz natural configurado }
+  /voz/audio/{id}:
+    get:
+      tags: [Traduccion de mensajes]
+      summary: Descargar el audio de una voz sintetizada
+      security: []
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Audio mp3, content: { audio/mpeg: {} } }
+        '404': { description: El audio ya vencio o no existe }
   /admin/idiomas/{id}:
     parameters: [{ $ref: '#/components/parameters/id' }]
     get:
