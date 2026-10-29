@@ -11,14 +11,15 @@ const PAIS_ISO = { Colombia: 'CO', Mexico: 'MX', Espana: 'ES', Argentina: 'AR', 
 const LOCALE_IDIOMA = { es: 'es-CO', en: 'en-US', fr: 'fr-FR', pt: 'pt-BR' };
 
 // estilo: mstts:express-as de Azure (si la voz no lo tiene, Azure lo ignora y queda la prosodia)
+// vector: emociones de IndexTTS 2 en VoiceStudio (alegre, enojado, triste, miedo, asco, melancolia, sorpresa, calma)
 // prosodia: respaldo que se nota en cualquier voz · instruccion: para modelos que siguen indicaciones (gpt-4o-mini-tts)
 const EXPRESION = {
-  Enojado: { estilo: 'angry', grado: 1.6, tono: '+4%', velocidad: 1.12, volumen: '+15%', instruccion: 'Habla con enojo real: voz firme, tensa y cortante, con enfasis fuerte en las palabras clave.' },
-  Alegre: { estilo: 'cheerful', grado: 1.6, tono: '+10%', velocidad: 1.08, volumen: '+5%', instruccion: 'Habla con mucha alegria y entusiasmo, sonriendo, con una entonacion que sube y baja.' },
-  Amigable: { estilo: 'friendly', grado: 1.2, tono: '+5%', velocidad: 1.0, volumen: '+0%', instruccion: 'Habla calido y cercano, como con un amigo, relajado y con una sonrisa suave.' },
-  Preocupado: { estilo: 'sad', grado: 1.3, tono: '-6%', velocidad: 0.92, volumen: '-5%', instruccion: 'Habla preocupado e inquieto, un poco mas bajo y lento, con duda en la voz.' },
-  Formal: { estilo: 'customerservice', grado: 1, tono: '-2%', velocidad: 0.95, volumen: '+0%', instruccion: 'Habla formal, claro y respetuoso, con calma y buena diccion.' },
-  Neutral: { estilo: null, grado: 1, tono: '+0%', velocidad: 1.0, volumen: '+0%', instruccion: 'Habla natural y conversacional, como una persona real, sin sonar robotico.' },
+  Enojado: { vector: [0, 0.85, 0, 0, 0.1, 0, 0, 0], estilo: 'angry', grado: 1.6, tono: '+4%', velocidad: 1.12, volumen: '+15%', instruccion: 'Habla con enojo real: voz firme, tensa y cortante, con enfasis fuerte en las palabras clave.' },
+  Alegre: { vector: [0.85, 0, 0, 0, 0, 0, 0.2, 0], estilo: 'cheerful', grado: 1.6, tono: '+10%', velocidad: 1.08, volumen: '+5%', instruccion: 'Habla con mucha alegria y entusiasmo, sonriendo, con una entonacion que sube y baja.' },
+  Amigable: { vector: [0.45, 0, 0, 0, 0, 0, 0, 0.5], estilo: 'friendly', grado: 1.2, tono: '+5%', velocidad: 1.0, volumen: '+0%', instruccion: 'Habla calido y cercano, como con un amigo, relajado y con una sonrisa suave.' },
+  Preocupado: { vector: [0, 0, 0.3, 0.5, 0, 0.2, 0, 0], estilo: 'sad', grado: 1.3, tono: '-6%', velocidad: 0.92, volumen: '-5%', instruccion: 'Habla preocupado e inquieto, un poco mas bajo y lento, con duda en la voz.' },
+  Formal: { vector: [0, 0, 0, 0, 0, 0, 0, 0.8], estilo: 'customerservice', grado: 1, tono: '-2%', velocidad: 0.95, volumen: '+0%', instruccion: 'Habla formal, claro y respetuoso, con calma y buena diccion.' },
+  Neutral: { vector: null, estilo: null, grado: 1, tono: '+0%', velocidad: 1.0, volumen: '+0%', instruccion: 'Habla natural y conversacional, como una persona real, sin sonar robotico.' },
 };
 
 function localeVoz(idioma, pais) {

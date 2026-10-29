@@ -322,3 +322,22 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Si no hay motor configurado o falla, la app vuelve a la voz del celular con tono y velocidad ajustados.
 
 **Consecuencias:** La voz suena natural y con emocion cuando hay clave de Azure o de OpenAI; sin ellas todo sigue funcionando con la voz del celular. Los audios viven solo en memoria del servidor (no se guardan).
+
+## ADR-016: VoiceStudio local como primer motor de voz con emocion
+
+**Estado:** Aceptada (29/10/2026). Extiende ADR-015.
+
+**Contexto:** Azure y OpenAI dan voz natural, pero cobran o piden clave y salen a internet. El proyecto ya traduce con Qwen local (ADR-004), y una voz local mantiene la misma linea: sin costo por uso y sin enviar la voz a terceros. VoiceStudio (github.com/debpalash/VoiceStudio) reune motores de voz locales; su motor IndexTTS 2 acepta la emocion como un vector de 8 pesos y habla espanol e ingles.
+
+**Decision:**
+- Nuevo adaptador `adaptadores/sintesis/voicestudio.js` del puerto `Sintetizador`.
+  - Con IndexTTS 2 usa `POST /generate` con `emo_vector`. Con los otros motores usa `POST /v1/audio/speech` (compatible con OpenAI) y manda la emocion como instruccion en texto.
+- Con `VOZ_MOTOR=auto` el orden es VoiceStudio, luego Azure, luego OpenAI, y al final la voz del celular.
+- La maquina de la demo es la Mac M5 de 32 GB, con instalacion nativa (Metal/MLX). En un Intel sin NVIDIA, IndexTTS en CPU tarda decenas de segundos por frase y no sirve en vivo.
+- La guia de montaje y medicion esta en `backend/VOICESTUDIO_MAC.md` (`npm run medir:voz`).
+
+**Consecuencias:**
+- Voz con emocion gratis y local, y la posibilidad de clonar una voz con permiso.
+- Hay que medir la latencia en la Mac antes de la demo (meta: mediana de 5 s o menos).
+- La licencia de VoiceStudio es AGPL-3.0 y cada modelo tiene la suya. Sirve para la tesis; para uso comercial hay que revisarla.
+- Algunos detalles de su API no estan confirmados en su documentacion; la guia lista que verificar.
