@@ -13,8 +13,11 @@ test('iniciar sesion, crear conversacion y traducir un modismo en el chat', asyn
   await page.getByText('Iniciar sesion', { exact: true }).last().click();
 
   // Nueva conversacion: idioma y region destino
-  await page.getByText('Ingles', { exact: true }).filter({ visible: true }).first().click();
-  await page.getByText(/Miami/).filter({ visible: true }).first().click();
+  // Los selectores abren una hoja inferior con la lista de opciones
+  await page.getByRole('button', { name: 'Traducir a: Elige un idioma' }).click();
+  await page.getByText('Ingles', { exact: true }).filter({ visible: true }).last().click();
+  await page.getByRole('button', { name: 'Region del idioma de destino: Elige una region' }).click();
+  await page.getByText('New York', { exact: true }).filter({ visible: true }).last().click();
   await page.getByText('Empezar a traducir').click();
 
   // Abre en la burbuja de voz (la IA); se cambia al chat desde la cabecera
