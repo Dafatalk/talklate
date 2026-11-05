@@ -16,8 +16,12 @@ scan:
 severity:
   - HIGH
   - CRITICAL
+pkg:
+  # Tambien las dependencias de desarrollo (eslint, TypeScript, Playwright...): corren en las maquinas
+  # del equipo y en el CI, asi que una vulnerable tambien es un riesgo
+  include-dev-deps: true
 vulnerability:
-  # Solo cuenta lo que tiene parche disponible; lo que no tiene arreglo se justifica en .trivyignore
+  # Cuenta todo, tenga o no parche; lo que no tiene arreglo se justifica en .trivyignore
   ignore-unfixed: false
 exit-code: 1
 ignorefile: .trivyignore

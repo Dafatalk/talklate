@@ -38,7 +38,7 @@
 El backend sigue una arquitectura hexagonal (puertos y adaptadores, ADR-013):
 - `backend/src/dominio`: reglas puras (validaciones, errores de negocio, analisis de idioma, tono y region, prosodia de la voz y expresion de cada tono).
 - `backend/src/aplicacion`: un caso de uso por epica (cuentas, sesiones, conversaciones, traduccion, voz, catalogo, reportes).
-- `backend/src/puertos`: contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador` y `Cifrador`.
+- `backend/src/puertos`: contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador` y `FirmadorTokens`.
 - `backend/src/adaptadores`: HTTP (Express) de entrada; de salida SurrealDB y SQLite, Qwen, Claude y reglas, Whisper, VoiceStudio, Azure y OpenAI, correo y cifrado.
 - `backend/src/composicion.js`: elige los adaptadores segun el entorno y arma los casos de uso.
 - `backend/db/surreal/schema.surql`: esquema de la base. `backend/openapi.yaml`: contrato de la API.

@@ -18,7 +18,7 @@ monolito modular (ADR-013): el dominio y los casos de uso estan en el centro y n
 Express, de la base de datos ni de los motores de IA; cada dependencia externa entra por un puerto
 y se conecta con un adaptador. La composicion (`src/composicion.js`) es el unico lugar que conoce
 los adaptadores concretos. Las reglas de dependencia se verifican con dependency-cruiser
-(`backend/.dependency-cruiser.cjs`, `npm run arch:check`). Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
+(`backend/.dependency-cruiser.cjs`, `npm run arch:check`). El chequeo corre en el CI en cada pull request y hoy no marca ninguna violacion: el hash de contrasenas (bcrypt) y los tokens (JWT) tambien entran por puertos (`Hasheador` y `FirmadorTokens`).
 
 ---
 
@@ -129,7 +129,7 @@ flowchart LR
 | C14 | Validaciones | Dominio | Plataforma | Reglas de formato de entrada (nombres, correo, contrasena, contenido, nombre de conversacion). | `src/dominio/validaciones.js` | ADR-011 |
 | C15 | Errores | Dominio | Plataforma | `ErrorNegocio` y cuerpo de error uniforme de la API. | `src/dominio/errores.js` | ADR-011 |
 | C16 | Analisis de texto | Dominio | Traduccion | Detecta idioma, tono y region de origen por vocabulario. | `src/dominio/analisis.js` | ADR-004, ADR-005 |
-| C17 | Puertos | Puertos | (todos) | Contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador` y `Cifrador`, y su verificacion al arrancar. | `src/puertos/index.js` | Puertos y adaptadores / ADR-013 |
+| C17 | Puertos | Puertos | (todos) | Contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador` y `FirmadorTokens`, y su verificacion al arrancar. | `src/puertos/index.js` | Puertos y adaptadores / ADR-013 |
 | C18 | Motor Qwen | Salida | Traduccion | Cumple `MotorTraduccion` via Ollama local (HTTP `/api/chat`). | `src/adaptadores/traduccion/qwen.js` | ADR-004 |
 | C19 | Motor Claude | Salida | Traduccion | Cumple `MotorTraduccion` via la API de Anthropic (solo si hay clave). | `src/adaptadores/traduccion/claude.js` | ADR-004 |
 | C20 | Motor de reglas | Salida | Traduccion | Cumple `MotorTraduccion` sin red: espanol/ingles con modismos por pais; degradacion aceptable. | `src/adaptadores/traduccion/reglas.js`, `acentos.js` | ADR-004 |

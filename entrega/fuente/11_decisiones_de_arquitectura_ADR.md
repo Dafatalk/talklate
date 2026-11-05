@@ -24,6 +24,8 @@
 | ADR-014 | Voz en Expo Go: grabacion en el celular, Whisper en el servidor y entonacion por texto y voz | - | aceptada |
 | ADR-015 | Voz natural con emocion en el servidor (puerto Sintetizador) | Cadena de respaldo | aceptada |
 | ADR-016 | VoiceStudio local como primer motor de voz con emocion | - | aceptada |
+| ADR-017 | Piramide de pruebas en tres niveles, todos en el CI | - | aceptada |
+| ADR-018 | Escaneo de seguridad con Trivy en el CI | - | aceptada |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
 
@@ -276,7 +278,7 @@ Una revision de la arquitectura confirmo que el monolito modular es la decision 
 Organizar la API en capas de **puertos y adaptadores** (Alistair Cockburn), sin cambiar su contrato:
 - **Dominio** (`src/dominio`): validaciones, errores de negocio, analisis de texto, prosodia de la voz y expresion de cada tono. No depende de nada externo.
 - **Aplicacion** (`src/aplicacion`): un caso de uso por epica (cuentas, sesiones, conversaciones, traduccion, voz, catalogo, reportes). Solo importa el dominio y los puertos.
-- **Puertos** (`src/puertos`): contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador` y `Cifrador`, verificados al arrancar.
+- **Puertos** (`src/puertos`): contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador` y `FirmadorTokens`, verificados al arrancar.
 - **Adaptadores** (`src/adaptadores`): de entrada, HTTP con Express; de salida, SurrealDB y SQLite, Qwen, Claude y reglas, Whisper, VoiceStudio, Azure y OpenAI, correo y AES-GCM.
 - **Composicion** (`src/composicion.js`): unico lugar que conoce los adaptadores concretos; los elige segun el entorno y arma los casos de uso.
 
@@ -294,7 +296,7 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Un adaptador incompleto falla al arrancar (`asegurarPuerto`), no a mitad de una peticion.
 - Mas archivos y una indireccion mas. El contrato de la API, la base y las pruebas de punta a punta no cambiaron (las mismas 16 pruebas de la API pasan con SQLite y con SurrealDB).
 - Los nombres siguen ADR-009 (dominio en espanol).
-- Las reglas de dependencia entre capas se verifican con dependency-cruiser (`backend/.dependency-cruiser.cjs`, `npm run arch:check`): dominio puro, aplicacion sin adaptadores, puertos como contratos y adaptadores que no se cruzan entre categorias. Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
+- Las reglas de dependencia entre capas se verifican con dependency-cruiser (`backend/.dependency-cruiser.cjs`, `npm run arch:check`): dominio puro, aplicacion sin adaptadores, puertos como contratos y adaptadores que no se cruzan entre categorias. El chequeo corre en el CI en cada pull request y hoy no marca ninguna violacion: el hash de contrasenas (bcrypt) y los tokens (JWT) tambien entran por puertos (`Hasheador` y `FirmadorTokens`).
 
 
 ## ADR-014: Voz en Expo Go con grabacion en el celular, Whisper en el servidor y entonacion por texto y voz
@@ -345,3 +347,40 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - La latencia se mide con `npm run medir:voz` en el equipo de despliegue (meta: mediana de 5 s o menos por frase, DRV-01).
 - La licencia de VoiceStudio es AGPL-3.0 y cada modelo tiene la suya: es valida para el uso academico; para un uso comercial se usa Azure u OpenAI detras del mismo puerto.
 - El adaptador queda cubierto por pruebas automaticas de las dos rutas (`/generate` y `/v1/audio/speech`), del vector de emocion y de los errores.
+
+## ADR-017: Piramide de pruebas en tres niveles, todos en el CI
+
+**Estado:** aceptada (05/11/2026). **Responde a:** DRV-08, DRV-03.
+
+**Contexto:** Las pruebas del backend estaban en cuatro archivos mezclados (reglas, adaptadores e integracion) y no habia pruebas de la app real en un navegador. No se veia que nivel cubria que, ni cuanto costaba correr cada uno.
+
+**Decision:**
+- Organizar las pruebas como piramide: **base** de unitarias (dominio, casos de uso y adaptadores con dobles; `backend/test/unitarias/` y `frontend/test/`), **medio** de integracion (API HTTP con base real; `backend/test/integracion/`, contra SQLite y SurrealDB) y **punta** de punta a punta (servidor real como proceso en `backend/test/e2e/` y app web con Playwright en `e2e/`).
+- Un script por nivel (`test:unitarias`, `test:integracion`, `test:e2e`) y un paso por nivel en el CI; la app web corre en un job aparte (`e2e-web`) que solo arranca si los niveles de abajo pasaron.
+- Cobertura minima de 80 % en unitarias + integracion, y `arch:check` (dependency-cruiser) en el CI. Para que pase, bcrypt y jsonwebtoken entran por los puertos `Hasheador` y `FirmadorTokens`.
+- En las pruebas de punta a punta, los servicios de IA (Whisper, VoiceStudio) se reemplazan por servidores HTTP falsos que hablan su mismo protocolo: se prueban los adaptadores reales sin depender de modelos pesados.
+
+**Alternativas:**
+- **Jest o Vitest en el backend:** mas funciones, pero `node:test` ya viene con Node 22, no agrega dependencias y tiene cobertura incluida.
+- **Cypress para la web:** maduro, pero Playwright es mas liviano en CI, emula celulares y ya era la herramienta usada para revisar la app.
+- **Detox o Maestro en el celular:** prueban la app nativa, pero exigen emuladores en CI; la app web comparte el mismo codigo (ADR-001) y cubre el recorrido.
+
+**Consecuencias:** 51 unitarias, 18 de integracion (x2 bases) y 4 de punta a punta; cobertura de lineas de 96.6 %. Cada falla dice en que nivel esta el problema. Detalle en `calidad/piramide_de_pruebas.md`.
+
+## ADR-018: Escaneo de seguridad con Trivy en el CI
+
+**Estado:** aceptada (05/11/2026). **Responde a:** DRV-03.
+
+**Contexto:** TalkLate maneja datos personales (Ley 1581) y depende de cientos de paquetes de npm. Una dependencia vulnerable o una clave escrita en el codigo son riesgos que las pruebas funcionales no detectan.
+
+**Decision:**
+- Escanear el repositorio con Trivy: dependencias npm (de produccion y de desarrollo), secretos y configuraciones inseguras. Bloquea el merge si hay hallazgos HIGH o CRITICAL.
+- Corre en cada pull request, en cada push a `develop` y `main` y cada lunes (los CVE nuevos aparecen aunque el codigo no cambie).
+- Trivy se instala desde el binario oficial con version fija (0.69.3) y checksum SHA-256 verificado. No se usan `aquasecurity/trivy-action` ni `setup-trivy`, comprometidas en marzo de 2026.
+- Las vulnerabilidades indirectas se corrigen con `overrides` de npm dentro de la misma version mayor. Lo que no tiene parche compatible va a `.trivyignore` con su razon, su riesgo real y una fecha de vencimiento.
+
+**Alternativas:**
+- **`npm audit`:** solo revisa npm y no busca secretos ni configuraciones; ademas no permite excepciones con vencimiento.
+- **Dependabot o Snyk:** utiles, pero dependen de la configuracion de la organizacion en GitHub o de un servicio externo; Trivy corre igual en local y en CI.
+
+**Consecuencias:** Se corrigieron 1 HIGH en el backend y 1 CRITICAL + 50 HIGH en el frontend (produccion y desarrollo). Queda 1 excepcion documentada (`decode-uri-component`, vence el 28/02/2027). Detalle en `calidad/seguridad_trivy.md`.

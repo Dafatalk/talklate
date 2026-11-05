@@ -9,7 +9,8 @@ TalkLate escanea su codigo con Trivy en cada pull request, en cada push a `devel
 | Que se escanea | Hallazgos HIGH / CRITICAL antes | Despues | Como se resolvio |
 | --- | --- | --- | --- |
 | Dependencias del backend (`backend/package-lock.json`) | 1 HIGH (`body-parser` 1.20.8) | 0 | Actualizacion de `express` a 4.22.3, que trae `body-parser` 1.20.9 |
-| Dependencias del frontend (`frontend/package-lock.json`) | 1 CRITICAL y 28 HIGH | 0 (1 excepcion documentada) | `overrides` de npm hacia versiones parchadas, sin cambiar de version mayor (ver tabla 2) |
+| Dependencias del frontend (`frontend/package-lock.json`), de produccion | 1 CRITICAL y 28 HIGH | 0 (1 excepcion documentada) | `overrides` de npm hacia versiones parchadas, sin cambiar de version mayor (ver tabla 2) |
+| Dependencias de desarrollo del frontend (eslint, TypeScript y sus herramientas) | 22 HIGH | 0 | `overrides` de npm hacia versiones parchadas de la misma version mayor |
 | Dependencias de las pruebas (`e2e/package-lock.json`) | 0 | 0 | - |
 | Secretos en el codigo (claves, tokens, contrasenas) | 0 | 0 | Las credenciales viven en `.env`, que no se sube al repositorio |
 | Configuraciones inseguras (IaC) | 0 | 0 | El proyecto no tiene Dockerfile ni infraestructura como codigo todavia; el escaneo queda activo para cuando la haya |
@@ -27,6 +28,10 @@ Todas son dependencias indirectas de las herramientas de Expo y React Native. Se
 | `browserslist` | 4.26.2 | 4.29.5 | HIGH | Contaminacion de prototipos y denegacion de servicio |
 | `picomatch` 2.x | 2.3.1 | 2.3.2 | HIGH | Denegacion de servicio por expresiones regulares |
 | `ws` 7.x (react-devtools) | 7.5.10 | 7.5.13 | HIGH | Denegacion de servicio por agotamiento de memoria |
+| `minimatch` 3.x y 9.x (desarrollo) | 3.1.2 / 9.0.5 | 3.1.4 / 9.0.7 | HIGH | Denegacion de servicio por patrones de busqueda |
+| `brace-expansion` 1.x y 2.x (desarrollo) | 1.1.11 / 2.0.1 | 1.1.20 / 2.1.6 | HIGH | Denegacion de servicio por expansion de llaves |
+| `glob` 10.x (desarrollo) | 10.4.5 | 10.5.0 | HIGH | Inyeccion de comandos en su linea de comandos |
+| `flatted` (desarrollo) | 3.3.3 | 3.4.2 | HIGH | Contaminacion de prototipos al leer datos |
 
 ## 3. Excepcion aceptada
 
@@ -40,7 +45,7 @@ La excepcion esta en `.trivyignore` con fecha de vencimiento: ese dia Trivy vuel
 
 | Archivo | Para que sirve |
 | --- | --- |
-| `trivy.yaml` | Configuracion: escaneres (`vuln`, `secret`, `misconfig`), severidades que bloquean (HIGH y CRITICAL), carpetas excluidas (`node_modules`, la web exportada y el template de UI original, que no se despliega) |
+| `trivy.yaml` | Configuracion: escaneres (`vuln`, `secret`, `misconfig`), tambien dependencias de desarrollo, severidades que bloquean (HIGH y CRITICAL), carpetas excluidas (`node_modules`, la web exportada y el template de UI original, que no se despliega) |
 | `.trivyignore` | Excepciones justificadas, cada una con razon y fecha de vencimiento |
 | `.github/workflows/seguridad.yml` | Instala Trivy, genera el reporte completo (todas las severidades) como artefacto y corre el escaneo que bloquea |
 
