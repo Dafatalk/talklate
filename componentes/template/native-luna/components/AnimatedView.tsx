@@ -1,6 +1,6 @@
 import React, { useEffect, memo, useRef, useState } from 'react';
 import { Animated, ViewStyle, StyleProp, EasingFunction, Easing, View, LayoutChangeEvent, Dimensions, InteractionManager } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from 'expo-router';
 
 export type AnimationType =
     | 'fadeIn'

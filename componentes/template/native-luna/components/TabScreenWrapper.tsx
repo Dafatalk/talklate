@@ -1,5 +1,5 @@
 import React from 'react';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from 'expo-router';
 import AnimatedView from './AnimatedView';
 import type { AnimationType } from './AnimatedView';
 import { View } from 'react-native';

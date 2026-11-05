@@ -1,6 +1,6 @@
 import '../global.css';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { ActivityIndicator, LogBox, Platform, View } from 'react-native';
 import { Stack, router, useSegments } from 'expo-router';
 import { NativeWindStyleSheet } from 'nativewind';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,6 +11,13 @@ import { ConversacionesProvider } from './contexts/ConversacionesContext';
 import useThemedNavigation from './hooks/useThemedNavigation';
 
 NativeWindStyleSheet.setOutput({ default: 'native' });
+
+// Warning solo de desarrollo de expo-router (SDK 58+): el drawer despacha una accion de cierre
+// interna antes de que el navegador este listo, y el reporter nuevo la marca como "unhandled".
+// No proviene de codigo de TalkLate y no aparece en produccion. Revisar si un patch de expo-router lo corrige.
+LogBox.ignoreLogs([
+  "The action 'CLOSE_DRAWER' was not handled by any navigator",
+]);
 
 const PANTALLAS_PUBLICAS = ['welcome', 'login', 'signup', 'forgot-password', 'politica-datos'];
 

@@ -6,14 +6,20 @@
     "version": "1.0.0",
     "runtimeVersion": "1.0.0",
     "scheme": "luna",
-   
     "experiments": {
       "tsconfigPaths": true
     },
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "@react-native-community/datetimepicker",
+      "expo-asset",
+      "expo-sharing",
+      "expo-status-bar"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
