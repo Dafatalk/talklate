@@ -3,12 +3,14 @@ import { Pressable, View } from 'react-native';
 import { Link } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Input from '@/components/forms/Input';
+import { DatePicker } from '@/components/forms/DatePicker';
 import ThemedText from '@/components/ThemedText';
 import ThemedScroller from '@/components/ThemeScroller';
 import Icon from '@/components/Icon';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { validarRegistro } from '@/lib/reglas';
+import { formatToYYYYMMDD } from '@/utils/date';
 
 export default function SignupScreen() {
   const insets = useSafeAreaInsets();
@@ -47,7 +49,7 @@ export default function SignupScreen() {
       <Input label="Nombre" variant="underlined" value={f.nombre} onChangeText={poner('nombre')} error={errores.nombre} autoComplete="given-name" />
       <Input label="Apellido" variant="underlined" value={f.apellido} onChangeText={poner('apellido')} error={errores.apellido} autoComplete="family-name" />
       <Input label="Correo" variant="underlined" value={f.correo} onChangeText={poner('correo')} error={errores.correo} keyboardType="email-address" autoCapitalize="none" autoComplete="email" />
-      <Input label="Fecha de nacimiento (AAAA-MM-DD)" variant="underlined" value={f.fecha} onChangeText={poner('fecha')} error={errores.fecha} autoCapitalize="none" keyboardType="numbers-and-punctuation" />
+      <DatePicker label="Fecha de nacimiento" variant="underlined" value={f.fecha ? new Date(f.fecha + 'T00:00:00') : undefined} onChange={(d) => setF((x) => ({ ...x, fecha: formatToYYYYMMDD(d) }))} error={errores.fecha} maxDate={new Date()} />
       <Input label="Contrasena" variant="underlined" value={f.password} onChangeText={poner('password')} error={errores.password} isPassword autoCapitalize="none" />
 
       <Pressable onPress={() => setF((x) => ({ ...x, acepta: !x.acepta }))} className="flex-row items-start mt-2" accessibilityRole="checkbox" accessibilityState={{ checked: f.acepta }}>
