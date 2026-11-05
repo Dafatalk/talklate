@@ -51,6 +51,8 @@ Playwright levanta solo el backend y un servidor estatico para la web (`e2e/play
 
 ## 6. Como correr todo en local
 
+Para levantar la app completa (backend + Expo, y con `--full` tambien Ollama y Whisper) basta `./run-talklate.sh` en la raiz del repositorio. Para las pruebas:
+
 ```bash
 # Backend: base y medio (rapidas)
 cd backend

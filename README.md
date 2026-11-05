@@ -25,6 +25,8 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 
 ## Probar la aplicación
 
+Arranque rapido en local: `./run-talklate.sh` (backend + Expo; `--full` levanta tambien Ollama y Whisper).
+
 ```bash
 # Terminal 1: API (Node 22.5 o superior)
 cd backend && npm install && npm start
