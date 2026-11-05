@@ -2,7 +2,7 @@
 // los casos de uso y los adaptadores concretos: lee la configuracion (variables de entorno), elige
 // cada adaptador, verifica que cumpla su puerto y entrega los casos de uso armados al adaptador HTTP.
 const log = require('./compartido/log');
-const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, HASHEADOR, FIRMADOR_TOKENS } = require('./puertos');
+const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, DETECTOR_GENERO, HASHEADOR, FIRMADOR_TOKENS } = require('./puertos');
 const { crearHasheadorBcrypt } = require('./adaptadores/credenciales/bcrypt');
 const { crearFirmadorJwt } = require('./adaptadores/credenciales/jwt');
 const { crearMotorQwen } = require('./adaptadores/traduccion/qwen');
@@ -14,6 +14,7 @@ const { crearTranscriptorWhisper } = require('./adaptadores/transcripcion/whispe
 const { crearSintetizadorAzure } = require('./adaptadores/sintesis/azure');
 const { crearSintetizadorOpenAI } = require('./adaptadores/sintesis/openai');
 const { crearSintetizadorElevenLabs } = require('./adaptadores/sintesis/elevenlabs');
+const { crearDetectorGeneroPitch } = require('./adaptadores/audio/genero');
 const { crearServicioVoz } = require('./aplicacion/voz');
 const { crearServicioTraduccion } = require('./aplicacion/traduccion');
 const { crearServicioSesiones } = require('./aplicacion/sesiones');
@@ -70,6 +71,13 @@ function crearTraduccion(entorno = process.env, opciones = {}) {
   return crearServicioTraduccion({ motores: opciones.motores || crearMotores(entorno, opciones), log });
 }
 
+// Deteccion de genero por la agudeza de la voz segun GENERO_VOZ: auto/pitch (por defecto, usa ffmpeg)
+// o ninguno (desactiva; cae a la inferencia por texto y al default). Ver adaptadores/audio/genero.js.
+function crearDetectorGenero(entorno = process.env) {
+  const habilitado = (entorno.GENERO_VOZ || 'auto').toLowerCase() !== 'ninguno';
+  return crearDetectorGeneroPitch({ ffmpegPath: entorno.FFMPEG_PATH || undefined, habilitado, timeoutMs: Number(entorno.GENERO_VOZ_TIMEOUT_MS) || undefined });
+}
+
 function secretoJwt(entorno) {
   if (entorno.JWT_SECRET) return entorno.JWT_SECRET;
   if (esProduccion(entorno)) throw new Error('Falta JWT_SECRET en produccion');
@@ -98,13 +106,14 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
     duracionRefrescoMs: (Number(entorno.DURACION_REFRESCO_DIAS) || 30) * 24 * 60 * 60 * 1000,
   });
   const voz = crearServicioVoz({ sintetizadores: adaptadores.sintetizadores || crearSintetizadores(entorno, { fetchFn: adaptadores.fetchFn }), log });
+  const detectorGenero = asegurarPuerto('detector de genero', adaptadores.detectorGenero || crearDetectorGenero(entorno), DETECTOR_GENERO);
   return {
     traduccion,
     transcriptor,
     voz,
     sesiones,
     cuentas: crearServicioCuentas({ repo, sesiones, notificador, hasheador, log }),
-    conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, log }),
+    conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, detectorGenero, log }),
     catalogo: crearServicioCatalogo({ repo, log }),
     reportes: crearServicioReportes({ repo, cifrador, log }),
   };

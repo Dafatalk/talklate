@@ -56,6 +56,13 @@ const TRANSCRIPTOR = ['disponible', 'transcribir'];
 const SINTETIZADOR = ['nombre', 'disponible', 'sintetizar'];
 
 /**
+ * Puerto DetectorGenero (salida): estima el genero de quien habla por la agudeza (pitch) de la voz,
+ * para elegir la voz de salida. Lo cumple adaptadores/audio/genero.js.
+ * detectar({ audio: Buffer }) -> { genero: 'hombre'|'mujer'|null, f0: number|null }
+ */
+const DETECTOR_GENERO = ['disponible', 'detectar'];
+
+/**
  * Puerto Hasheador (salida): hash con sal de contrasenas y codigos. Lo cumple adaptadores/credenciales/bcrypt.js.
  * hashear(valor, costo?) -> hash · comparar(valor, hash) -> boolean
  */
@@ -79,4 +86,4 @@ function asegurarRepositorio(repo) {
   return repo;
 }
 
-module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, HASHEADOR, FIRMADOR_TOKENS, asegurarPuerto, asegurarRepositorio };
+module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, DETECTOR_GENERO, HASHEADOR, FIRMADOR_TOKENS, asegurarPuerto, asegurarRepositorio };

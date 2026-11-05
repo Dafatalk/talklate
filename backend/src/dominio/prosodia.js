@@ -45,4 +45,15 @@ function combinarTono(tonoTexto, prosodia) {
   return (prosodia && prosodia.tono) || tonoTexto || 'Neutral';
 }
 
-module.exports = { analizarProsodia, combinarTono };
+// Genero aproximado por la agudeza (frecuencia fundamental, Hz) de la voz: la voz masculina suele
+// estar por debajo de ~160 Hz y la femenina por encima de ~180 Hz. La banda intermedia es ambigua
+// (mujeres de voz grave, hombres de voz aguda) y se deja SIN decidir (null) para no equivocarse.
+// Es solo un apoyo para elegir la voz de salida; no determina la identidad de genero de la persona.
+function generoPorPitch(f0) {
+  if (typeof f0 !== 'number' || !Number.isFinite(f0) || f0 <= 0) return null;
+  if (f0 < 160) return 'hombre';
+  if (f0 > 180) return 'mujer';
+  return null;
+}
+
+module.exports = { analizarProsodia, combinarTono, generoPorPitch };

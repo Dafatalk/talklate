@@ -10,7 +10,7 @@ const { analizarProsodia } = require('../dominio/prosodia');
 const MAX_AUDIO_BYTES = 10 * 1024 * 1024; // unos minutos de audio comprimido
 const TIPOS_AUDIO = /^audio\/(m4a|mp4|x-m4a|aac|webm|ogg|wav|x-wav|mpeg|3gpp)(;.*)?$/i;
 
-function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, log }) {
+function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, detectorGenero, log }) {
   const { cifrar, descifrar } = cifrador;
 
   // --- formato (puro) ---
@@ -120,7 +120,7 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor,
 
   // HU Ingresar mensaje (voz/texto), Traducir, Reconocer idioma origen, Recibir por el mismo canal,
   // Recibir y responder (interlocutor)
-  async function enviarMensaje(usuarioId, id, datos, { prosodia = null } = {}) {
+  async function enviarMensaje(usuarioId, id, datos, { prosodia = null, generoVoz = null } = {}) {
     const c = await delUsuario(usuarioId, id);
     const contenido = V.validarContenidoMensaje(datos.contenido);
     const canalEntrada = String(datos.canal || 'texto').toLowerCase();
@@ -159,6 +159,9 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor,
     }
 
     log.info('traduccion', { conversacion_id: c.id, motor: t.motor, duracion_ms: Date.now() - inicio, canal: canalNombre, aproximada: !!t.aproximada });
+    // Genero para elegir la voz: manda la agudeza de la voz (canal de voz); si no se pudo medir, cae a
+    // la inferencia por texto del motor y, al final, al default del sintetizador.
+    const genero = generoVoz || t.genero || null;
     const tono = tonos.find((x) => x.nombre === t.tono) || tonos.find((x) => x.nombre === 'Neutral') || tonos[0];
     const canal = await repo.catalogo.canalPorNombre(canalNombre);
     const ahora = new Date().toISOString();
@@ -167,17 +170,17 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor,
     const contenidoCifrado = cifrar(contenido);
     const traduccionCifrada = cifrar(t.traduccion);
     await repo.mensajes.crear({
-      origen: { id: origenId, lpcId: escribeEn.id, canalId: canal.id, entonacionId: tono.id, contenido: contenidoCifrado, remitente, genero: t.genero || null, fecha: ahora },
+      origen: { id: origenId, lpcId: escribeEn.id, canalId: canal.id, entonacionId: tono.id, contenido: contenidoCifrado, remitente, genero, fecha: ahora },
       destino: { id: destinoId, lpcId: traduceA.id, contenido_traducido: traduccionCifrada, nota: t.nota, aproximada: t.aproximada, motor: t.motor, estado_entrega: 'Entregado', fecha: ahora },
     });
 
     return {
       conversacionId: c.id,
       mensaje: formatoMensaje({
-        id: origenId, contenido: contenidoCifrado, remitente, fecha_creacion: ahora, canal: canalNombre, tono: tono.nombre, genero: t.genero || null,
+        id: origenId, contenido: contenidoCifrado, remitente, fecha_creacion: ahora, canal: canalNombre, tono: tono.nombre, genero,
         destino_id: destinoId, contenido_traducido: traduccionCifrada, nota_cultural: t.nota, aproximada: t.aproximada ? 1 : 0, motor: t.motor, estado_entrega: 'Entregado', reportado: 0,
       }),
-      entrega: { canal: canalNombre, reproducir_audio: canalNombre === 'Voz', idioma_codigo: traduceA.idioma_codigo, region_origen_detectada: t.regionOrigen, ritmo_voz: prosodia ? prosodia.ritmoSalida : 1, genero: t.genero || null },
+      entrega: { canal: canalNombre, reproducir_audio: canalNombre === 'Voz', idioma_codigo: traduceA.idioma_codigo, region_origen_detectada: t.regionOrigen, ritmo_voz: prosodia ? prosodia.ritmoSalida : 1, genero },
       configuracion: configuracion(lpcs),
       aviso,
     };
@@ -211,7 +214,14 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor,
     if (!texto) throw reglaNegocio('No escuchamos nada en el audio. Acercate al microfono e intenta de nuevo.');
 
     const prosodia = analizarProsodia(datos.prosodia, texto);
-    const r = await enviarMensaje(usuarioId, id, { contenido: texto, canal: 'voz', remitente, idioma_origen_id: datos.idioma_origen_id }, { prosodia });
+    // Genero por la agudeza de la voz (reemplaza la inferencia por texto, que fallaba en ingles). Si el
+    // detector no esta disponible o el pitch es ambiguo, generoVoz queda null y enviarMensaje cae al texto.
+    let generoVoz = null;
+    if (detectorGenero && detectorGenero.disponible()) {
+      try { ({ genero: generoVoz } = await detectorGenero.detectar({ audio })); }
+      catch (e) { log.error('genero_voz_fallido', { conversacion_id: c.id, detalle: e.message }); }
+    }
+    const r = await enviarMensaje(usuarioId, id, { contenido: texto, canal: 'voz', remitente, idioma_origen_id: datos.idioma_origen_id }, { prosodia, generoVoz });
     return { ...r, transcripcion: texto, prosodia: prosodia ? { tono_voz: prosodia.tono, descripcion: prosodia.descripcion } : null };
   }
 
