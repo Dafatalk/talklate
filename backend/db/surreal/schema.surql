@@ -108,6 +108,8 @@ DEFINE FIELD IF NOT EXISTS tone ON original_message TYPE record<tone>;
 DEFINE FIELD IF NOT EXISTS content ON original_message TYPE string;
 DEFINE FIELD IF NOT EXISTS sender ON original_message TYPE string DEFAULT 'usuario' ASSERT $value INSIDE ['usuario', 'interlocutor'];
 DEFINE FIELD IF NOT EXISTS created_at ON original_message TYPE string;
+-- Genero de quien escribe, inferido por el motor para elegir la voz (ADR-017). Opcional: mensajes sin pistas quedan en NONE.
+DEFINE FIELD IF NOT EXISTS gender ON original_message TYPE option<string>;
 
 DEFINE TABLE IF NOT EXISTS translated_message SCHEMAFULL;
 DEFINE FIELD IF NOT EXISTS original_message ON translated_message TYPE record<original_message>;
