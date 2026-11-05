@@ -7,7 +7,7 @@ function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tono
     `Idioma destino: ${destino.nombre || destino.codigo}${regionDestino ? ` (region: ${regionDestino})` : ''}.`,
     `Tonos posibles: ${tonos.join(', ')}.`,
     ...(prosodia ? [`El mensaje llego por voz: la persona ${prosodia.descripcion}. Usa tambien eso para elegir el tono y conservalo en la traduccion.`] : []),
-    'Responde SOLO con un JSON: {"traduccion": string, "tono": uno de los tonos posibles, "nota_cultural": string o null (explica en espanol breve cualquier modismo adaptado), "region_origen": string o null}.',
+    'Responde SOLO con un JSON: {"traduccion": string, "tono": uno de los tonos posibles, "genero": "masculino" | "femenino" | null (el genero de quien ESCRIBE el mensaje, inferido por pistas del texto como la concordancia en espanol -cansada/cansado- o como se nombra; null si no hay pistas), "nota_cultural": string o null (explica en espanol breve cualquier modismo adaptado), "region_origen": string o null}.',
     '',
     'Mensaje:',
     texto,
@@ -22,9 +22,12 @@ function leerRespuesta(bruto, tonos) {
   if (ini < 0 || fin < ini) throw new Error('La respuesta del modelo no trae JSON');
   const json = JSON.parse(t.slice(ini, fin + 1));
   if (typeof json.traduccion !== 'string' || !json.traduccion.trim()) throw new Error('Respuesta del modelo sin traduccion');
+  const g = String(json.genero || '').toLowerCase();
+  const genero = /^(masculino|male|hombre|m)$/.test(g) ? 'hombre' : /^(femenino|female|mujer|f)$/.test(g) ? 'mujer' : null;
   return {
     traduccion: json.traduccion.trim(),
     tono: tonos.includes(json.tono) ? json.tono : null,
+    genero,
     nota: json.nota_cultural || null,
     regionOrigen: json.region_origen || null,
     aproximada: false,

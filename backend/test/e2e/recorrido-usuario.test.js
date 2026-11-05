@@ -1,7 +1,7 @@
 // Prueba de punta a punta (punta de la piramide): levanta el servidor REAL como proceso aparte
 // (`node src/server.js`, con SQLite en un archivo temporal) y recorre la app por HTTP como lo haria el
 // celular: registro, conversacion, mensaje escrito, mensaje hablado, voz natural, reporte y borrado de
-// la cuenta. Los servicios de IA externos (Whisper y VoiceStudio) se reemplazan por servidores HTTP
+// la cuenta. Los servicios de IA externos (Whisper y el motor de voz) se reemplazan por servidores HTTP
 // falsos que hablan su mismo protocolo, asi que tambien se prueban los adaptadores reales de verdad.
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -12,7 +12,7 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 
 const raizBackend = path.join(__dirname, '..', '..');
-let servidor, whisper, voicestudio, carpeta, base, raiz;
+let servidor, whisper, vozFalsa, carpeta, base, raiz;
 const pedidosVoz = [];
 
 function escuchar(manejador) {
@@ -38,8 +38,8 @@ test.before(async () => {
       res.end(JSON.stringify({ text: 'Que mas parce, estoy muy feliz de verte' }));
     });
   });
-  // VoiceStudio falso: guarda lo que le piden y devuelve un "wav"
-  voicestudio = await escuchar((req, res) => {
+  // Motor de voz falso (API compatible con OpenAI): guarda lo que le piden y devuelve audio
+  vozFalsa = await escuchar((req, res) => {
     let cuerpo = '';
     req.on('data', (d) => { cuerpo += d; });
     req.on('end', () => {
@@ -66,8 +66,8 @@ test.before(async () => {
       TALKLATE_LOGS: 'silencio',
       CORREO_MODO: 'consola',
       TRANSCRIPCION_URL: `http://127.0.0.1:${puerto(whisper)}/v1/audio/transcriptions`,
-      VOZ_MOTOR: 'voicestudio',
-      VOICESTUDIO_URL: `http://127.0.0.1:${puerto(voicestudio)}`,
+      VOZ_MOTOR: 'openai',
+      VOZ_URL: `http://127.0.0.1:${puerto(vozFalsa)}/v1/audio/speech`,
     },
   });
   let salida = '';
@@ -82,7 +82,7 @@ test.before(async () => {
 
 test.after(async () => {
   if (servidor) servidor.kill();
-  await Promise.all([whisper, voicestudio].filter(Boolean).map((s) => new Promise((r) => s.close(r))));
+  await Promise.all([whisper, vozFalsa].filter(Boolean).map((s) => new Promise((r) => s.close(r))));
   if (carpeta) fs.rmSync(carpeta, { recursive: true, force: true });
 });
 
@@ -101,7 +101,7 @@ test('recorrido completo: registro, conversar por texto y por voz, escuchar, rep
   const salud = await (await fetch(`${raiz}/health`)).json();
   assert.equal(salud.ok, true);
   assert.equal(salud.transcripcion_voz, true);
-  assert.deepEqual(salud.voz_natural, ['voicestudio']);
+  assert.deepEqual(salud.voz_natural, ['openai']);
 
   // 2. Registro con consentimiento de datos (Ley 1581)
   const correo = `e2e_${Date.now()}@correo.com`;
@@ -132,15 +132,15 @@ test('recorrido completo: registro, conversar por texto y por voz, escuchar, rep
   assert.equal(voz.datos.mensaje.canal, 'Voz');
   assert.equal(voz.datos.entrega.reproducir_audio, true);
 
-  // 6. La traduccion se escucha con voz natural: VoiceStudio recibe el vector de emocion del tono
+  // 6. La traduccion se escucha con voz natural: el motor de voz recibe la instruccion de emocion del tono
   const sint = await api('POST', '/voz', { texto: voz.datos.mensaje.traduccion.contenido, idioma: 'en', pais: 'Estados Unidos', tono: voz.datos.mensaje.tono, ritmo: voz.datos.entrega.ritmo_voz }, token);
   assert.equal(sint.estado, 201, JSON.stringify(sint.datos));
-  assert.equal(sint.datos.motor, 'voicestudio');
-  assert.equal(pedidosVoz.at(-1).ruta, '/generate');
-  assert.match(pedidosVoz.at(-1).cuerpo, /emo_vector/);
+  assert.equal(sint.datos.motor, 'openai');
+  assert.equal(pedidosVoz.at(-1).ruta, '/v1/audio/speech');
+  assert.match(pedidosVoz.at(-1).cuerpo, /instructions/);
   const audio = await fetch(raiz + sint.datos.url);
   assert.equal(audio.status, 200);
-  assert.equal(audio.headers.get('content-type'), 'audio/wav');
+  assert.equal(audio.headers.get('content-type'), 'audio/mpeg');
 
   // 7. Historial: la conversacion tiene sus dos mensajes en orden
   const abierta = await api('GET', `/conversaciones/${id}`, null, token);

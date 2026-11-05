@@ -19,7 +19,6 @@ BACKEND_PORT=3000
 EXPO_PORT=8081
 OLLAMA_PORT=11434
 WHISPER_PORT=9000
-VOICE_PORT=3900
 
 # Modelo de Whisper (sobreescribible: WHISPER_MODEL=... ./run-talklate.sh --full)
 WHISPER_MODEL="${WHISPER_MODEL:-$HOME/modelos/ggml-small.bin}"
@@ -75,8 +74,7 @@ echo "==> Servicios de IA local:"
 ollama_down=0
 whisper_down=0
 estado_servicio "Ollama"      "$OLLAMA_PORT"  "arranca con: ollama serve"                 || ollama_down=1
-estado_servicio "Whisper STT" "$WHISPER_PORT" "ver backend/VOICESTUDIO_MAC.md"            || whisper_down=1
-estado_servicio "VoiceStudio" "$VOICE_PORT"   "app manual; si no, usa la voz del celular" || true
+estado_servicio "Whisper STT" "$WHISPER_PORT" "arranca con whisper-server en :9000"        || whisper_down=1
 echo
 
 # 3) Con --full, intenta levantar lo que falte (en segundo plano, persistente)

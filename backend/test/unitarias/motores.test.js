@@ -111,6 +111,13 @@ test('caso de uso de traduccion: usa el primer motor que responde y salta los ca
   assert.equal(a.llamadas, 2);
 });
 
+test('caso de uso de traduccion: pasa el genero que detecta el motor (no lo descarta)', async () => {
+  const conGenero = motorFalso('ia', () => ({ traduccion: 'done', nota: null, aproximada: false, tono: 'Neutral', genero: 'mujer' }));
+  assert.equal((await crearServicioTraduccion({ motores: [conGenero], log }).traducir(ENTRADA)).genero, 'mujer');
+  const sinGenero = motorFalso('ia2', () => ({ traduccion: 'done', nota: null, aproximada: false }));
+  assert.equal((await crearServicioTraduccion({ motores: [sinGenero], log }).traducir(ENTRADA)).genero, null);
+});
+
 test('caso de uso de traduccion: pares soportados y error cuando ningun motor puede', async () => {
   const soloEsEn = motorFalso('reglas', () => ({ traduccion: 'ok', nota: null, aproximada: true }), ['es>en', 'en>es']);
   const s = crearServicioTraduccion({ motores: [motorFalso('ia', falla), soloEsEn], log });
@@ -218,30 +225,53 @@ test('voz natural: Azure pone la emocion en SSML y OpenAI la pide como instrucci
   await assert.rejects(crearServicioVoz({ log: {} }).sintetizar({ texto: 'hola', idioma: 'es' }), (e) => e.estado === 503);
 });
 
-test('voz natural: VoiceStudio manda el vector de emocion a IndexTTS 2 y la instruccion a otros motores', async () => {
-  const { crearSintetizadorVoiceStudio } = require('../../src/adaptadores/sintesis/voicestudio');
+test('voz natural: OpenAI-compat manda la instruccion de emocion en el cuerpo', async () => {
+  const { crearSintetizadorOpenAI } = require('../../src/adaptadores/sintesis/openai');
   let pedido;
   const fetchFn = async (url, op) => { pedido = { url, op }; return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) }; };
-  const idx = crearSintetizadorVoiceStudio({ url: 'http://127.0.0.1:3900/', perfil: 'demo', apiKey: 'k', fetchFn });
-  assert.equal(idx.disponible(), true);
-  const r = await idx.sintetizar({ texto: 'Estoy furioso', idioma: 'es', tono: 'Enojado', ritmo: 1 });
-  assert.equal(pedido.url, 'http://127.0.0.1:3900/generate');
-  assert.equal(r.tipo, 'audio/wav');
+  const s = crearSintetizadorOpenAI({ url: 'http://127.0.0.1:8880/v1', apiKey: 'k', fetchFn });
+  assert.equal(s.disponible(), true);
+  const r = await s.sintetizar({ texto: 'que bien', idioma: 'es', tono: 'Alegre', ritmo: 1 });
+  assert.equal(r.tipo, 'audio/mpeg');
   assert.equal(pedido.op.headers.Authorization, 'Bearer k');
-  assert.equal(pedido.op.body.get('engine'), 'indextts2');
-  assert.equal(pedido.op.body.get('language'), 'es');
-  assert.equal(pedido.op.body.get('profile_id'), 'demo');
-  assert.deepEqual(JSON.parse(pedido.op.body.get('emo_vector')), [0, 0.85, 0, 0, 0.1, 0, 0, 0]);
-  await idx.sintetizar({ texto: 'hola', idioma: 'es', tono: 'Neutral' });
-  assert.equal(pedido.op.body.get('emo_vector'), null); // neutral: sin emocion forzada
-  const cosy = crearSintetizadorVoiceStudio({ url: 'http://127.0.0.1:3900', motor: 'cosyvoice', fetchFn });
-  const c = await cosy.sintetizar({ texto: 'que bien', idioma: 'es', tono: 'Alegre' });
-  assert.equal(pedido.url, 'http://127.0.0.1:3900/v1/audio/speech');
-  assert.equal(c.tipo, 'audio/mpeg');
   const cuerpo = JSON.parse(pedido.op.body);
-  assert.equal(cuerpo.model, 'cosyvoice');
-  assert.match(cuerpo.instruct, /alegria/);
-  assert.equal(crearSintetizadorVoiceStudio({}).disponible(), false);
-  const malo = crearSintetizadorVoiceStudio({ url: 'http://x', fetchFn: async () => ({ ok: false, status: 503 }) });
-  await assert.rejects(malo.sintetizar({ texto: 'a', idioma: 'es', tono: 'Neutral' }), /503/);
+  assert.match(cuerpo.instructions || cuerpo.instruct || '', /alegria/);
+  assert.equal(crearSintetizadorOpenAI({}).disponible(), false);
+});
+
+test('voz natural: ElevenLabs elige el voice_id por locale y manda la emocion en voice_settings', async () => {
+  const { crearSintetizadorElevenLabs } = require('../../src/adaptadores/sintesis/elevenlabs');
+  let pedido;
+  const fetchFn = async (url, op) => { pedido = { url, op }; return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) }; };
+  const voces = { 'es-CO': 'paisa123', 'en-US': 'miami456', default: 'def' };
+  const s = crearSintetizadorElevenLabs({ apiKey: 'k', voces, fetchFn });
+  assert.equal(s.disponible(), true);
+  const r = await s.sintetizar({ texto: 'que rabia', idioma: 'es', pais: 'Colombia', tono: 'Enojado', ritmo: 1 });
+  assert.match(pedido.url, /\/text-to-speech\/paisa123\?/);
+  assert.equal(pedido.op.headers['xi-api-key'], 'k');
+  assert.equal(r.tipo, 'audio/mpeg');
+  const cuerpo = JSON.parse(pedido.op.body);
+  assert.equal(cuerpo.model_id, 'eleven_multilingual_v2');
+  assert.ok(cuerpo.voice_settings.stability < 0.5); // tono expresivo baja la estabilidad
+  await s.sintetizar({ texto: 'hi', idioma: 'en', pais: 'Estados Unidos', tono: 'Neutral' });
+  assert.match(pedido.url, /\/text-to-speech\/miami456\?/);
+  assert.equal(crearSintetizadorElevenLabs({ voces }).disponible(), false); // sin api key
+  assert.equal(crearSintetizadorElevenLabs({ apiKey: 'k' }).disponible(), false); // sin voces
+  const malo = crearSintetizadorElevenLabs({ apiKey: 'k', voces, fetchFn: async () => ({ ok: false, status: 401 }) });
+  await assert.rejects(malo.sintetizar({ texto: 'a', idioma: 'es', pais: 'Colombia', tono: 'Neutral' }), /401/);
+});
+
+test('voz natural: ElevenLabs elige la voz por genero del hablante y cae al default', async () => {
+  const { crearSintetizadorElevenLabs } = require('../../src/adaptadores/sintesis/elevenlabs');
+  let pedido;
+  const fetchFn = async (url, op) => { pedido = { url, op }; return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) }; };
+  const voces = { 'es-CO': { hombre: 'paisaH', mujer: 'paisaM' }, 'en-US': { hombre: 'nyH', mujer: 'nyM' } };
+  const s = crearSintetizadorElevenLabs({ apiKey: 'k', voces, generoDefault: 'hombre', fetchFn });
+  assert.equal(s.disponible(), true);
+  await s.sintetizar({ texto: 'estoy cansada', idioma: 'es', pais: 'Colombia', tono: 'Neutral', genero: 'mujer' });
+  assert.match(pedido.url, /\/text-to-speech\/paisaM\?/);
+  await s.sintetizar({ texto: 'estoy cansado', idioma: 'es', pais: 'Colombia', tono: 'Neutral', genero: 'hombre' });
+  assert.match(pedido.url, /\/text-to-speech\/paisaH\?/);
+  await s.sintetizar({ texto: 'hola', idioma: 'es', pais: 'Colombia', tono: 'Neutral' }); // sin genero -> default hombre
+  assert.match(pedido.url, /\/text-to-speech\/paisaH\?/);
 });

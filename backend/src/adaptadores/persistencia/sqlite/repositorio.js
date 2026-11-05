@@ -139,7 +139,7 @@ module.exports = function crearRepoSqlite(db) {
   const mensajes = {
     async deConversacion(convId) {
       return todo(`
-        SELECT mo.id, mo.contenido, mo.remitente, mo.fecha_creacion, ca.nombre AS canal, en.nombre AS tono,
+        SELECT mo.id, mo.contenido, mo.remitente, mo.genero, mo.fecha_creacion, ca.nombre AS canal, en.nombre AS tono,
                md.id AS destino_id, md.contenido_traducido, md.nota_cultural, md.aproximada, md.motor, md.estado_entrega,
                (SELECT 1 FROM reporte rp WHERE rp.mensaje_destino_id = md.id LIMIT 1) AS reportado
         FROM mensaje_original mo
@@ -162,7 +162,7 @@ module.exports = function crearRepoSqlite(db) {
     },
     async crear({ origen, destino }) {
       transaccion(db, () => {
-        corre('INSERT INTO mensaje_original (id, lenguaje_conversacion_id, canal_id, entonacion_id, contenido, remitente, fecha_creacion) VALUES (?,?,?,?,?,?,?)', origen.id, origen.lpcId, origen.canalId, origen.entonacionId, origen.contenido, origen.remitente, origen.fecha);
+        corre('INSERT INTO mensaje_original (id, lenguaje_conversacion_id, canal_id, entonacion_id, contenido, remitente, genero, fecha_creacion) VALUES (?,?,?,?,?,?,?,?)', origen.id, origen.lpcId, origen.canalId, origen.entonacionId, origen.contenido, origen.remitente, origen.genero ?? null, origen.fecha);
         corre('INSERT INTO mensaje_destino (id, mensaje_original_id, lenguaje_conversacion_id, contenido_traducido, nota_cultural, aproximada, motor, estado_entrega, fecha_creacion) VALUES (?,?,?,?,?,?,?,?,?)', destino.id, origen.id, destino.lpcId, destino.contenido_traducido, destino.nota ?? null, destino.aproximada ? 1 : 0, destino.motor, destino.estado_entrega || 'Entregado', destino.fecha);
       });
     },

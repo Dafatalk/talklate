@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS mensaje_original (
   entonacion_id TEXT NOT NULL REFERENCES entonacion(id),
   contenido TEXT NOT NULL,
   remitente TEXT NOT NULL DEFAULT 'usuario' CHECK (remitente IN ('usuario','interlocutor')),
+  genero TEXT CHECK (genero IN ('hombre','mujer') OR genero IS NULL),
   fecha_creacion TEXT NOT NULL
 );
 

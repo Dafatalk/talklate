@@ -28,7 +28,7 @@ function crearServicioVoz({ sintetizadores = [], log, vidaMs = 5 * 60 * 1000, ma
       if (texto.length > 1000) throw new ErrorNegocio(400, 'El texto es muy largo para decirlo en voz (maximo 1000 caracteres).');
       const idioma = String(datos.idioma || '').toLowerCase().slice(0, 5);
       if (!/^[a-z]{2}$/.test(idioma)) throw new ErrorNegocio(400, 'Indica el idioma con su codigo de dos letras (ej. es, en).');
-      const entrada = { texto, idioma, pais: datos.pais || null, tono: TONOS.includes(datos.tono) ? datos.tono : 'Neutral', ritmo: Number(datos.ritmo) || 1 };
+      const entrada = { texto, idioma, pais: datos.pais || null, tono: TONOS.includes(datos.tono) ? datos.tono : 'Neutral', ritmo: Number(datos.ritmo) || 1, genero: ['hombre', 'mujer'].includes(datos.genero) ? datos.genero : null };
       for (const s of sintetizadores.filter((x) => x.disponible())) {
         try {
           const r = await s.sintetizar(entrada);

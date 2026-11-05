@@ -393,7 +393,7 @@ const mensajes = {
   async deConversacion(convId) {
     const { cById, eById } = await mapas();
     const c = lit(rid('conversation', convId));
-    const originales = await S.filas(`SELECT content AS contenido, sender AS remitente, created_at AS fecha_creacion, channel AS canal, tone AS entonacion, id FROM original_message WHERE conversation_language.conversation = ${c} ORDER BY created_at;`);
+    const originales = await S.filas(`SELECT content AS contenido, sender AS remitente, created_at AS fecha_creacion, channel AS canal, tone AS entonacion, gender AS genero, id FROM original_message WHERE conversation_language.conversation = ${c} ORDER BY created_at;`);
     const destinos = await S.filas(`SELECT translated_content AS contenido_traducido, cultural_note AS nota_cultural, approximate AS aproximada, engine AS motor, delivery_status AS estado_entrega, original_message, id FROM translated_message WHERE conversation_language.conversation = ${c};`);
     const reportados = new Set((await S.filas(`SELECT translated_message FROM report WHERE translated_message.conversation_language.conversation = ${c};`)).map((x) => idPlano(x.translated_message)));
     const dPorOriginal = {};
@@ -403,7 +403,7 @@ const mensajes = {
       const d = dPorOriginal[moId];
       return {
         id: moId, contenido: mo.contenido, remitente: mo.remitente, fecha_creacion: mo.fecha_creacion,
-        canal: cById[idPlano(mo.canal)], tono: eById[idPlano(mo.entonacion)],
+        canal: cById[idPlano(mo.canal)], tono: eById[idPlano(mo.entonacion)], genero: mo.genero ?? null,
         destino_id: d ? idPlano(d.id) : null,
         contenido_traducido: d ? d.contenido_traducido : null,
         nota_cultural: d ? (d.nota_cultural ?? null) : null,
@@ -427,7 +427,7 @@ const mensajes = {
   async crear({ origen, destino }) {
     await S.consulta([
       'BEGIN TRANSACTION;',
-      `CREATE ${lit(rid('original_message', origen.id))} SET conversation_language = ${lit(rid('conversation_language', origen.lpcId))}, channel = ${lit(rid('channel', origen.canalId))}, tone = ${lit(rid('tone', origen.entonacionId))}, content = ${lit(origen.contenido)}, sender = ${lit(origen.remitente)}, created_at = ${lit(origen.fecha)};`,
+      `CREATE ${lit(rid('original_message', origen.id))} SET conversation_language = ${lit(rid('conversation_language', origen.lpcId))}, channel = ${lit(rid('channel', origen.canalId))}, tone = ${lit(rid('tone', origen.entonacionId))}, content = ${lit(origen.contenido)}, sender = ${lit(origen.remitente)}, gender = ${lit(origen.genero ?? null)}, created_at = ${lit(origen.fecha)};`,
       `CREATE ${lit(rid('translated_message', destino.id))} SET original_message = ${lit(rid('original_message', origen.id))}, conversation_language = ${lit(rid('conversation_language', destino.lpcId))}, translated_content = ${lit(destino.contenido_traducido)}, cultural_note = ${lit(destino.nota ?? null)}, approximate = ${lit(!!destino.aproximada)}, engine = ${lit(destino.motor)}, delivery_status = ${lit(destino.estado_entrega || 'Entregado')}, created_at = ${lit(destino.fecha)};`,
       'COMMIT TRANSACTION;',
     ].join('\n'));

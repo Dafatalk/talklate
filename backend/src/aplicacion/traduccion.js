@@ -37,6 +37,7 @@ function crearServicioTraduccion({ motores, log, esperaTrasFalloMs = 60 * 1000, 
           nota: r.nota || null,
           aproximada: !!r.aproximada,
           tono: r.tono || tonoLocal,
+          genero: r.genero || null, // genero de quien escribe (lo infiere el modelo); elige la voz en ElevenLabs
           regionOrigen: r.regionOrigen || conRegion.regionOrigen,
           motor: motor.etiqueta(),
         };

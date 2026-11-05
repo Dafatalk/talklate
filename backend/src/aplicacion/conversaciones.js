@@ -21,7 +21,7 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor,
 
   function formatoMensaje(f) {
     return {
-      id: f.id, remitente: f.remitente, canal: f.canal, tono: f.tono, contenido: descifrar(f.contenido), fecha: f.fecha_creacion,
+      id: f.id, remitente: f.remitente, canal: f.canal, tono: f.tono, genero: f.genero ?? null, contenido: descifrar(f.contenido), fecha: f.fecha_creacion,
       traduccion: f.destino_id ? { id: f.destino_id, contenido: descifrar(f.contenido_traducido), nota_cultural: f.nota_cultural, aproximada: !!f.aproximada, motor: f.motor, estado_entrega: f.estado_entrega, reportado: !!f.reportado } : null,
     };
   }
@@ -167,17 +167,17 @@ function crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor,
     const contenidoCifrado = cifrar(contenido);
     const traduccionCifrada = cifrar(t.traduccion);
     await repo.mensajes.crear({
-      origen: { id: origenId, lpcId: escribeEn.id, canalId: canal.id, entonacionId: tono.id, contenido: contenidoCifrado, remitente, fecha: ahora },
+      origen: { id: origenId, lpcId: escribeEn.id, canalId: canal.id, entonacionId: tono.id, contenido: contenidoCifrado, remitente, genero: t.genero || null, fecha: ahora },
       destino: { id: destinoId, lpcId: traduceA.id, contenido_traducido: traduccionCifrada, nota: t.nota, aproximada: t.aproximada, motor: t.motor, estado_entrega: 'Entregado', fecha: ahora },
     });
 
     return {
       conversacionId: c.id,
       mensaje: formatoMensaje({
-        id: origenId, contenido: contenidoCifrado, remitente, fecha_creacion: ahora, canal: canalNombre, tono: tono.nombre,
+        id: origenId, contenido: contenidoCifrado, remitente, fecha_creacion: ahora, canal: canalNombre, tono: tono.nombre, genero: t.genero || null,
         destino_id: destinoId, contenido_traducido: traduccionCifrada, nota_cultural: t.nota, aproximada: t.aproximada ? 1 : 0, motor: t.motor, estado_entrega: 'Entregado', reportado: 0,
       }),
-      entrega: { canal: canalNombre, reproducir_audio: canalNombre === 'Voz', idioma_codigo: traduceA.idioma_codigo, region_origen_detectada: t.regionOrigen, ritmo_voz: prosodia ? prosodia.ritmoSalida : 1 },
+      entrega: { canal: canalNombre, reproducir_audio: canalNombre === 'Voz', idioma_codigo: traduceA.idioma_codigo, region_origen_detectada: t.regionOrigen, ritmo_voz: prosodia ? prosodia.ritmoSalida : 1, genero: t.genero || null },
       configuracion: configuracion(lpcs),
       aviso,
     };
