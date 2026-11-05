@@ -20,6 +20,12 @@
 
 ---
 
+## 2026-11-05 - Julian (Claude / Opus)
+
+- **Avances:** Script `run-talklate.sh` en la raiz: levanta backend (`:3000`) y frontend Expo en LAN (`:8081`) con un comando. Instala dependencias si faltan (frontend con `--legacy-peer-deps`), muestra el estado de Ollama/Whisper/VoiceStudio y, con `--full`, intenta levantar Ollama y Whisper. `Ctrl+C` detiene back y front; los servicios de IA quedan aparte. Probado: `/health` OK con SurrealDB y Expo arriba en ~10 s (sin `--full`).
+- **Decidi:** Un `.sh` sin dependencias nuevas en vez de un `package.json` raiz con `concurrently` (cero dependencias, sin `node_modules` en la raiz).
+- **Handoff / pendiente:** Para traduccion real con Qwen, correr con `--full` o dejar `ollama serve` aparte. Issue #41; PR a `develop`.
+
 ## 2026-10-23 (2) - Dafatalk (Claude / Opus)
 
 - **Decidi (equipo):** **se mantiene SurrealDB; no se migra a PostgreSQL.** Justificacion tecnica (no solo "lo recomendo el profesor"): enlaces nativos para la cadena conversacion -> mensajes -> traducciones -> reportes, reglas del dominio en el esquema (UNIQUE, ASSERT), multimodelo para lo que viene (reportes flexibles, busqueda vectorial de modismos) y gestionada en la nube con usuarios de permisos limitados. Julian: confirma que el usuario de base del backend solo tenga permisos sobre `talklate/app`. El riesgo (tecnologia mas joven) se controla con la arquitectura hexagonal. La frase para la sustentacion esta en ADR-012.
