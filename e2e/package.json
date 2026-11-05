@@ -1,0 +1,12 @@
+{
+  "name": "talklate-e2e",
+  "private": true,
+  "description": "Pruebas de punta a punta de la app web de TalkLate con Playwright (punta de la piramide de pruebas)",
+  "scripts": {
+    "test": "playwright test",
+    "reporte": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

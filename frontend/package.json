@@ -71,5 +71,14 @@
     "root": true
   },
   "main": "expo-router/entry",
-  "private": true
+  "private": true,
+  "overrides": {
+    "@xmldom/xmldom": "^0.8.15",
+    "browserslist": "^4.28.7",
+    "js-yaml": "^4.3.2",
+    "node-forge": "^1.4.1",
+    "picomatch@^2": "^2.3.2",
+    "shell-quote": "^1.9.0",
+    "ws@^7": "^7.5.11"
+  }
 }

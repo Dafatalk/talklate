@@ -1,16 +1,16 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 process.env.TALKLATE_LOGS = 'silencio';
-const { traducirLocal } = require('../src/adaptadores/traduccion/reglas');
-const { crearMotorClaude } = require('../src/adaptadores/traduccion/claude');
-const { crearMotorQwen } = require('../src/adaptadores/traduccion/qwen');
-const { crearServicioTraduccion } = require('../src/aplicacion/traduccion');
-const { crearMotores, crearTraduccion } = require('../src/composicion');
-const { detectarIdioma, detectarTono, detectarRegionOrigen } = require('../src/dominio/analisis');
-const V = require('../src/dominio/validaciones');
-const log = require('../src/compartido/log');
-const { analizarProsodia, combinarTono } = require('../src/dominio/prosodia');
-const { crearTranscriptorWhisper } = require('../src/adaptadores/transcripcion/whisper');
+const { traducirLocal } = require('../../src/adaptadores/traduccion/reglas');
+const { crearMotorClaude } = require('../../src/adaptadores/traduccion/claude');
+const { crearMotorQwen } = require('../../src/adaptadores/traduccion/qwen');
+const { crearServicioTraduccion } = require('../../src/aplicacion/traduccion');
+const { crearMotores, crearTraduccion } = require('../../src/composicion');
+const { detectarIdioma, detectarTono, detectarRegionOrigen } = require('../../src/dominio/analisis');
+const V = require('../../src/dominio/validaciones');
+const log = require('../../src/compartido/log');
+const { analizarProsodia, combinarTono } = require('../../src/dominio/prosodia');
+const { crearTranscriptorWhisper } = require('../../src/adaptadores/transcripcion/whisper');
 
 test('el motor local adapta modismos con variantes por pais destino', () => {
   assert.equal(traducirLocal('Hay que ponerse las pilas con el trabajo', 'es', 'en', 'US').traduccion, 'We need to get cracking on the work');
@@ -183,9 +183,9 @@ test('adaptador Whisper: envia el audio como multipart (API compatible con OpenA
 });
 
 test('voz natural: Azure pone la emocion en SSML y OpenAI la pide como instruccion', async () => {
-  const { crearSintetizadorAzure, ssml } = require('../src/adaptadores/sintesis/azure');
-  const { crearSintetizadorOpenAI } = require('../src/adaptadores/sintesis/openai');
-  const { crearServicioVoz } = require('../src/aplicacion/voz');
+  const { crearSintetizadorAzure, ssml } = require('../../src/adaptadores/sintesis/azure');
+  const { crearSintetizadorOpenAI } = require('../../src/adaptadores/sintesis/openai');
+  const { crearServicioVoz } = require('../../src/aplicacion/voz');
   const enojo = ssml({ texto: 'No <puedo> creerlo', idioma: 'en', pais: 'Estados Unidos', tono: 'Enojado', ritmo: 1 });
   assert.equal(enojo.voz, 'en-US-JennyNeural');
   assert.match(enojo.xml, /style="angry"/);
@@ -219,7 +219,7 @@ test('voz natural: Azure pone la emocion en SSML y OpenAI la pide como instrucci
 });
 
 test('voz natural: VoiceStudio manda el vector de emocion a IndexTTS 2 y la instruccion a otros motores', async () => {
-  const { crearSintetizadorVoiceStudio } = require('../src/adaptadores/sintesis/voicestudio');
+  const { crearSintetizadorVoiceStudio } = require('../../src/adaptadores/sintesis/voicestudio');
   let pedido;
   const fetchFn = async (url, op) => { pedido = { url, op }; return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) }; };
   const idx = crearSintetizadorVoiceStudio({ url: 'http://127.0.0.1:3900/', perfil: 'demo', apiKey: 'k', fetchFn });

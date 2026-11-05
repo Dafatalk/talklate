@@ -1,0 +1,50 @@
+name: Seguridad (Trivy)
+
+# Escaneo de seguridad del repositorio con Trivy: dependencias vulnerables (npm), secretos y
+# configuraciones inseguras. Corre en cada PR, en cada push a develop/main y cada lunes, porque
+# aparecen CVE nuevos aunque el codigo no cambie.
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  schedule:
+    - cron: '17 11 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Version fija y verificada por checksum. No se usa aquasecurity/trivy-action ni setup-trivy:
+  # en marzo de 2026 sus etiquetas fueron comprometidas (ataque a la cadena de suministro).
+  TRIVY_VERSION: 0.69.3
+  TRIVY_SHA256: 1816b632dfe529869c740c0913e36bd1629cb7688bd5634f4a858c1d57c88b75
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Trivy (binario oficial con checksum)
+        run: |
+          curl -sSfL -o /tmp/trivy.tgz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "${TRIVY_SHA256}  /tmp/trivy.tgz" | sha256sum -c -
+          tar xzf /tmp/trivy.tgz -C /tmp trivy
+          /tmp/trivy --version
+      - name: Base de datos de vulnerabilidades en cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: trivy-db-
+      - name: Reporte completo (todas las severidades)
+        run: /tmp/trivy fs --config trivy.yaml --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --exit-code 0 --format table --output trivy-reporte.txt .
+      - name: Escaneo que bloquea (HIGH y CRITICAL)
+        run: /tmp/trivy fs --config trivy.yaml .
+      - name: Guardar el reporte
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reporte
+          path: trivy-reporte.txt

@@ -1,0 +1,9 @@
+# Excepciones de Trivy aceptadas por el equipo. Cada una tiene la razon y una fecha de vencimiento
+# (exp:): al vencer, Trivy vuelve a fallar y la excepcion se revisa de nuevo.
+
+# decode-uri-component 0.2.2 (frontend, dependencia indirecta de expo-router -> query-string@7).
+# CVE-2026-118664: denegacion de servicio con texto mal codificado en la URL. El unico parche (0.5.1) es
+# un modulo ESM que query-string@7 no puede cargar con require, asi que no se puede forzar con overrides.
+# Impacto: solo afecta al navegador o al celular de quien abre un enlace malicioso a la propia app; no
+# hay servidor expuesto. Se retira cuando expo-router actualice query-string.
+CVE-2026-118664 exp:2027-02-28

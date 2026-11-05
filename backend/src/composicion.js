@@ -2,7 +2,9 @@
 // los casos de uso y los adaptadores concretos: lee la configuracion (variables de entorno), elige
 // cada adaptador, verifica que cumpla su puerto y entrega los casos de uso armados al adaptador HTTP.
 const log = require('./compartido/log');
-const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR } = require('./puertos');
+const { asegurarPuerto, asegurarRepositorio, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, HASHEADOR, FIRMADOR_TOKENS } = require('./puertos');
+const { crearHasheadorBcrypt } = require('./adaptadores/credenciales/bcrypt');
+const { crearFirmadorJwt } = require('./adaptadores/credenciales/jwt');
 const { crearMotorQwen } = require('./adaptadores/traduccion/qwen');
 const { crearMotorClaude } = require('./adaptadores/traduccion/claude');
 const { crearMotorReglas } = require('./adaptadores/traduccion/reglas');
@@ -72,9 +74,11 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
     url: entorno.TRANSCRIPCION_URL, modelo: entorno.TRANSCRIPCION_MODELO || undefined, apiKey: entorno.TRANSCRIPCION_API_KEY,
     timeoutMs: Number(entorno.TRANSCRIPCION_TIMEOUT_MS) || undefined, fetchFn: adaptadores.fetchFn,
   }), TRANSCRIPTOR);
+  const hasheador = asegurarPuerto('hasheador', adaptadores.hasheador || crearHasheadorBcrypt(), HASHEADOR);
+  const firmador = asegurarPuerto('firmador de tokens', adaptadores.firmador || crearFirmadorJwt({ secreto: secretoJwt(entorno) }), FIRMADOR_TOKENS);
   const sesiones = crearServicioSesiones({
     repo,
-    secreto: secretoJwt(entorno),
+    firmador,
     duracionAccesoSeg: Number(entorno.DURACION_ACCESO_SEG) || undefined,
     duracionRefrescoMs: (Number(entorno.DURACION_REFRESCO_DIAS) || 30) * 24 * 60 * 60 * 1000,
   });
@@ -84,7 +88,7 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
     transcriptor,
     voz,
     sesiones,
-    cuentas: crearServicioCuentas({ repo, sesiones, notificador, log }),
+    cuentas: crearServicioCuentas({ repo, sesiones, notificador, hasheador, log }),
     conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, log }),
     catalogo: crearServicioCatalogo({ repo, log }),
     reportes: crearServicioReportes({ repo, cifrador, log }),
