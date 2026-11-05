@@ -6,11 +6,11 @@
   "status": "pass",
   "visualReview": "not-requested",
   "provenance": "current",
-  "deliveryReceiptId": "bbc9a379-712c-411e-a4af-f939a1bd9733",
+  "deliveryReceiptId": "0d963998-ee91-4d40-978f-c98b4267fc9c",
   "artifact": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "dff44dc3d7357fcd1bc4a95df95f4a72325606faab11566da3462de9f60bee88",
-    "bytes": 875121
+    "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
+    "bytes": 875014
   },
   "state": {
     "detail": "read",
@@ -18,7 +18,7 @@
   },
   "chrome": {
     "status": "available",
-    "executable": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+    "executable": "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"
   },
   "diagnostics": [],
   "containment": {
@@ -32,7 +32,7 @@
         "innerWidth": 1440,
         "innerHeight": 900,
         "scrollWidth": 1440,
-        "scrollHeight": 1007,
+        "scrollHeight": 970,
         "overflowX": false,
         "overflowY": true,
         "verticalScrollAccepted": true,
@@ -47,9 +47,9 @@
           "bodyPaddingPx": 12,
           "headerPx": 99,
           "diagramChromePx": 78,
-          "svgPx": 817,
+          "svgPx": 781,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.1786666666666665,
@@ -84,7 +84,7 @@
         "innerWidth": 1600,
         "innerHeight": 1000,
         "scrollWidth": 1600,
-        "scrollHeight": 1110,
+        "scrollHeight": 1071,
         "overflowX": false,
         "overflowY": true,
         "verticalScrollAccepted": true,
@@ -99,9 +99,9 @@
           "bodyPaddingPx": 64,
           "headerPx": 107,
           "diagramChromePx": 84,
-          "svgPx": 854,
+          "svgPx": 816,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.504,
@@ -136,13 +136,13 @@
         "innerWidth": 1920,
         "innerHeight": 1080,
         "scrollWidth": 1920,
-        "scrollHeight": 1110,
+        "scrollHeight": 1080,
         "overflowX": false,
-        "overflowY": true,
-        "verticalScrollAccepted": true,
-        "overflowDisposition": "readable-vertical-scroll",
+        "overflowY": false,
+        "verticalScrollAccepted": false,
+        "overflowDisposition": "contained",
         "readerLayout": "adaptive",
-        "readerOverflow": "authored",
+        "readerOverflow": null,
         "readerFit": "intrinsic-height",
         "ok": true,
         "readerWidth": 1437,
@@ -151,9 +151,9 @@
           "bodyPaddingPx": 64,
           "headerPx": 107,
           "diagramChromePx": 84,
-          "svgPx": 854,
+          "svgPx": 816,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.504,
@@ -197,15 +197,15 @@
         "readerOverflow": null,
         "readerFit": "intrinsic-height",
         "ok": true,
-        "readerWidth": 1791,
-        "diagramWidth": 1741,
+        "readerWidth": 1871,
+        "diagramWidth": 1821,
         "pageComposition": {
           "bodyPaddingPx": 64,
           "headerPx": 94,
           "diagramChromePx": 94,
           "svgPx": 1056,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 8,
@@ -293,7 +293,7 @@
         "innerWidth": 1440,
         "innerHeight": 900,
         "scrollWidth": 1440,
-        "scrollHeight": 1007,
+        "scrollHeight": 970,
         "overflowX": false,
         "overflowY": true,
         "verticalScrollAccepted": true,
@@ -308,9 +308,9 @@
           "bodyPaddingPx": 12,
           "headerPx": 99,
           "diagramChromePx": 78,
-          "svgPx": 817,
+          "svgPx": 781,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.1786666666666665,
@@ -345,7 +345,7 @@
         "innerWidth": 1600,
         "innerHeight": 1000,
         "scrollWidth": 1600,
-        "scrollHeight": 1110,
+        "scrollHeight": 1071,
         "overflowX": false,
         "overflowY": true,
         "verticalScrollAccepted": true,
@@ -360,9 +360,9 @@
           "bodyPaddingPx": 64,
           "headerPx": 107,
           "diagramChromePx": 84,
-          "svgPx": 854,
+          "svgPx": 816,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.504,
@@ -397,13 +397,13 @@
         "innerWidth": 1920,
         "innerHeight": 1080,
         "scrollWidth": 1920,
-        "scrollHeight": 1110,
+        "scrollHeight": 1080,
         "overflowX": false,
-        "overflowY": true,
-        "verticalScrollAccepted": true,
-        "overflowDisposition": "readable-vertical-scroll",
+        "overflowY": false,
+        "verticalScrollAccepted": false,
+        "overflowDisposition": "contained",
         "readerLayout": "adaptive",
-        "readerOverflow": "authored",
+        "readerOverflow": null,
         "readerFit": "intrinsic-height",
         "ok": true,
         "readerWidth": 1437,
@@ -412,9 +412,9 @@
           "bodyPaddingPx": 64,
           "headerPx": 107,
           "diagramChromePx": 84,
-          "svgPx": 854,
+          "svgPx": 816,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.504,
@@ -458,15 +458,15 @@
         "readerOverflow": null,
         "readerFit": "intrinsic-height",
         "ok": true,
-        "readerWidth": 1791,
-        "diagramWidth": 1741,
+        "readerWidth": 1871,
+        "diagramWidth": 1821,
         "pageComposition": {
           "bodyPaddingPx": 64,
           "headerPx": 94,
           "diagramChromePx": 94,
           "svgPx": 1056,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 8,
@@ -506,7 +506,7 @@
         "innerWidth": 1440,
         "innerHeight": 900,
         "scrollWidth": 1440,
-        "scrollHeight": 1007,
+        "scrollHeight": 970,
         "overflowX": false,
         "overflowY": true,
         "verticalScrollAccepted": true,
@@ -521,9 +521,9 @@
           "bodyPaddingPx": 12,
           "headerPx": 99,
           "diagramChromePx": 78,
-          "svgPx": 817,
+          "svgPx": 781,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.1786666666666665,
@@ -558,7 +558,7 @@
         "innerWidth": 1600,
         "innerHeight": 1000,
         "scrollWidth": 1600,
-        "scrollHeight": 1110,
+        "scrollHeight": 1071,
         "overflowX": false,
         "overflowY": true,
         "verticalScrollAccepted": true,
@@ -573,9 +573,9 @@
           "bodyPaddingPx": 64,
           "headerPx": 107,
           "diagramChromePx": 84,
-          "svgPx": 854,
+          "svgPx": 816,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.504,
@@ -610,13 +610,13 @@
         "innerWidth": 1920,
         "innerHeight": 1080,
         "scrollWidth": 1920,
-        "scrollHeight": 1110,
+        "scrollHeight": 1080,
         "overflowX": false,
-        "overflowY": true,
-        "verticalScrollAccepted": true,
-        "overflowDisposition": "readable-vertical-scroll",
+        "overflowY": false,
+        "verticalScrollAccepted": false,
+        "overflowDisposition": "contained",
         "readerLayout": "adaptive",
-        "readerOverflow": "authored",
+        "readerOverflow": null,
         "readerFit": "intrinsic-height",
         "ok": true,
         "readerWidth": 1437,
@@ -625,9 +625,9 @@
           "bodyPaddingPx": 64,
           "headerPx": 107,
           "diagramChromePx": 84,
-          "svgPx": 854,
+          "svgPx": 816,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 7.504,
@@ -671,15 +671,15 @@
         "readerOverflow": null,
         "readerFit": "intrinsic-height",
         "ok": true,
-        "readerWidth": 1791,
-        "diagramWidth": 1741,
+        "readerWidth": 1871,
+        "diagramWidth": 1821,
         "pageComposition": {
           "bodyPaddingPx": 64,
           "headerPx": 94,
           "diagramChromePx": 94,
           "svgPx": 1056,
           "cardsPx": 0,
-          "viewBoxHeight": 910
+          "viewBoxHeight": 870
         },
         "viewBoxWidth": 1500,
         "minimumProjectedNodeTextPx": 8,
@@ -715,7 +715,7 @@
     "contactSheet": null
   },
   "sidecars": {
-    "directory": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4",
+    "directory": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5",
     "receipt": "talklate-hexagonal.browser-check.json",
     "files": []
   }

@@ -3,7 +3,7 @@
 **Proyecto:** TalkLate, aplicacion movil de traduccion en tiempo real con conciencia de matices culturales y emocionales.
 **Equipo:** Julian David Diaz Medina y Diego Alejandro Franco Atehortua.
 **Director del trabajo de grado:** Wider Farid Sanchez Garzon.
-**Version de la entrega:** 1.0 (29/10/2026).
+**Version de la entrega:** 1.1 (05/11/2026): se suman la piramide de pruebas (documento 18) y la seguridad con Trivy (documento 19).
 
 Esta carpeta reune los documentos de analisis, requisitos y arquitectura de TalkLate en Word y PDF, numerados en orden de lectura. Todos estan alineados con el codigo de la rama `develop`.
 

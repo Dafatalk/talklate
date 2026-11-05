@@ -5,16 +5,16 @@
   "status": "pass",
   "type": "architecture",
   "quality": "showcase",
-  "startedAt": "2026-10-29T22:46:21.012Z",
+  "startedAt": "2026-11-05T15:56:20.041Z",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-    "sha256": "2a8edc5454277f5258033f5e3d21b816fd75eb2581ed4ae01cabd8dc22107e25",
-    "bytes": 8949
+    "sha256": "4554f98bc18ec4675b9b227ef0cac3cabff41a8649e36a8e663246ea64105f93",
+    "bytes": 13097
   },
   "artifact": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "dff44dc3d7357fcd1bc4a95df95f4a72325606faab11566da3462de9f60bee88",
-    "bytes": 875121
+    "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
+    "bytes": 875014
   },
   "stages": {
     "validate": {
@@ -40,8 +40,8 @@
         "ok": true,
         "command": "validate",
         "specification": {
-          "sha256": "2a8edc5454277f5258033f5e3d21b816fd75eb2581ed4ae01cabd8dc22107e25",
-          "bytes": 8949
+          "sha256": "4554f98bc18ec4675b9b227ef0cac3cabff41a8649e36a8e663246ea64105f93",
+          "bytes": 13097
         },
         "validation": {
           "checksPassed": 9,
@@ -56,7 +56,7 @@
     "deliver": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 575,
+      "durationMs": 616,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -72,19 +72,19 @@
       ],
       "receipt": {
         "schemaVersion": 1,
-        "receiptId": "bbc9a379-712c-411e-a4af-f939a1bd9733",
+        "receiptId": "0d963998-ee91-4d40-978f-c98b4267fc9c",
         "ok": true,
         "command": "deliver",
         "type": "architecture",
         "input": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
         "output": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
         "specification": {
-          "sha256": "2a8edc5454277f5258033f5e3d21b816fd75eb2581ed4ae01cabd8dc22107e25",
-          "bytes": 8949
+          "sha256": "4554f98bc18ec4675b9b227ef0cac3cabff41a8649e36a8e663246ea64105f93",
+          "bytes": 13097
         },
         "artifact": {
-          "sha256": "dff44dc3d7357fcd1bc4a95df95f4a72325606faab11566da3462de9f60bee88",
-          "bytes": 875121
+          "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
+          "bytes": 875014
         },
         "validation": {
           "checksPassed": 9,
@@ -97,8 +97,8 @@
         "evidence": {
           "verified": true,
           "repository": "https://github.com/Dafatalk/talklate",
-          "revision": "135d4d489b0e02cfe8dfa50177d24e91f7aa7e6c",
-          "references": 24
+          "revision": "efd0498a5296b32c8e3c67cbec50ead1d636b8b6",
+          "references": 25
         },
         "update": {
           "status": "unavailable",
@@ -116,7 +116,7 @@
     "check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 218,
+      "durationMs": 240,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -128,8 +128,8 @@
         "ok": true,
         "file": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
         "artifact": {
-          "sha256": "dff44dc3d7357fcd1bc4a95df95f4a72325606faab11566da3462de9f60bee88",
-          "bytes": 875121
+          "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
+          "bytes": 875014
         },
         "checks": [
           {
@@ -204,8 +204,8 @@
             "routesOverSuggestedBends": 1,
             "maxStretch": 1,
             "routesOverSuggestedStretch": 0,
-            "minSegmentPx": 23,
-            "minInteriorSegmentPx": 23,
+            "minSegmentPx": 24,
+            "minInteriorSegmentPx": 37,
             "shortSegmentCount": 0,
             "shortEndpointSegmentCount": 0,
             "shortInteriorSegmentCount": 0,
@@ -237,10 +237,10 @@
           "leadingSpace": {
             "measured": true,
             "emptyTopPx": 80,
-            "emptyTopRatio": 0.088,
+            "emptyTopRatio": 0.092,
             "occupiedTop": 80,
             "viewBoxTop": 0,
-            "canvasHeight": 910,
+            "canvasHeight": 870,
             "typicalNodeHeight": 62,
             "reviewSuggested": false
           },
@@ -265,18 +265,18 @@
             },
             "minimumSourceTextPx": 8,
             "minimumProjectedTextPx": 7.1786666666666665,
-            "semanticTextCount": 54
+            "semanticTextCount": 51
           },
           "issues": []
         },
         "provenance": "current",
-        "deliveryReceiptId": "bbc9a379-712c-411e-a4af-f939a1bd9733"
+        "deliveryReceiptId": "0d963998-ee91-4d40-978f-c98b4267fc9c"
       }
     },
     "browser-check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 2952,
+      "durationMs": 3620,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -285,7 +285,7 @@
         "--json",
         "--require-provenance",
         "--out-dir",
-        "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4"
+        "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5"
       ],
       "execution": "in-process",
       "receipt": {
@@ -296,11 +296,11 @@
         "status": "pass",
         "visualReview": "not-requested",
         "provenance": "current",
-        "deliveryReceiptId": "bbc9a379-712c-411e-a4af-f939a1bd9733",
+        "deliveryReceiptId": "0d963998-ee91-4d40-978f-c98b4267fc9c",
         "artifact": {
           "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-          "sha256": "dff44dc3d7357fcd1bc4a95df95f4a72325606faab11566da3462de9f60bee88",
-          "bytes": 875121
+          "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
+          "bytes": 875014
         },
         "state": {
           "detail": "read",
@@ -308,7 +308,7 @@
         },
         "chrome": {
           "status": "available",
-          "executable": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+          "executable": "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"
         },
         "diagnostics": [],
         "containment": {
@@ -322,7 +322,7 @@
               "innerWidth": 1440,
               "innerHeight": 900,
               "scrollWidth": 1440,
-              "scrollHeight": 1007,
+              "scrollHeight": 970,
               "overflowX": false,
               "overflowY": true,
               "verticalScrollAccepted": true,
@@ -337,9 +337,9 @@
                 "bodyPaddingPx": 12,
                 "headerPx": 99,
                 "diagramChromePx": 78,
-                "svgPx": 817,
+                "svgPx": 781,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.1786666666666665,
@@ -374,7 +374,7 @@
               "innerWidth": 1600,
               "innerHeight": 1000,
               "scrollWidth": 1600,
-              "scrollHeight": 1110,
+              "scrollHeight": 1071,
               "overflowX": false,
               "overflowY": true,
               "verticalScrollAccepted": true,
@@ -389,9 +389,9 @@
                 "bodyPaddingPx": 64,
                 "headerPx": 107,
                 "diagramChromePx": 84,
-                "svgPx": 854,
+                "svgPx": 816,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.504,
@@ -426,13 +426,13 @@
               "innerWidth": 1920,
               "innerHeight": 1080,
               "scrollWidth": 1920,
-              "scrollHeight": 1110,
+              "scrollHeight": 1080,
               "overflowX": false,
-              "overflowY": true,
-              "verticalScrollAccepted": true,
-              "overflowDisposition": "readable-vertical-scroll",
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
               "readerLayout": "adaptive",
-              "readerOverflow": "authored",
+              "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
               "readerWidth": 1437,
@@ -441,9 +441,9 @@
                 "bodyPaddingPx": 64,
                 "headerPx": 107,
                 "diagramChromePx": 84,
-                "svgPx": 854,
+                "svgPx": 816,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.504,
@@ -487,15 +487,15 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1791,
-              "diagramWidth": 1741,
+              "readerWidth": 1871,
+              "diagramWidth": 1821,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 94,
                 "diagramChromePx": 94,
                 "svgPx": 1056,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 8,
@@ -583,7 +583,7 @@
               "innerWidth": 1440,
               "innerHeight": 900,
               "scrollWidth": 1440,
-              "scrollHeight": 1007,
+              "scrollHeight": 970,
               "overflowX": false,
               "overflowY": true,
               "verticalScrollAccepted": true,
@@ -598,9 +598,9 @@
                 "bodyPaddingPx": 12,
                 "headerPx": 99,
                 "diagramChromePx": 78,
-                "svgPx": 817,
+                "svgPx": 781,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.1786666666666665,
@@ -635,7 +635,7 @@
               "innerWidth": 1600,
               "innerHeight": 1000,
               "scrollWidth": 1600,
-              "scrollHeight": 1110,
+              "scrollHeight": 1071,
               "overflowX": false,
               "overflowY": true,
               "verticalScrollAccepted": true,
@@ -650,9 +650,9 @@
                 "bodyPaddingPx": 64,
                 "headerPx": 107,
                 "diagramChromePx": 84,
-                "svgPx": 854,
+                "svgPx": 816,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.504,
@@ -687,13 +687,13 @@
               "innerWidth": 1920,
               "innerHeight": 1080,
               "scrollWidth": 1920,
-              "scrollHeight": 1110,
+              "scrollHeight": 1080,
               "overflowX": false,
-              "overflowY": true,
-              "verticalScrollAccepted": true,
-              "overflowDisposition": "readable-vertical-scroll",
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
               "readerLayout": "adaptive",
-              "readerOverflow": "authored",
+              "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
               "readerWidth": 1437,
@@ -702,9 +702,9 @@
                 "bodyPaddingPx": 64,
                 "headerPx": 107,
                 "diagramChromePx": 84,
-                "svgPx": 854,
+                "svgPx": 816,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.504,
@@ -748,15 +748,15 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1791,
-              "diagramWidth": 1741,
+              "readerWidth": 1871,
+              "diagramWidth": 1821,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 94,
                 "diagramChromePx": 94,
                 "svgPx": 1056,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 8,
@@ -796,7 +796,7 @@
               "innerWidth": 1440,
               "innerHeight": 900,
               "scrollWidth": 1440,
-              "scrollHeight": 1007,
+              "scrollHeight": 970,
               "overflowX": false,
               "overflowY": true,
               "verticalScrollAccepted": true,
@@ -811,9 +811,9 @@
                 "bodyPaddingPx": 12,
                 "headerPx": 99,
                 "diagramChromePx": 78,
-                "svgPx": 817,
+                "svgPx": 781,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.1786666666666665,
@@ -848,7 +848,7 @@
               "innerWidth": 1600,
               "innerHeight": 1000,
               "scrollWidth": 1600,
-              "scrollHeight": 1110,
+              "scrollHeight": 1071,
               "overflowX": false,
               "overflowY": true,
               "verticalScrollAccepted": true,
@@ -863,9 +863,9 @@
                 "bodyPaddingPx": 64,
                 "headerPx": 107,
                 "diagramChromePx": 84,
-                "svgPx": 854,
+                "svgPx": 816,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.504,
@@ -900,13 +900,13 @@
               "innerWidth": 1920,
               "innerHeight": 1080,
               "scrollWidth": 1920,
-              "scrollHeight": 1110,
+              "scrollHeight": 1080,
               "overflowX": false,
-              "overflowY": true,
-              "verticalScrollAccepted": true,
-              "overflowDisposition": "readable-vertical-scroll",
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
               "readerLayout": "adaptive",
-              "readerOverflow": "authored",
+              "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
               "readerWidth": 1437,
@@ -915,9 +915,9 @@
                 "bodyPaddingPx": 64,
                 "headerPx": 107,
                 "diagramChromePx": 84,
-                "svgPx": 854,
+                "svgPx": 816,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 7.504,
@@ -961,15 +961,15 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1791,
-              "diagramWidth": 1741,
+              "readerWidth": 1871,
+              "diagramWidth": 1821,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 94,
                 "diagramChromePx": 94,
                 "svgPx": 1056,
                 "cardsPx": 0,
-                "viewBoxHeight": 910
+                "viewBoxHeight": 870
               },
               "viewBoxWidth": 1500,
               "minimumProjectedNodeTextPx": 8,
@@ -1005,7 +1005,7 @@
           "contactSheet": null
         },
         "sidecars": {
-          "directory": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4",
+          "directory": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5",
           "receipt": "talklate-hexagonal.browser-check.json",
           "files": []
         }
@@ -1018,19 +1018,19 @@
   },
   "diagnostics": [],
   "evidence": {
-    "receipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4/talklate-hexagonal.finalize.json",
-    "summaryReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4/talklate-hexagonal.finalize-summary.json",
-    "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-4/talklate-hexagonal.browser-check.json"
+    "receipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5/talklate-hexagonal.finalize.json",
+    "summaryReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5/talklate-hexagonal.finalize-summary.json",
+    "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5/talklate-hexagonal.browser-check.json"
   },
   "visualReview": "not-requested",
-  "finishedAt": "2026-10-29T22:46:24.886Z",
-  "durationMs": 3873,
+  "finishedAt": "2026-11-05T15:56:24.643Z",
+  "durationMs": 4601,
   "update": {
     "status": "current",
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "checkedAt": "2026-11-05T15:54:34.166Z",
     "source": "cache",
     "noticeRequired": false,
     "noticeText": null

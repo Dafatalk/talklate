@@ -229,7 +229,7 @@ function portada(titulo, subtitulo) {
     linea('Julian David Diaz Medina', { size: 22 }),
     linea('Diego Alejandro Franco Atehortua', { size: 22, after: 360 }),
     linea('Director: Wider Farid Sanchez Garzon', { size: 22, after: 360 }),
-    linea('Version 1.0 - Octubre de 2026', { size: 20, color: '595959' }),
+    linea('Version 1.1 - Noviembre de 2026', { size: 20, color: '595959' }),
     new Paragraph({ children: [new PageBreak()] }),
   ];
 }
