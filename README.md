@@ -10,6 +10,8 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 
 | Ruta | Contenido |
 | --- | --- |
+| `calidad/` | Piramide de pruebas (unitarias, integracion y punta a punta) y seguridad con Trivy - ver `calidad/README.md` |
+| `e2e/` | Pruebas de punta a punta de la app web con Playwright |
 | `entrega/` | **Documentacion para entregar**, numerada en orden de lectura (vision, requisitos, drivers, arquitectura, ADR, datos, sprints) — ver `entrega/README.md` |
 | `contexto.md` | Visión de producto (F1) |
 | `requerimientos/` | Mapa de impacto y requerimientos funcionales (F2) |
@@ -22,6 +24,8 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 | `softverse-mcp/` | Servidor MCP que trackea el estado de las fases |
 
 ## Probar la aplicación
+
+Arranque rapido en local: `./run-talklate.sh` (backend + Expo; `--full` levanta tambien Ollama y Whisper).
 
 ```bash
 # Terminal 1: API (Node 22.5 o superior)

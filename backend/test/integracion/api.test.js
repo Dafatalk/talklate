@@ -5,8 +5,8 @@ process.env.TALKLATE_LOGS = 'silencio';
 process.env.LIMITE_MENSAJES_POR_MINUTO = '1000';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearApp } = require('../src/adaptadores/http/app');
-const { componer } = require('../src/composicion');
+const { crearApp } = require('../../src/adaptadores/http/app');
+const { componer } = require('../../src/composicion');
 
 // TEST_DB_DRIVER=surreal corre la misma suite contra un SurrealDB real (ver npm run test:surreal);
 // por defecto usa SQLite en memoria. Cada corrida en SurrealDB usa un namespace nuevo.
@@ -16,10 +16,10 @@ function crearRepo() {
     // Las pruebas crean y borran datos: sin SURREAL_URL explicita usan un SurrealDB local, no el remoto
     process.env.SURREAL_URL = process.env.SURREAL_URL || 'http://127.0.0.1:8000';
     process.env.SURREAL_NS = process.env.SURREAL_NS || `prueba_${Date.now()}`;
-    return require('../src/adaptadores/persistencia/surreal/repositorio')();
+    return require('../../src/adaptadores/persistencia/surreal/repositorio')();
   }
-  const { abrir } = require('../src/adaptadores/persistencia/sqlite/esquema');
-  return require('../src/adaptadores/persistencia/sqlite/repositorio')(abrir(':memory:'));
+  const { abrir } = require('../../src/adaptadores/persistencia/sqlite/esquema');
+  return require('../../src/adaptadores/persistencia/sqlite/repositorio')(abrir(':memory:'));
 }
 
 const ADMIN = { correo: 'dafa123.daf@gmail.com', password: 'Admin123!' };

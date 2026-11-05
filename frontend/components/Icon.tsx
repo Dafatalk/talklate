@@ -23,6 +23,8 @@ interface IconProps {
     style?: ViewStyle;
     strokeWidth?: number;
     fill?: string;
+    // Nombre que leen los lectores de pantalla (y las pruebas) cuando el icono es un boton
+    accessibilityLabel?: string;
 }
 
 const Icon: React.FC<IconProps> = ({
@@ -37,7 +39,8 @@ const Icon: React.FC<IconProps> = ({
     className,
     style,
     strokeWidth = 2,
-    fill = 'none'
+    fill = 'none',
+    accessibilityLabel,
 }) => {
     const colors = useThemeColors();
 
@@ -96,7 +99,7 @@ const Icon: React.FC<IconProps> = ({
     if (href) {
         return (
             <Link href={href} asChild>
-                <Pressable disabled={disabled}>
+                <Pressable disabled={disabled} accessibilityRole="button" accessibilityLabel={accessibilityLabel}>
                     {content}
                 </Pressable>
             </Link>
@@ -108,6 +111,8 @@ const Icon: React.FC<IconProps> = ({
             <Pressable
                 onPress={disabled ? undefined : onPress}
                 disabled={disabled}
+                accessibilityRole="button"
+                accessibilityLabel={accessibilityLabel}
                 style={style} className={classes || undefined}
             >
                 {content}

@@ -1,7 +1,6 @@
 // Caso de uso: sesiones (ADR-006). Token de acceso corto (JWT) + token de refresco largo y rotativo
-// (convenciones/seguridad.md seccion 3). Solo usa el puerto Repositorio; el middleware HTTP que lee
+// (convenciones/seguridad.md seccion 3). Usa los puertos Repositorio y FirmadorTokens; el middleware HTTP que lee
 // la cabecera Authorization esta en adaptadores/http/sesion.js.
-const jwt = require('jsonwebtoken');
 const crypto = require('node:crypto');
 const { noAutorizado } = require('../dominio/errores');
 
@@ -9,10 +8,10 @@ const hash = (t) => crypto.createHash('sha256').update(t).digest('hex');
 const EXPIRADA = 'La sesion ya ha expirado. Inicia sesion de nuevo.';
 const NO_VALIDA = 'La sesion ya ha expirado o no es valida.';
 
-function crearServicioSesiones({ repo, secreto, duracionAccesoSeg = 15 * 60, duracionRefrescoMs = 30 * 24 * 60 * 60 * 1000 }) {
-  if (!secreto) throw new Error('El servicio de sesiones necesita un secreto para firmar los tokens');
+function crearServicioSesiones({ repo, firmador, duracionAccesoSeg = 15 * 60, duracionRefrescoMs = 30 * 24 * 60 * 60 * 1000 }) {
+  if (!firmador) throw new Error('El servicio de sesiones necesita un firmador de tokens');
 
-  const firmarAcceso = (usuario) => jwt.sign({ sub: usuario.id, rol: usuario.rol, jti: crypto.randomUUID() }, secreto, { expiresIn: duracionAccesoSeg });
+  const firmarAcceso = (usuario) => firmador.firmar({ sub: usuario.id, rol: usuario.rol, jti: crypto.randomUUID() }, duracionAccesoSeg);
 
   // Crea el par de tokens. El de refresco solo se guarda como hash.
   async function emitir(usuario) {
@@ -40,7 +39,7 @@ function crearServicioSesiones({ repo, secreto, duracionAccesoSeg = 15 * 60, dur
     if (!token) throw noAutorizado();
     let datos;
     try {
-      datos = jwt.verify(token, secreto);
+      datos = firmador.verificar(token);
     } catch {
       throw noAutorizado(NO_VALIDA);
     }

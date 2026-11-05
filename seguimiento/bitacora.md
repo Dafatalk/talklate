@@ -20,6 +20,12 @@
 
 ---
 
+## 2026-11-05 - Julian (Claude / Opus)
+
+- **Avances:** Script `run-talklate.sh` en la raiz: levanta backend (`:3000`) y frontend Expo en LAN (`:8081`) con un comando. Instala dependencias si faltan (frontend con `--legacy-peer-deps`), muestra el estado de Ollama/Whisper/VoiceStudio y, con `--full`, intenta levantar Ollama y Whisper. `Ctrl+C` detiene back y front; los servicios de IA quedan aparte. Probado: `/health` OK con SurrealDB y Expo arriba en ~10 s (sin `--full`).
+- **Decidi:** Un `.sh` sin dependencias nuevas en vez de un `package.json` raiz con `concurrently` (cero dependencias, sin `node_modules` en la raiz).
+- **Handoff / pendiente:** Para traduccion real con Qwen, correr con `--full` o dejar `ollama serve` aparte. Issue #41; PR a `develop`.
+
 ## 2026-10-23 (2) - Dafatalk (Claude / Opus)
 
 - **Decidi (equipo):** **se mantiene SurrealDB; no se migra a PostgreSQL.** Justificacion tecnica (no solo "lo recomendo el profesor"): enlaces nativos para la cadena conversacion -> mensajes -> traducciones -> reportes, reglas del dominio en el esquema (UNIQUE, ASSERT), multimodelo para lo que viene (reportes flexibles, busqueda vectorial de modismos) y gestionada en la nube con usuarios de permisos limitados. Julian: confirma que el usuario de base del backend solo tenga permisos sobre `talklate/app`. El riesgo (tecnologia mas joven) se controla con la arquitectura hexagonal. La frase para la sustentacion esta en ADR-012.
@@ -108,3 +114,12 @@
 - Se regenero `backend/package-lock.json`: faltaba dependency-cruiser y `npm ci` fallaba en CI.
 - Las carpetas de trabajo (`requerimientos/`, `arquitectura/`) siguen siendo la fuente que se edita; `entrega/` es la version para entregar.
 - **Documentos en Word y PDF:** la entrega ya no se muestra en Markdown. `entrega/TalkLate_Documento_Completo.pdf` (84 paginas, con portada e indice) y los 17 documentos por separado en `entrega/documentos/` (Word y PDF), con tablas con formato y diagramas como figuras numeradas. Los textos quedan en `entrega/fuente/` y se regeneran con `entrega/fuente/herramientas/`.
+
+## 2026-11-05 - Dafatalk (Claude / Opus)
+
+- **Piramide de pruebas (ADR-017):** pruebas ordenadas por nivel. Base: 46 unitarias del backend (`backend/test/unitarias/`) + 5 del frontend. Medio: 18 de integracion (`backend/test/integracion/`, contra SQLite y SurrealDB). Punta: 2 E2E de la API con el servidor real como proceso (`backend/test/e2e/`) y 2 E2E de la app web con Playwright (`e2e/`). Cobertura del backend 96.6 %. Un paso por nivel en el CI y un job `e2e-web`.
+- **Arquitectura:** bcrypt y jsonwebtoken pasan detras de los puertos `Hasheador` y `FirmadorTokens` (8 puertos en total). `npm run arch:check` queda sin violaciones y ahora corre en el CI. Diagrama Archify hexagonal actualizado.
+- **Trivy (ADR-018):** workflow `.github/workflows/seguridad.yml` en cada PR, push y cada lunes; binario v0.69.3 con checksum (no se usa trivy-action, comprometida en marzo de 2026). Se corrigieron 1 HIGH del backend (express/body-parser) y 1 CRITICAL + 50 HIGH del frontend con `overrides`. Excepcion documentada: `decode-uri-component` (vence 28/02/2027). Nuevo RNF-011.
+- **Accesibilidad:** el icono para cambiar entre burbuja y chat ahora tiene nombre accesible ("Cambiar a chat" / "Cambiar a voz").
+- **Docs:** carpeta `calidad/` y documentos 18 y 19 en la entrega (Word y PDF); entrega en version 1.1.
+- **Revision:** PR #42 de Julian (`run-talklate.sh`) revisado; dos sugerencias menores en el PR.

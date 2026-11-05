@@ -4,7 +4,7 @@
 
 **Version:** 1.0 (29/10/2026). Cada requisito funcional sale de una historia de usuario (`03_historias_de_usuario.md`) y cita la regla de negocio del modelo de datos (`12_modelo_de_datos.md`) que aplica. Los criterios de aceptacion estan en `04_criterios_de_aceptacion.md`.
 
-Resumen: 26 requisitos funcionales, 10 requisitos no funcionales y 8 drivers de arquitectura (`06_drivers_de_arquitectura.md`).
+Resumen: 26 requisitos funcionales, 11 requisitos no funcionales y 8 drivers de arquitectura (`06_drivers_de_arquitectura.md`).
 
 ## 1. Actores
 
@@ -58,9 +58,10 @@ Ordenados por prioridad (1 = mas valor), el mismo orden de los sprints.
 | RNF-005 | Disponibilidad | Si un motor de IA falla, el servicio sigue: traduccion Qwen -> Claude -> reglas; voz VoiceStudio -> Azure -> OpenAI -> voz del celular. | DRV-05 | `motores.test.js` |
 | RNF-006 | Seguridad (abuso) | 30 mensajes por minuto por usuario, 8 intentos de inicio de sesion fallidos, 5 solicitudes de recuperacion cada 15 minutos. | DRV-06 | Pruebas de seguridad |
 | RNF-007 | Portabilidad | Una sola base de codigo para iOS, Android y web. | DRV-07 | Compilacion web y Expo Go |
-| RNF-008 | Mantenibilidad | Cobertura de pruebas de 80 % o mas en la logica de negocio; arquitectura hexagonal con puertos verificados al arrancar y reglas de dependencia validadas con dependency-cruiser. | DRV-08 | `npm run coverage`, `npm run arch:check` y CI |
+| RNF-008 | Mantenibilidad | Cobertura de pruebas de 80 % o mas en la logica de negocio; piramide de pruebas (unitarias, integracion y punta a punta) en el CI; arquitectura hexagonal con puertos verificados al arrancar y reglas de dependencia validadas con dependency-cruiser. | DRV-08 | `npm run coverage`, `npm run arch:check` y CI |
 | RNF-009 | Interoperabilidad | La API sigue la convencion REST del proyecto y esta documentada en OpenAPI 3.0. | DRV-08 | `backend/openapi.yaml` y `/api/v1/docs` |
 | RNF-010 | Naturalidad de la voz | La voz de salida replica la emocion detectada (enojo, alegria, preocupacion, amabilidad, formalidad); 7 de cada 10 personas de prueba la califican como comprensible y natural. | DRV-02 | Prueba de escucha con usuarios y audios de `npm run medir:voz` |
+| RNF-011 | Seguridad de la cadena de suministro | 0 vulnerabilidades HIGH o CRITICAL en las dependencias (de produccion y de desarrollo) y 0 secretos en el codigo, salvo excepciones documentadas con fecha de vencimiento. | DRV-03 | Trivy en CI en cada pull request y cada lunes (`.github/workflows/seguridad.yml`) |
 
 ## 4. Trazabilidad impacto -> requisito -> driver
 

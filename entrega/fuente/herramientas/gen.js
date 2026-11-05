@@ -38,6 +38,8 @@ const DOCS = [
   ['15_plan_de_liberaciones', 'Plan de liberaciones'],
   ['16_matriz_sensibilidad_datos', 'Matriz de sensibilidad de datos'],
   ['17_politica_tratamiento_datos', 'Politica de tratamiento de datos personales'],
+  ['18_piramide_de_pruebas', 'Piramide de pruebas'],
+  ['19_seguridad_trivy', 'Seguridad con Trivy'],
 ];
 const NOMBRE = Object.fromEntries(DOCS.map(([f, t], i) => [f + '.md', `documento ${i + 1} (${t})`]));
 
@@ -227,7 +229,7 @@ function portada(titulo, subtitulo) {
     linea('Julian David Diaz Medina', { size: 22 }),
     linea('Diego Alejandro Franco Atehortua', { size: 22, after: 360 }),
     linea('Director: Wider Farid Sanchez Garzon', { size: 22, after: 360 }),
-    linea('Version 1.0 - Octubre de 2026', { size: 20, color: '595959' }),
+    linea('Version 1.1 - Noviembre de 2026', { size: 20, color: '595959' }),
     new Paragraph({ children: [new PageBreak()] }),
   ];
 }
@@ -279,7 +281,7 @@ async function guardar(nombre, d) {
     creator: 'Equipo TalkLate', title: 'TalkLate - Documento de analisis, requisitos y arquitectura', styles: estilos, numbering: numeracion(ctx.listaId + 1),
     features: { updateFields: true },
     sections: [
-      { properties: pagina, children: portada('Documento de analisis, requisitos y arquitectura', 'Vision, mapa de impacto, historias, requisitos, drivers, arquitectura, decisiones, datos y planificacion') },
+      { properties: pagina, children: portada('Documento de analisis, requisitos y arquitectura', 'Vision, mapa de impacto, historias, requisitos, drivers, arquitectura, decisiones, datos, planificacion, pruebas y seguridad') },
       { properties: pagina, ...cabeceraPie('Documento de analisis, requisitos y arquitectura'), children: [
         new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun('Contenido')] }),
         new TableOfContents('Contenido', { hyperlink: true, headingStyleRange: '1-2' }),

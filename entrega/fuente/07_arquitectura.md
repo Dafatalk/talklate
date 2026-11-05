@@ -18,10 +18,10 @@ real (`backend/src`, `frontend/`).
 | `08_stack_tecnologico.md` | Stack | Tecnologia por capa y alternativas evaluadas |
 | `09_diagramas_c4.md` | C4 Niveles 1 y 2 | Contexto del sistema y contenedores |
 | `10_componentes.md` | C4 Nivel 3 (API) | Componentes internos de la API TalkLate |
-| `11_decisiones_de_arquitectura_ADR.md` | Decisiones | 16 ADR con contexto, alternativas y consecuencias |
+| `11_decisiones_de_arquitectura_ADR.md` | Decisiones | 18 ADR con contexto, alternativas y consecuencias |
 | `12_modelo_de_datos.md` | Datos | Modelo de dominio, reglas y correspondencia con la base |
 | `diagramas/arquitectura_talklate.html` | Vista general interactiva | Diagrama de arquitectura (Archify) con el flujo de voz |
-| `diagramas/arquitectura_hexagonal.html` | Vista interactiva del backend | Nucleo, 6 puertos y adaptadores (Archify) |
+| `diagramas/arquitectura_hexagonal.html` | Vista interactiva del backend | Nucleo, 8 puertos y adaptadores (Archify) |
 
 ## 1. Estilo arquitectonico
 
@@ -53,11 +53,11 @@ tono viaja al prompt de traduccion y al sintetizador, que lo convierte en emocio
 Por dentro, la API sigue una **arquitectura hexagonal (puertos y adaptadores)** (ADR-013): el
 dominio y los casos de uso estan en el centro y no dependen de Express, de la base ni de los
 motores de IA; cada dependencia externa entra por un puerto (`Repositorio`, `MotorTraduccion`,
-`Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`) y se conecta con un adaptador. Las
+`Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador`, `FirmadorTokens`) y se conecta con un adaptador. Las
 reglas de dependencia entre capas se verifican con dependency-cruiser
-(`npm run arch:check`). Hoy marca dos dependencias pendientes de mover detras de un puerto: `bcryptjs` en `aplicacion/cuentas.js` y `jsonwebtoken` en `aplicacion/sesiones.js`.
+(`npm run arch:check`). El chequeo corre en el CI en cada pull request y hoy no marca ninguna violacion: el hash de contrasenas (bcrypt) y los tokens (JWT) tambien entran por puertos (`Hasheador` y `FirmadorTokens`).
 
-![Backend hexagonal: nucleo, 6 puertos y adaptadores (Archify)](diagramas/img/archify_hexagonal.png)
+![Backend hexagonal: nucleo, 8 puertos y adaptadores (Archify)](diagramas/img/archify_hexagonal.png)
 
 ```mermaid
 flowchart LR
@@ -388,6 +388,8 @@ Detalle completo en `11_decisiones_de_arquitectura_ADR.md`. Resumen de que resue
 | ADR-014 | Voz en Expo Go: grabacion en el celular, Whisper en el servidor y entonacion por texto y voz | DRV-01, DRV-02, DRV-07 |
 | ADR-015 | Voz natural con emocion en el servidor (puerto Sintetizador) | DRV-02, DRV-05 |
 | ADR-016 | VoiceStudio local como primer motor de voz con emocion | DRV-02, DRV-06 |
+| ADR-017 | Piramide de pruebas en tres niveles, todos en el CI | DRV-08 |
+| ADR-018 | Escaneo de seguridad con Trivy en el CI | DRV-03 |
 
 ---
 

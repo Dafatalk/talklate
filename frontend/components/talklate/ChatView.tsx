@@ -182,7 +182,7 @@ export default function ChatView({ id }: { id: string }) {
             </View>,
           ]}
           rightComponents={conv ? [
-            <Icon key="modo" name={modo === 'burbuja' ? 'MessageSquare' : 'AudioLines'} size={20} onPress={cambiarModo} className="mr-4" />,
+            <Icon key="modo" name={modo === 'burbuja' ? 'MessageSquare' : 'AudioLines'} size={20} onPress={cambiarModo} className="mr-4" accessibilityLabel={modo === 'burbuja' ? 'Cambiar a chat' : 'Cambiar a voz'} />,
             <Icon key="renombrar" name="Pencil" size={20} onPress={() => setRenombrando(true)} />,
           ] : []}
         />

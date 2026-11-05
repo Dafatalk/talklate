@@ -1,0 +1,27 @@
+# Configuracion de Trivy para TalkLate (ver calidad/seguridad_trivy.md).
+# Escanea el repositorio completo: dependencias npm (vulnerabilidades), secretos en el codigo y
+# configuraciones inseguras de infraestructura (IaC).
+scan:
+  scanners:
+    - vuln
+    - secret
+    - misconfig
+  skip-dirs:
+    - "**/node_modules"
+    - frontend/dist
+    - e2e/reporte
+    - e2e/test-results
+    # Template de UI original (Luna), sin cambios y fuera del producto: no se despliega
+    - componentes/template
+severity:
+  - HIGH
+  - CRITICAL
+pkg:
+  # Tambien las dependencias de desarrollo (eslint, TypeScript, Playwright...): corren en las maquinas
+  # del equipo y en el CI, asi que una vulnerable tambien es un riesgo
+  include-dev-deps: true
+vulnerability:
+  # Cuenta todo, tenga o no parche; lo que no tiene arreglo se justifica en .trivyignore
+  ignore-unfixed: false
+exit-code: 1
+ignorefile: .trivyignore

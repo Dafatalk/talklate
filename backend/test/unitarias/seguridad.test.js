@@ -1,10 +1,10 @@
 process.env.TALKLATE_LOGS = 'silencio';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { crearCifradorAesGcm } = require('../src/adaptadores/cifrado/aesGcm');
-const { crearLimite } = require('../src/adaptadores/http/limites');
-const log = require('../src/compartido/log');
-const { cuerpoError } = require('../src/dominio/errores');
+const { crearCifradorAesGcm } = require('../../src/adaptadores/cifrado/aesGcm');
+const { crearLimite } = require('../../src/adaptadores/http/limites');
+const log = require('../../src/compartido/log');
+const { cuerpoError } = require('../../src/dominio/errores');
 
 test('cifrado AES-256-GCM: ida y vuelta, textos viejos sin cifrar y clave distinta', () => {
   const { cifrar, descifrar } = crearCifradorAesGcm({ secreto: 'clave-de-prueba' });
@@ -41,7 +41,29 @@ test('formato de error de la convencion', () => {
 });
 
 test('en produccion sin servicio de correo se informa el fallo (Usuario-RN-7)', async () => {
-  const { crearNotificadorConsola } = require('../src/adaptadores/correo/consola');
+  const { crearNotificadorConsola } = require('../../src/adaptadores/correo/consola');
   await assert.rejects(crearNotificadorConsola({ produccion: true }).enviarCodigoRecuperacion('u1', '123456'), (e) => e.estado === 502);
   assert.deepEqual(await crearNotificadorConsola().enviarCodigoRecuperacion('u1', '123456'), { devolverCodigo: true });
+});
+
+test('hasheador bcrypt: no guarda el valor original y solo acepta el correcto', () => {
+  const { crearHasheadorBcrypt } = require('../../src/adaptadores/credenciales/bcrypt');
+  const h = crearHasheadorBcrypt();
+  const hash = h.hashear('Clave123!', 4);
+  assert.ok(!hash.includes('Clave123!'));
+  assert.notEqual(h.hashear('Clave123!', 4), hash); // sal distinta en cada hash
+  assert.equal(h.comparar('Clave123!', hash), true);
+  assert.equal(h.comparar('Otra123!', hash), false);
+  assert.equal(h.comparar(undefined, hash), false);
+});
+
+test('firmador JWT: firma, verifica, rechaza tokens alterados, vencidos o de otro secreto', () => {
+  const { crearFirmadorJwt } = require('../../src/adaptadores/credenciales/jwt');
+  const f = crearFirmadorJwt({ secreto: 'uno' });
+  const token = f.firmar({ sub: 'u1', rol: 'cliente' }, 60);
+  assert.equal(f.verificar(token).sub, 'u1');
+  assert.throws(() => f.verificar(token.slice(0, -2) + 'xx'));
+  assert.throws(() => crearFirmadorJwt({ secreto: 'dos' }).verificar(token));
+  assert.throws(() => f.verificar(f.firmar({ sub: 'u1' }, -1)), /expired/);
+  assert.throws(() => crearFirmadorJwt({}), /secreto/);
 });

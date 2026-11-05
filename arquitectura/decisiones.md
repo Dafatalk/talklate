@@ -341,3 +341,40 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Hay que medir la latencia en la Mac antes de la demo (meta: mediana de 5 s o menos).
 - La licencia de VoiceStudio es AGPL-3.0 y cada modelo tiene la suya. Sirve para la tesis; para uso comercial hay que revisarla.
 - Algunos detalles de su API no estan confirmados en su documentacion; la guia lista que verificar.
+
+## ADR-017: Piramide de pruebas en tres niveles, todos en el CI
+
+**Estado:** aceptada (05/11/2026). **Responde a:** DRV-08, DRV-03.
+
+**Contexto:** Las pruebas del backend estaban en cuatro archivos mezclados (reglas, adaptadores e integracion) y no habia pruebas de la app real en un navegador. No se veia que nivel cubria que, ni cuanto costaba correr cada uno.
+
+**Decision:**
+- Organizar las pruebas como piramide: **base** de unitarias (dominio, casos de uso y adaptadores con dobles; `backend/test/unitarias/` y `frontend/test/`), **medio** de integracion (API HTTP con base real; `backend/test/integracion/`, contra SQLite y SurrealDB) y **punta** de punta a punta (servidor real como proceso en `backend/test/e2e/` y app web con Playwright en `e2e/`).
+- Un script por nivel (`test:unitarias`, `test:integracion`, `test:e2e`) y un paso por nivel en el CI; la app web corre en un job aparte (`e2e-web`) que solo arranca si los niveles de abajo pasaron.
+- Cobertura minima de 80 % en unitarias + integracion, y `arch:check` (dependency-cruiser) en el CI. Para que pase, bcrypt y jsonwebtoken entran por los puertos `Hasheador` y `FirmadorTokens`.
+- En las pruebas de punta a punta, los servicios de IA (Whisper, VoiceStudio) se reemplazan por servidores HTTP falsos que hablan su mismo protocolo: se prueban los adaptadores reales sin depender de modelos pesados.
+
+**Alternativas:**
+- **Jest o Vitest en el backend:** mas funciones, pero `node:test` ya viene con Node 22, no agrega dependencias y tiene cobertura incluida.
+- **Cypress para la web:** maduro, pero Playwright es mas liviano en CI, emula celulares y ya era la herramienta usada para revisar la app.
+- **Detox o Maestro en el celular:** prueban la app nativa, pero exigen emuladores en CI; la app web comparte el mismo codigo (ADR-001) y cubre el recorrido.
+
+**Consecuencias:** 51 unitarias, 18 de integracion (x2 bases) y 4 de punta a punta; cobertura de lineas de 96.6 %. Cada falla dice en que nivel esta el problema. Detalle en `calidad/piramide_de_pruebas.md`.
+
+## ADR-018: Escaneo de seguridad con Trivy en el CI
+
+**Estado:** aceptada (05/11/2026). **Responde a:** DRV-03.
+
+**Contexto:** TalkLate maneja datos personales (Ley 1581) y depende de cientos de paquetes de npm. Una dependencia vulnerable o una clave escrita en el codigo son riesgos que las pruebas funcionales no detectan.
+
+**Decision:**
+- Escanear el repositorio con Trivy: dependencias npm (de produccion y de desarrollo), secretos y configuraciones inseguras. Bloquea el merge si hay hallazgos HIGH o CRITICAL.
+- Corre en cada pull request, en cada push a `develop` y `main` y cada lunes (los CVE nuevos aparecen aunque el codigo no cambie).
+- Trivy se instala desde el binario oficial con version fija (0.69.3) y checksum SHA-256 verificado. No se usan `aquasecurity/trivy-action` ni `setup-trivy`, comprometidas en marzo de 2026.
+- Las vulnerabilidades indirectas se corrigen con `overrides` de npm dentro de la misma version mayor. Lo que no tiene parche compatible va a `.trivyignore` con su razon, su riesgo real y una fecha de vencimiento.
+
+**Alternativas:**
+- **`npm audit`:** solo revisa npm y no busca secretos ni configuraciones; ademas no permite excepciones con vencimiento.
+- **Dependabot o Snyk:** utiles, pero dependen de la configuracion de la organizacion en GitHub o de un servicio externo; Trivy corre igual en local y en CI.
+
+**Consecuencias:** Se corrigieron 1 HIGH en el backend y 1 CRITICAL + 50 HIGH en el frontend (produccion y desarrollo). Queda 1 excepcion documentada (`decode-uri-component`, vence el 28/02/2027). Detalle en `calidad/seguridad_trivy.md`.

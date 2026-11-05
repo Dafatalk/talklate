@@ -49,3 +49,9 @@ backend/data/
 *.bak
 * 2.*
 backend/medicion-voz/
+
+# Pruebas de punta a punta (Playwright) y reportes de Trivy
+e2e/node_modules/
+e2e/reporte/
+e2e/test-results/
+trivy-reporte.txt

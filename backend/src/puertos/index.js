@@ -55,6 +55,18 @@ const TRANSCRIPTOR = ['disponible', 'transcribir'];
  */
 const SINTETIZADOR = ['nombre', 'disponible', 'sintetizar'];
 
+/**
+ * Puerto Hasheador (salida): hash con sal de contrasenas y codigos. Lo cumple adaptadores/credenciales/bcrypt.js.
+ * hashear(valor, costo?) -> hash · comparar(valor, hash) -> boolean
+ */
+const HASHEADOR = ['hashear', 'comparar'];
+
+/**
+ * Puerto FirmadorTokens (salida): firma y verifica el token de acceso. Lo cumple adaptadores/credenciales/jwt.js.
+ * firmar(datos, duracionSeg) -> token · verificar(token) -> datos (lanza si es invalido o vencio)
+ */
+const FIRMADOR_TOKENS = ['firmar', 'verificar'];
+
 // Verifica que un adaptador cumpla su puerto; falla al arrancar y no a mitad de una peticion.
 function asegurarPuerto(nombre, objeto, metodos) {
   const faltan = metodos.filter((m) => !objeto || (typeof objeto[m] !== 'function' && !(m === 'nombre' && typeof objeto[m] === 'string')));
@@ -67,4 +79,4 @@ function asegurarRepositorio(repo) {
   return repo;
 }
 
-module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, asegurarPuerto, asegurarRepositorio };
+module.exports = { MOTOR_TRADUCCION, REPOSITORIO, NOTIFICADOR, CIFRADOR, TRANSCRIPTOR, SINTETIZADOR, HASHEADOR, FIRMADOR_TOKENS, asegurarPuerto, asegurarRepositorio };
