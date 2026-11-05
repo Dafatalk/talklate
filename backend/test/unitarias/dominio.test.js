@@ -117,7 +117,6 @@ test('voz de salida: cada tono tiene su expresion y la velocidad queda acotada',
   for (const tono of Object.keys(EXPRESION)) {
     const e = expresionPara(tono);
     assert.ok(e.instruccion.length > 10, tono);
-    if (tono !== 'Neutral') assert.equal(e.vector.length, 8, tono);
   }
   assert.equal(expresionPara('Enojado').estilo, 'angry');
   assert.equal(expresionPara('Inventado').estilo, null); // cae en Neutral

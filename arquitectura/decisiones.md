@@ -325,7 +325,7 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 
 ## ADR-016: VoiceStudio local como primer motor de voz con emocion
 
-**Estado:** Aceptada (29/10/2026). Extiende ADR-015.
+**Estado:** Revertida (05/11/2026) — reemplazada por ADR-019. Fue aceptada el 29/10/2026 y extendia ADR-015. Motivo: IndexTTS 2 no soporta Metal/MPS y en la Mac corre solo en CPU (~30 s por frase), inviable en vivo.
 
 **Contexto:** Azure y OpenAI dan voz natural, pero cobran o piden clave y salen a internet. El proyecto ya traduce con Qwen local (ADR-004), y una voz local mantiene la misma linea: sin costo por uso y sin enviar la voz a terceros. VoiceStudio (github.com/debpalash/VoiceStudio) reune motores de voz locales; su motor IndexTTS 2 acepta la emocion como un vector de 8 pesos y habla espanol e ingles.
 
@@ -378,3 +378,21 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - **Dependabot o Snyk:** utiles, pero dependen de la configuracion de la organizacion en GitHub o de un servicio externo; Trivy corre igual en local y en CI.
 
 **Consecuencias:** Se corrigieron 1 HIGH en el backend y 1 CRITICAL + 50 HIGH en el frontend (produccion y desarrollo). Queda 1 excepcion documentada (`decode-uri-component`, vence el 28/02/2027). Detalle en `calidad/seguridad_trivy.md`.
+
+## ADR-019: ElevenLabs (nube) como motor de voz; se revierte VoiceStudio
+
+**Estado:** Aceptada (05/11/2026). Reemplaza ADR-016; extiende ADR-015.
+
+**Contexto:** VoiceStudio con IndexTTS 2 (ADR-016) daba voz local con emocion, pero IndexTTS no soporta Metal/MPS: en la Mac (Apple Silicon) corre solo en CPU, ~30 s por frase, inviable para una conversacion en vivo. Los motores de VoiceStudio que si usan la GPU (omnivoice, mlx-audio) no hacen emocion real. Se necesita voz natural, con emocion, con acento regional (paisa, New York) y rapida.
+
+**Decision:**
+- Se elimina el adaptador VoiceStudio y se agrega `adaptadores/sintesis/elevenlabs.js` (puerto `Sintetizador`), que llama la API REST de ElevenLabs (`POST /v1/text-to-speech/{voice_id}`, modelo `eleven_multilingual_v2`) con `fetch` (sin SDK, igual que azure/openai).
+- La emocion va en `voice_settings` (menos `stability` = mas expresivo; `style` exagera modismos) y la velocidad en `speed`, derivadas del tono y la prosodia que ya se detectaban (ADR-015).
+- La voz se elige por locale y genero: es-CO = paisa (hombre/mujer), en-US = New York (hombre/mujer). El genero lo infiere el mismo modelo de traduccion local (campo `genero` en su JSON, sin llamada extra) y viaja por `entrega.genero` hasta el adaptador; si no hay pista usa `ELEVENLABS_GENERO` (default hombre).
+- Config: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOZ_PAISA_HOMBRE/MUJER`, `ELEVENLABS_VOZ_NY_HOMBRE/MUJER`, `ELEVENLABS_GENERO`, `ELEVENLABS_MODELO`. Con `VOZ_MOTOR=auto` el orden es ElevenLabs -> Azure -> OpenAI -> voz del celular.
+
+**Consecuencias:**
+- Voz natural, con emocion y acento regional, y rapida (1-5 s por frase).
+- Es un servicio en la nube: cambia el enfoque local-first de ADR-015/016 (el texto traducido sale a ElevenLabs). Las voces de la Voice Library requieren plan pago para usarse via API (el plan free las bloquea).
+- La deteccion de genero por texto es imperfecta, sobre todo en ingles; cuando no hay pista usa el genero por defecto. Detectar el genero por el tono de voz (pitch) o persistirlo por mensaje quedan como mejoras futuras.
+- Los limites de creditos, el uso comercial y la atribucion dependen del plan de ElevenLabs contratado.

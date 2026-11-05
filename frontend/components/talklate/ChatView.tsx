@@ -73,10 +73,10 @@ export default function ChatView({ id }: { id: string }) {
 
   // El audio se reproduce en el idioma/pais en que quedo la traduccion, con la entonacion del mensaje
   // y, si fue hablado, a la velocidad con que hablo la persona
-  const reproducir = (m: Mensaje, config: Configuracion, opciones: { ritmo?: number; alTerminar?: () => void } = {}) => {
+  const reproducir = (m: Mensaje, config: Configuracion, opciones: { ritmo?: number; genero?: 'hombre' | 'mujer' | null; alTerminar?: () => void } = {}) => {
     if (!m.traduccion) return opciones.alTerminar?.();
     const hacia = idiomaDeEntrega(m.remitente, config);
-    if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono, opciones);
+    if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono, { ...opciones, genero: opciones.genero ?? m.genero ?? null });
     else opciones.alTerminar?.();
   };
 
@@ -113,7 +113,7 @@ export default function ChatView({ id }: { id: string }) {
       setUltimo({ original: r.transcripcion, traduccion: r.mensaje.traduccion?.contenido || '', tono: r.mensaje.tono, remitente });
       if (r.aviso) setAviso(r.aviso);
       setEstadoVoz('hablando');
-      reproducir(r.mensaje, r.configuracion, { ritmo: r.entrega.ritmo_voz, alTerminar: () => setEstadoVoz('lista') });
+      reproducir(r.mensaje, r.configuracion, { ritmo: r.entrega.ritmo_voz, genero: r.entrega.genero, alTerminar: () => setEstadoVoz('lista') });
       refrescar();
     } catch (err: any) {
       setAviso(err.message);
@@ -133,7 +133,7 @@ export default function ChatView({ id }: { id: string }) {
       setConv({ ...conv, configuracion: r.configuracion, total_mensajes: conv.total_mensajes + 1 });
       if (r.aviso) setAviso(r.aviso);
       // Se entrega por el mismo canal en que llego: si hablaste, la traduccion se escucha
-      if (r.entrega.reproducir_audio) reproducir(r.mensaje, r.configuracion);
+      if (r.entrega.reproducir_audio) reproducir(r.mensaje, r.configuracion, { genero: r.entrega.genero });
       refrescar();
     } catch (err: any) {
       setAviso(err.message);

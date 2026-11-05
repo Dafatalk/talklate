@@ -158,9 +158,13 @@ test('mensaje por voz: reconoce el idioma, adapta el modismo, entrega por el mis
   assert.equal(r.datos.mensaje.tono, 'Preocupado');
   assert.equal(r.datos.entrega.reproducir_audio, true);
   assert.equal(r.datos.configuracion.origen.codigo, 'es'); // Conversacion-RN-2
-  const crudo = (await repo.mensajes.deConversacion(conversacion.id)).find((m) => m.id === r.datos.mensaje.id).contenido;
-  assert.match(crudo, /^enc:v1:/);
-  assert.ok(!crudo.includes('pilas'));
+  const guardado = (await repo.mensajes.deConversacion(conversacion.id)).find((m) => m.id === r.datos.mensaje.id);
+  assert.match(guardado.contenido, /^enc:v1:/);
+  assert.ok(!guardado.contenido.includes('pilas'));
+  // el genero se persiste y se relee (viaja por el API y vuelve de la DB; null con el motor de reglas, que no lo detecta)
+  assert.ok('genero' in guardado);
+  assert.ok('genero' in r.datos.mensaje);
+  assert.equal(r.datos.entrega.genero ?? null, guardado.genero ?? null);
   const uno = await api('GET', `/conversaciones/${conversacion.id}/mensajes/${r.datos.mensaje.id}`, null, token);
   assert.equal(uno.datos.contenido, 'Hay que ponerse las pilas con el trabajo');
 });

@@ -21,7 +21,7 @@ const FRASES = [
 
 (async () => {
   const motores = crearSintetizadores(process.env).filter((s) => s.disponible());
-  if (!motores.length) { console.error('No hay motor de voz configurado. Revisa VOZ_MOTOR y VOICESTUDIO_URL en .env'); process.exit(1); }
+  if (!motores.length) { console.error('No hay motor de voz configurado. Revisa VOZ_MOTOR en .env'); process.exit(1); }
   const motor = motores[0];
   const salida = path.join(__dirname, '..', 'medicion-voz');
   fs.mkdirSync(salida, { recursive: true });

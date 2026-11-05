@@ -20,6 +20,14 @@
 
 ---
 
+## 2026-11-05 (2) - Julian (Claude / Opus)
+
+- **Voz: se revierte VoiceStudio y entra ElevenLabs (ADR-016 -> ADR-017).** IndexTTS 2 no usa la GPU de Apple (solo CPU, ~30 s/frase), inviable en vivo; se elimino su adaptador, su guia y su config.
+- **ElevenLabs (nube):** adaptador `sintesis/elevenlabs.js` (REST con `fetch`, modelo `eleven_multilingual_v2`). Voz natural con emocion (`voice_settings`) y acento regional: paisa (es-CO) y New York (en-US), cada una con voz hombre/mujer. Rapido (1-5 s). Config `.env`: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOZ_PAISA_HOMBRE/MUJER`, `ELEVENLABS_VOZ_NY_HOMBRE/MUJER`, `ELEVENLABS_GENERO`; `VOZ_MOTOR=elevenlabs`.
+- **Genero automatico:** lo infiere el modelo de traduccion local y elige la voz por mensaje. Bug corregido: el servicio de traduccion descartaba el campo `genero`, por eso siempre salia voz de hombre.
+- **Emocion y velocidad:** ya se detectaban (LLM + prosodia); ahora tambien alimentan a ElevenLabs. Tests 43/43.
+- **Handoff / pendiente:** la deteccion de genero por texto es floja en ingles (evaluar pitch del audio o persistir el genero por mensaje). Las voces de la Voice Library requieren plan pago via API.
+
 ## 2026-11-05 - Julian (Claude / Opus)
 
 - **Avances:** Script `run-talklate.sh` en la raiz: levanta backend (`:3000`) y frontend Expo en LAN (`:8081`) con un comando. Instala dependencias si faltan (frontend con `--legacy-peer-deps`), muestra el estado de Ollama/Whisper/VoiceStudio y, con `--full`, intenta levantar Ollama y Whisper. `Ctrl+C` detiene back y front; los servicios de IA quedan aparte. Probado: `/health` OK con SurrealDB y Expo arriba en ~10 s (sin `--full`).

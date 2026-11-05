@@ -22,11 +22,11 @@ export type ResumenConversacion = {
   ultimo_mensaje: { contenido: string; traduccion: string | null; fecha: string } | null;
 };
 export type Traduccion = { id: string; contenido: string; nota_cultural: string | null; aproximada: boolean; motor: string; estado_entrega: string; reportado: boolean };
-export type Mensaje = { id: string; remitente: 'usuario' | 'interlocutor'; canal: 'Texto' | 'Voz'; tono: string; contenido: string; fecha: string; traduccion: Traduccion | null };
+export type Mensaje = { id: string; remitente: 'usuario' | 'interlocutor'; canal: 'Texto' | 'Voz'; tono: string; genero?: 'hombre' | 'mujer' | null; contenido: string; fecha: string; traduccion: Traduccion | null };
 export type ConversacionCompleta = ResumenConversacion & { mensajes: Mensaje[] };
 export type RespuestaMensaje = {
   mensaje: Mensaje;
-  entrega: { canal: 'Texto' | 'Voz'; reproducir_audio: boolean; idioma_codigo: string; region_origen_detectada: string | null; ritmo_voz?: number };
+  entrega: { canal: 'Texto' | 'Voz'; reproducir_audio: boolean; idioma_codigo: string; region_origen_detectada: string | null; ritmo_voz?: number; genero?: 'hombre' | 'mujer' | null };
   configuracion: Configuracion;
   aviso: string | null;
 };
@@ -145,7 +145,7 @@ export const api = {
   enviarMensajeVoz: (id: string, b: { audio_base64: string; tipo: string; remitente: 'usuario' | 'interlocutor'; prosodia: Record<string, number> }) =>
     pedir<RespuestaMensajeVoz>('POST', `/conversaciones/${id}/mensajes/voz`, b),
   // Voz natural con la emocion del tono (Azure / OpenAI en el servidor); devuelve la URL completa del mp3
-  sintetizarVoz: async (b: { texto: string; idioma: string; pais?: string | null; tono: string; ritmo?: number }) => {
+  sintetizarVoz: async (b: { texto: string; idioma: string; pais?: string | null; tono: string; ritmo?: number; genero?: 'hombre' | 'mujer' | null }) => {
     const r = await pedir<{ url: string; motor: string; voz?: string }>('POST', '/voz', b);
     return { ...r, url: apiBase().replace(/\/api\/v1$/, '') + r.url };
   },

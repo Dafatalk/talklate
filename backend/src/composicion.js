@@ -13,7 +13,7 @@ const { crearCifradorAesGcm } = require('./adaptadores/cifrado/aesGcm');
 const { crearTranscriptorWhisper } = require('./adaptadores/transcripcion/whisper');
 const { crearSintetizadorAzure } = require('./adaptadores/sintesis/azure');
 const { crearSintetizadorOpenAI } = require('./adaptadores/sintesis/openai');
-const { crearSintetizadorVoiceStudio } = require('./adaptadores/sintesis/voicestudio');
+const { crearSintetizadorElevenLabs } = require('./adaptadores/sintesis/elevenlabs');
 const { crearServicioVoz } = require('./aplicacion/voz');
 const { crearServicioTraduccion } = require('./aplicacion/traduccion');
 const { crearServicioSesiones } = require('./aplicacion/sesiones');
@@ -38,16 +38,31 @@ function crearMotores(entorno = process.env, { fetchFn } = {}) {
   return [qwen(), claude(), reglas];
 }
 
-// Voz natural segun VOZ_MOTOR (ADR-015, ADR-016): auto (VoiceStudio local -> Azure -> OpenAI compatible),
-// voicestudio, azure, openai o ninguno
-// (ninguno = la app usa la voz del celular)
+// Voz natural segun VOZ_MOTOR (ADR-015): auto (ElevenLabs -> Azure -> OpenAI compatible),
+// elevenlabs, azure, openai o ninguno (ninguno = la app usa la voz del celular)
 function crearSintetizadores(entorno = process.env, { fetchFn } = {}) {
   const modo = (entorno.VOZ_MOTOR || 'auto').toLowerCase();
   const azure = () => crearSintetizadorAzure({ clave: entorno.AZURE_SPEECH_KEY, region: entorno.AZURE_SPEECH_REGION, fetchFn });
   const openai = () => crearSintetizadorOpenAI({ url: entorno.VOZ_URL, modelo: entorno.VOZ_MODELO || undefined, voz: entorno.VOZ_NOMBRE || undefined, apiKey: entorno.VOZ_API_KEY, fetchFn });
-  const voicestudio = () => crearSintetizadorVoiceStudio({ url: entorno.VOICESTUDIO_URL, motor: entorno.VOICESTUDIO_MOTOR || undefined, perfil: entorno.VOICESTUDIO_PERFIL || undefined, apiKey: entorno.VOICESTUDIO_API_KEY, timeoutMs: Number(entorno.VOICESTUDIO_TIMEOUT_MS) || undefined, fetchFn });
-  const porModo = { ninguno: [], azure: [azure()], openai: [openai()], voicestudio: [voicestudio()] };
-  const lista = porModo[modo] || [voicestudio(), azure(), openai()];
+  // ElevenLabs: voces por locale (es-CO=paisa, en-US=New York) con par hombre/mujer. El genero se detecta
+  // por mensaje (lo infiere el modelo de traduccion); si no hay pista usa ELEVENLABS_GENERO (default hombre).
+  const paisa = { hombre: entorno.ELEVENLABS_VOZ_PAISA_HOMBRE, mujer: entorno.ELEVENLABS_VOZ_PAISA_MUJER };
+  const newYork = { hombre: entorno.ELEVENLABS_VOZ_NY_HOMBRE, mujer: entorno.ELEVENLABS_VOZ_NY_MUJER };
+  const elevenlabs = () => crearSintetizadorElevenLabs({
+    apiKey: entorno.ELEVENLABS_API_KEY,
+    modelo: entorno.ELEVENLABS_MODELO || undefined,
+    generoDefault: (entorno.ELEVENLABS_GENERO || 'hombre').toLowerCase(),
+    voces: {
+      'es-CO': paisa,
+      'en-US': newYork,
+      es: paisa,
+      en: newYork,
+      default: entorno.ELEVENLABS_VOZ_DEFAULT,
+    },
+    fetchFn,
+  });
+  const porModo = { ninguno: [], elevenlabs: [elevenlabs()], azure: [azure()], openai: [openai()] };
+  const lista = porModo[modo] || [elevenlabs(), azure(), openai()];
   return lista.map((s) => asegurarPuerto(`sintetizador.${s.nombre}`, s, SINTETIZADOR));
 }
 

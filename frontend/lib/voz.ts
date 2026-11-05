@@ -55,11 +55,11 @@ function hablarCelular(texto: string, codigo: string, pais: string | null | unde
   });
 }
 
-async function hablarNatural(texto: string, codigo: string, pais: string | null | undefined, tono: string, ritmo: number): Promise<boolean> {
+async function hablarNatural(texto: string, codigo: string, pais: string | null | undefined, tono: string, ritmo: number, genero?: 'hombre' | 'mujer' | null): Promise<boolean> {
   if (Date.now() < sinVozNaturalHasta) return false;
   const mio = turno;
   try {
-    const { url } = await api.sintetizarVoz({ texto, idioma: codigo, pais, tono, ritmo });
+    const { url } = await api.sintetizarVoz({ texto, idioma: codigo, pais, tono, ritmo, genero: genero ?? null });
     await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
     if (mio !== turno) return true; // la detuvieron mientras se generaba el audio
     const p = createAudioPlayer({ uri: url });
@@ -77,12 +77,12 @@ async function hablarNatural(texto: string, codigo: string, pais: string | null 
 
 // La traduccion sale con la misma entonacion del mensaje; "ritmo" (1 = normal) imita la velocidad
 // con que hablo la persona en los mensajes de voz. alTerminar se llama una sola vez al acabar.
-export async function hablar(texto: string, codigoIdioma: string, paisNombre?: string | null, tono = 'Neutral', opciones: { ritmo?: number; alTerminar?: () => void } = {}) {
+export async function hablar(texto: string, codigoIdioma: string, paisNombre?: string | null, tono = 'Neutral', opciones: { ritmo?: number; genero?: 'hombre' | 'mujer' | null; alTerminar?: () => void } = {}) {
   detenerVoz();
   turno += 1;
   alTerminarActual = opciones.alTerminar;
   const ritmo = opciones.ritmo && Number.isFinite(opciones.ritmo) ? opciones.ritmo : 1;
-  if (!(await hablarNatural(texto, codigoIdioma, paisNombre, tono, ritmo))) hablarCelular(texto, codigoIdioma, paisNombre, tono, ritmo);
+  if (!(await hablarNatural(texto, codigoIdioma, paisNombre, tono, ritmo, opciones.genero))) hablarCelular(texto, codigoIdioma, paisNombre, tono, ritmo);
 }
 
 export function detenerVoz() {
