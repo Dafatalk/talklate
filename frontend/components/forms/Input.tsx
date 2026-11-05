@@ -42,7 +42,7 @@ const Input: React.FC<CustomTextInputProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [localValue, setLocalValue] = useState(value || '');
   const animatedLabelValue = useRef(new Animated.Value(value ? 1 : 0)).current;
-  const inputRef = useRef<RNTextInput>(null);
+  const inputRef = useRef<React.ComponentRef<typeof RNTextInput>>(null);
 
   useEffect(() => {
     setLocalValue(value || '');
