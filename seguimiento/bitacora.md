@@ -131,3 +131,4 @@
 - **Accesibilidad:** el icono para cambiar entre burbuja y chat ahora tiene nombre accesible ("Cambiar a chat" / "Cambiar a voz").
 - **Docs:** carpeta `calidad/` y documentos 18 y 19 en la entrega (Word y PDF); entrega en version 1.1.
 - **Revision:** PR #42 de Julian (`run-talklate.sh`) revisado; dos sugerencias menores en el PR.
+- **Integracion de `feature/glosario-cultural` (Julian):** glosario cultural paisa / New York en el prompt de Qwen y Claude, y la region de ejemplo pasa de Miami a New York. Se probo toda la piramide con sus cambios (Expo SDK 58, nueva pantalla de Nueva conversacion con selectores desplegables, ElevenLabs): backend 63 unitarias, 81 con cobertura (96.3 % de lineas), 2 E2E de la API, `arch:check` limpio, frontend 5 pruebas y tipos ok, Trivy limpio. La prueba de Playwright se adapto a los selectores desplegables y a New York.

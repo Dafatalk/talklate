@@ -1,3 +1,23 @@
+const { buscarTerminos, localeDe } = require('./glosario');
+
+// Arma las lineas de glosario cultural: los modismos del glosario que aparecen en el mensaje, con su
+// equivalente natural en la variedad destino. Asi el motor sabe como decirlo un nativo y no traduce
+// literal. Si no hay coincidencias no agrega nada. (Ver glosario.js.)
+function lineasGlosario({ texto, origen, destino }) {
+  const matches = buscarTerminos(texto, localeDe(origen.codigo));
+  if (!matches.length) return [];
+  const dest = destino.nombre || destino.codigo;
+  return [
+    '',
+    `Modismos detectados en el mensaje. Usa el equivalente cultural natural en ${dest} (nunca la traduccion literal) y respeta el registro del hablante:`,
+    ...matches.map((m) => {
+      const eq = m.equivalent ? ` -> en ${dest}: ${m.equivalent}` : '';
+      const flag = m.sensitive ? ' [sensible: cuida el registro, puede ofender fuera de contexto]' : '';
+      return `- "${m.term}" = ${m.meaning_es}${eq}${flag}`;
+    }),
+  ];
+}
+
 // Prompt comun para los motores de IA (Qwen y Claude): conservar intencion, tono y modismos
 function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tonos, prosodia }) {
   return [
@@ -8,6 +28,7 @@ function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tono
     `Tonos posibles: ${tonos.join(', ')}.`,
     ...(prosodia ? [`El mensaje llego por voz: la persona ${prosodia.descripcion}. Usa tambien eso para elegir el tono y conservalo en la traduccion.`] : []),
     'Responde SOLO con un JSON: {"traduccion": string, "tono": uno de los tonos posibles, "genero": "masculino" | "femenino" | null (el genero de quien ESCRIBE el mensaje, inferido por pistas del texto como la concordancia en espanol -cansada/cansado- o como se nombra; null si no hay pistas), "nota_cultural": string o null (explica en espanol breve cualquier modismo adaptado), "region_origen": string o null}.',
+    ...lineasGlosario({ texto, origen, destino }),
     '',
     'Mensaje:',
     texto,
