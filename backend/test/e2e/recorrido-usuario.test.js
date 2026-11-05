@@ -112,8 +112,8 @@ test('recorrido completo: registro, conversar por texto y por voz, escuchar, rep
   // 3. Elige idioma y region destino y crea la conversacion
   const catalogo = (await api('GET', '/catalogo', null, token)).datos;
   const ingles = catalogo.idiomas.find((i) => i.codigo === 'en');
-  const miami = ingles.regiones.find((r) => r.nombre === 'Miami');
-  const conv = await api('POST', '/conversaciones', { idioma_destino_id: ingles.id, region_destino_id: miami.id }, token);
+  const ny = ingles.regiones.find((r) => r.nombre === 'New York');
+  const conv = await api('POST', '/conversaciones', { idioma_destino_id: ingles.id, region_destino_id: ny.id }, token);
   assert.equal(conv.estado, 201);
   const id = conv.datos.id;
 
