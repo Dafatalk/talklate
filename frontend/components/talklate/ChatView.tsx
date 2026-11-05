@@ -30,7 +30,7 @@ export default function ChatView({ id }: { id: string }) {
   const [errorNombre, setErrorNombre] = useState('');
   const [reportando, setReportando] = useState<Mensaje | null>(null);
   const [errorReporte, setErrorReporte] = useState('');
-  const lista = useRef<ScrollView>(null);
+  const lista = useRef<React.ComponentRef<typeof ScrollView>>(null);
   const [modo, setModo] = useState<Modo>('burbuja');
   const [remitente, setRemitente] = useState<Remitente>('usuario');
   const [estadoVoz, setEstadoVoz] = useState<'lista' | 'traduciendo' | 'hablando'>('lista');

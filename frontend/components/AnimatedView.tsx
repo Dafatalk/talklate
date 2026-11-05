@@ -1,5 +1,5 @@
 import React, { useEffect, memo, useRef, useState } from 'react';
-import { Animated, ViewStyle, StyleProp, EasingFunction, Easing, View, LayoutChangeEvent, Dimensions, InteractionManager } from 'react-native';
+import { Animated, ViewStyle, StyleProp, EasingFunction, Easing, View, LayoutChangeEvent, Dimensions } from 'react-native';
 import { useIsFocused } from 'expo-router';
 
 export type AnimationType =
@@ -85,7 +85,7 @@ function AnimatedViewComponent({
     const animatedValue = useRef(new Animated.Value(0)).current;
     const isFocused = useIsFocused();
     const hasAnimatedOnce = useRef(false);
-    const viewRef = useRef<View>(null);
+    const viewRef = useRef<React.ComponentRef<typeof View>>(null);
     // Important: initial state is false if triggerOnVisible is true, otherwise we animate immediately
     const [isVisible, setIsVisible] = useState(false);
     const { height: windowHeight } = Dimensions.get('window');
@@ -109,8 +109,8 @@ function AnimatedViewComponent({
         if (isFirstRender.current) {
             isFirstRender.current = false;
             
-            // Wait for interactions to complete (navigation, etc)
-            InteractionManager.runAfterInteractions(() => {
+            // Wait for the next frame to complete (navigation, etc); InteractionManager was removed in RN 0.88
+            requestAnimationFrame(() => {
                 // Slight delay to ensure component is fully mounted and measurable
                 setTimeout(() => {
                     checkVisibility();
