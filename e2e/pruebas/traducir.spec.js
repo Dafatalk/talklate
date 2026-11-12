@@ -12,6 +12,9 @@ test('iniciar sesion, crear conversacion y traducir un modismo en el chat', asyn
   await campos.nth(1).fill(ADMIN.password);
   await page.getByText('Iniciar sesion', { exact: true }).last().click();
 
+  // La pantalla inicial es la lista de conversaciones: se abre una nueva con el boton +
+  await page.getByRole('button', { name: 'Nueva conversacion' }).click();
+
   // Nueva conversacion: idioma y region destino
   // Los selectores abren una hoja inferior con la lista de opciones
   await page.getByRole('button', { name: 'Traducir a: Elige un idioma' }).click();

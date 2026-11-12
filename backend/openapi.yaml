@@ -14,6 +14,7 @@ tags:
   - name: Gestion de conversaciones
   - name: Traduccion de mensajes
   - name: Reportes
+  - name: Problemas de la app
   - name: Administracion de idiomas y regiones
 components:
   securitySchemes:
@@ -456,6 +457,48 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { type: object, properties: { estado: { type: string, enum: [abierto, revisado, descartado] }, nota_admin: { type: string } } } } } }
       responses:
         '200': { description: Reporte actualizado, content: { application/json: { schema: { $ref: '#/components/schemas/Reporte' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /problemas:
+    post:
+      tags: [Problemas de la app]
+      summary: Reportar un problema general de la app
+      description: Cualquier usuario con sesion. Limite de 10 reportes por hora por usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [descripcion]
+              properties:
+                descripcion: { type: string, minLength: 5, maxLength: 1000 }
+                categoria: { type: string, maxLength: 60 }
+                contacto: { type: string, maxLength: 120 }
+      responses:
+        '201': { description: Problema recibido }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /admin/problemas:
+    get:
+      tags: [Problemas de la app]
+      summary: Revisar los problemas reportados (administrador)
+      parameters:
+        - { name: estado, in: query, schema: { type: string, enum: [abierto, revisado, descartado] } }
+        - { $ref: '#/components/parameters/page' }
+        - { $ref: '#/components/parameters/limit' }
+      responses:
+        '200': { description: Lista paginada }
+        '403': { $ref: '#/components/responses/Error' }
+  /admin/problemas/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    patch:
+      tags: [Problemas de la app]
+      summary: Marcar un problema como revisado o descartado (administrador)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [estado], properties: { estado: { type: string, enum: [abierto, revisado, descartado] }, nota_admin: { type: string, maxLength: 1000 } } } } } }
+      responses:
+        '200': { description: Problema actualizado }
         '400': { $ref: '#/components/responses/Error' }
         '404': { $ref: '#/components/responses/Error' }
   /admin/idiomas:

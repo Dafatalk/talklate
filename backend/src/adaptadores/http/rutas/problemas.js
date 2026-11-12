@@ -2,12 +2,16 @@
 const express = require('express');
 const { requerirSesion, requerirAdmin, ruta } = require('../sesion');
 const { paginar } = require('../../../aplicacion/paginacion');
+const { crearLimite, porUsuario } = require('../limites');
 
 module.exports = function rutasProblemas({ problemas, sesiones }) {
   const r = express.Router();
   r.use(['/problemas', '/admin'], requerirSesion(sesiones));
 
-  r.post('/problemas', ruta(async (req, res) => {
+  // Evita llenar la base de reportes: 10 por hora por usuario (configurable)
+  const limite = crearLimite({ maximo: Number(process.env.LIMITE_PROBLEMAS_POR_HORA) || 10, ventanaMs: 60 * 60 * 1000, clave: porUsuario, mensaje: 'Enviaste muchos reportes. Intenta de nuevo mas tarde.' });
+
+  r.post('/problemas', limite, ruta(async (req, res) => {
     const p = await problemas.reportar(req.usuario, req.body || {});
     res.status(201).json(p);
   }));

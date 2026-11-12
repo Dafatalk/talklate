@@ -67,3 +67,35 @@ test('firmador JWT: firma, verifica, rechaza tokens alterados, vencidos o de otr
   assert.throws(() => f.verificar(f.firmar({ sub: 'u1' }, -1)), /expired/);
   assert.throws(() => crearFirmadorJwt({}), /secreto/);
 });
+
+test('salida del modelo: la nota y la region solo se aceptan como texto y con largo acotado', () => {
+  const { leerRespuesta } = require('../../src/adaptadores/traduccion/prompt');
+  const tonos = ['Neutral', 'Alegre'];
+  const r = leerRespuesta(JSON.stringify({ traduccion: 'Hello', tono: 'Alegre', nota_cultural: 'x'.repeat(900), region_origen: { raro: true } }), tonos);
+  assert.equal(r.nota.length, 500);
+  assert.equal(r.regionOrigen, null); // un objeto no es una region valida
+  assert.equal(leerRespuesta(JSON.stringify({ traduccion: 'Hello', nota_cultural: ['a'] }), tonos).nota, null);
+  assert.equal(leerRespuesta(JSON.stringify({ traduccion: 'Hello', nota_cultural: '  ' }), tonos).nota, null);
+});
+
+test('reportar un problema tiene limite de uso por usuario (429)', async () => {
+  process.env.LIMITE_PROBLEMAS_POR_HORA = '2';
+  const express = require('express');
+  const { ErrorNegocio } = require('../../src/dominio/errores');
+  const rutas = require('../../src/adaptadores/http/rutas/problemas');
+  let n = 0;
+  const app = express();
+  app.use(express.json());
+  app.use(rutas({ problemas: { reportar: async () => ({ id: String(++n) }) }, sesiones: { verificarAcceso: async () => ({ usuario: { id: 'u1', rol: 'cliente' }, sesion: {} }) } }));
+  app.use((e, _req, res, _n) => res.status(e instanceof ErrorNegocio ? e.estado : 500).json({ message: e.message }));
+  const srv = app.listen(0);
+  await new Promise((r) => srv.once('listening', r));
+  try {
+    const url = `http://127.0.0.1:${srv.address().port}/problemas`;
+    const pedir = () => fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then((r) => r.status);
+    assert.deepEqual([await pedir(), await pedir(), await pedir()], [201, 201, 429]);
+  } finally {
+    srv.close();
+    delete process.env.LIMITE_PROBLEMAS_POR_HORA;
+  }
+});

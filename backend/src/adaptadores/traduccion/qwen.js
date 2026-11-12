@@ -18,7 +18,7 @@ function crearMotorQwen({ url = 'http://localhost:11434', modelo = 'qwen2.5:7b',
           stream: false,
           format: 'json', // pide salida JSON valida
           think: false, // modelos Qwen3: sin modo de razonamiento, que rompe el JSON y es lento
-          options: { temperature: 0.2 },
+          options: { temperature: 0.2, num_predict: 1024 }, // tope de salida: evita respuestas sin fin
           messages: [{ role: 'user', content: armarPrompt(paraPrompt(entrada)) }],
         }),
         signal: AbortSignal.timeout(timeoutMs),

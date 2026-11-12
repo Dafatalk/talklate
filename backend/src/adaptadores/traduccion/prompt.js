@@ -44,6 +44,9 @@ function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tono
   ].join('\n');
 }
 
+// La salida del modelo es entrada no confiable: solo se aceptan textos, con largo acotado
+const textoAcotado = (v, max) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
+
 // Lee el JSON de la respuesta aunque el modelo lo envuelva en texto o en un bloque de codigo
 function leerRespuesta(bruto, tonos) {
   const t = String(bruto || '').trim();
@@ -58,8 +61,8 @@ function leerRespuesta(bruto, tonos) {
     traduccion: json.traduccion.trim(),
     tono: tonos.includes(json.tono) ? json.tono : null,
     genero,
-    nota: json.nota_cultural || null,
-    regionOrigen: json.region_origen || null,
+    nota: textoAcotado(json.nota_cultural, 500),
+    regionOrigen: textoAcotado(json.region_origen, 80),
     aproximada: false,
   };
 }
