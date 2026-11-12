@@ -12,7 +12,7 @@ TalkLate se prueba en tres niveles: muchas pruebas unitarias rapidas en la base,
 | --- | --- | --- | --- | --- | --- |
 | Punta de la piramide: punta a punta (E2E) | La app completa como la usa una persona: servidor real como proceso aparte y app web en un navegador | 4 (2 de la API y 2 de la app web) | ~1 min | `backend/test/e2e/`, `e2e/pruebas/` | `npm run test:e2e` (backend) y `npm test` (carpeta `e2e/`) |
 | Medio: integracion | La API HTTP completa con una base de datos real (SQLite en memoria y SurrealDB en CI) | 29 (18 de la API corren contra SQLite y SurrealDB; 11 de problemas, contra SQLite) | ~3 s | `backend/test/integracion/` | `npm run test:integracion` y `npm run test:surreal` |
-| Base: unitarias | Reglas del dominio, casos de uso y adaptadores, con dobles de prueba (sin red ni base) | 77 (72 del backend y 5 del frontend) | < 2 s | `backend/test/unitarias/`, `frontend/test/` | `npm run test:unitarias` (backend) y `npm test` (frontend) |
+| Base: unitarias | Reglas del dominio, casos de uso y adaptadores, con dobles de prueba (sin red ni base) | 78 (73 del backend y 5 del frontend) | < 2 s | `backend/test/unitarias/`, `frontend/test/` | `npm run test:unitarias` (backend) y `npm test` (frontend) |
 
 Cobertura del backend (unitarias + integracion): **96.5 % de lineas, 94.5 % de funciones y 84.6 % de ramas**. El minimo exigido es 80 % (convencion del proyecto) y el CI falla si baja.
 
@@ -30,7 +30,7 @@ Cobertura del backend (unitarias + integracion): **96.5 % de lineas, 94.5 % de f
 | `backend/test/unitarias/dominio.test.js` | Reglas de negocio puras: correo, contrasena, edad minima, nombres, contenido del mensaje; deteccion de idioma, tono y region; prosodia de la voz; expresion de la voz por tono; errores de negocio | 14 |
 | `backend/test/unitarias/aplicacion.test.js` | Casos de uso con dobles: Circuit Breaker de traduccion (con reloj falso), cadena de voz, vencimiento y limite de audios, paginacion, problemas reportados | 12 |
 | `backend/test/unitarias/motores.test.js` | Adaptadores de IA con `fetch` falso: Qwen, Claude, motor de reglas, Whisper, Azure, OpenAI y VoiceStudio; composicion de la cadena de motores | 13 |
-| `backend/test/unitarias/seguridad.test.js` | Cifrado AES-256-GCM, limites de uso, logs sin datos personales, formato de error, notificador, hash de contrasenas (bcrypt), tokens JWT, validacion de la salida del modelo y limite de uso al reportar problemas | 9 |
+| `backend/test/unitarias/seguridad.test.js` | Cifrado AES-256-GCM, limites de uso, logs sin datos personales, formato de error, notificador, hash de contrasenas (bcrypt), tokens JWT, validacion de la salida del modelo, limite de uso al reportar problemas y administrador sin contrasena por defecto en produccion | 10 |
 | `backend/test/unitarias/glosario.test.js` | Glosario cultural: busqueda de modismos paisa y neoyorquinos (sin tildes ni falsos positivos), limite de entradas y que el prompt los incluya | 8 |
 | `backend/test/unitarias/genero-voz.test.js` | Genero por el pitch de la voz: banda de decision, estimacion de la frecuencia, detector deshabilitado y ffmpeg inexistente | 6 |
 | `backend/test/unitarias/surreal-cliente.test.js` | Cliente de SurrealDB con `fetch` falso: sesion, reintento con token vencido, literales seguros contra inyeccion | 4 |

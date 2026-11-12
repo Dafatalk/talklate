@@ -10,7 +10,7 @@
     "repository": {
       "url": "https://github.com/Dafatalk/talklate",
       "provider": "github",
-      "revision": "54a348ed0ba6a23d407b22a092f295f672fe9881"
+      "revision": "092c3cdeb5409ef94c568b7221e9c4e2564aecb2"
     }
   },
   "components": [
@@ -217,7 +217,7 @@
       "id": "traduccion",
       "type": "backend",
       "label": "Adaptador traducción",
-      "sublabel": "qwen → claude → reglas",
+      "sublabel": "claude (vertex) → reglas",
       "pos": [
         1010,
         290
@@ -228,10 +228,6 @@
       ],
       "sources": [
         {
-          "path": "backend/src/adaptadores/traduccion/qwen.js",
-          "label": "qwen"
-        },
-        {
           "path": "backend/src/adaptadores/traduccion/claude.js",
           "label": "claude"
         },
@@ -239,6 +235,10 @@
           "path": "backend/src/adaptadores/traduccion/reglas.js",
           "line": 313,
           "label": "reglas"
+        },
+        {
+          "path": "backend/src/adaptadores/traduccion/vertex.js",
+          "label": "vertex"
         }
       ]
     },
@@ -370,7 +370,7 @@
       "id": "ollama",
       "type": "external",
       "label": "Ollama · Qwen",
-      "sublabel": "LLM local",
+      "sublabel": "alternativo, no se usa",
       "pos": [
         1300,
         268
@@ -383,8 +383,8 @@
     {
       "id": "claudeapi",
       "type": "external",
-      "label": "Claude API",
-      "sublabel": "Anthropic",
+      "label": "Claude · Vertex AI",
+      "sublabel": "Google Cloud",
       "pos": [
         1300,
         336
@@ -568,9 +568,10 @@
       "id": "traduccion-ollama",
       "from": "traduccion",
       "to": "ollama",
-      "label": "HTTP",
+      "label": "alterno",
       "fromSide": "right",
-      "toSide": "left"
+      "toSide": "left",
+      "variant": "dashed"
     },
     {
       "id": "traduccion-claude",
@@ -638,7 +639,7 @@
       "title": "Composición",
       "items": [
         "composicion.js elige cada adaptador por variables de entorno",
-        "TRADUCTOR, TRANSCRIPCION_URL y VOZ_MOTOR"
+        "TRADUCTOR (claude en la configuracion del equipo), TRANSCRIPCION_URL y VOZ_MOTOR"
       ]
     }
   ]

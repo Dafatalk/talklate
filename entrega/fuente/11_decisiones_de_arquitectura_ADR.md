@@ -367,7 +367,7 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - **Cypress para la web:** maduro, pero Playwright es mas liviano en CI, emula celulares y ya era la herramienta usada para revisar la app.
 - **Detox o Maestro en el celular:** prueban la app nativa, pero exigen emuladores en CI; la app web comparte el mismo codigo (ADR-001) y cubre el recorrido.
 
-**Consecuencias:** 77 unitarias (72 del backend y 5 del frontend), 29 de integracion (18 de la API contra SQLite y SurrealDB, 11 de problemas contra SQLite) y 4 de punta a punta; cobertura de lineas del backend de 96.5 %. Cada falla dice en que nivel esta el problema. Detalle en `calidad/piramide_de_pruebas.md`.
+**Consecuencias:** 78 unitarias (73 del backend y 5 del frontend), 29 de integracion (18 de la API contra SQLite y SurrealDB, 11 de problemas contra SQLite) y 4 de punta a punta; cobertura de lineas del backend de 96.5 %. Cada falla dice en que nivel esta el problema. Detalle en `calidad/piramide_de_pruebas.md`.
 
 ## ADR-018: Escaneo de seguridad con Trivy en el CI
 

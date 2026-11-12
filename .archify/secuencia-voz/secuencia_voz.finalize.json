@@ -5,16 +5,16 @@
   "status": "pass",
   "type": "sequence",
   "quality": "showcase",
-  "startedAt": "2026-11-12T21:45:53.651Z",
+  "startedAt": "2026-11-12T22:15:12.732Z",
   "specification": {
     "path": "/home/user/talklate/.archify/secuencia-voz/candidate.json",
-    "sha256": "ba5f517376852a728d04506e68e157b6610e83a452b77b6f55771dde03c98ed9",
-    "bytes": 3338
+    "sha256": "56de1f3b0d206065d281a32e79ec0efe3c21797b19f3e39aa64c74e524a610e4",
+    "bytes": 3342
   },
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
-    "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
-    "bytes": 841282
+    "sha256": "99e36b895428c77ec239d3412e5f5ef2b2765cc6b0731cbf27d3db45a799be15",
+    "bytes": 841356
   },
   "stages": {
     "validate": {
@@ -40,8 +40,8 @@
         "ok": true,
         "command": "validate",
         "specification": {
-          "sha256": "ba5f517376852a728d04506e68e157b6610e83a452b77b6f55771dde03c98ed9",
-          "bytes": 3338
+          "sha256": "56de1f3b0d206065d281a32e79ec0efe3c21797b19f3e39aa64c74e524a610e4",
+          "bytes": 3342
         },
         "validation": {
           "checksPassed": 9,
@@ -56,7 +56,7 @@
     "deliver": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 456,
+      "durationMs": 453,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -72,19 +72,19 @@
       ],
       "receipt": {
         "schemaVersion": 1,
-        "receiptId": "73043d11-67a1-45fb-b734-8317dd2d116d",
+        "receiptId": "69f6947c-3fa6-4361-8d30-e467015e7c56",
         "ok": true,
         "command": "deliver",
         "type": "sequence",
         "input": "/home/user/talklate/.archify/secuencia-voz/candidate.json",
         "output": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
         "specification": {
-          "sha256": "ba5f517376852a728d04506e68e157b6610e83a452b77b6f55771dde03c98ed9",
-          "bytes": 3338
+          "sha256": "56de1f3b0d206065d281a32e79ec0efe3c21797b19f3e39aa64c74e524a610e4",
+          "bytes": 3342
         },
         "artifact": {
-          "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
-          "bytes": 841282
+          "sha256": "99e36b895428c77ec239d3412e5f5ef2b2765cc6b0731cbf27d3db45a799be15",
+          "bytes": 841356
         },
         "validation": {
           "checksPassed": 9,
@@ -110,7 +110,7 @@
     "check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 196,
+      "durationMs": 241,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -122,8 +122,8 @@
         "ok": true,
         "file": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
         "artifact": {
-          "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
-          "bytes": 841282
+          "sha256": "99e36b895428c77ec239d3412e5f5ef2b2765cc6b0731cbf27d3db45a799be15",
+          "bytes": 841356
         },
         "checks": [
           {
@@ -252,13 +252,13 @@
           "issues": []
         },
         "provenance": "current",
-        "deliveryReceiptId": "73043d11-67a1-45fb-b734-8317dd2d116d"
+        "deliveryReceiptId": "69f6947c-3fa6-4361-8d30-e467015e7c56"
       }
     },
     "browser-check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 2075,
+      "durationMs": 2518,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -278,11 +278,11 @@
         "status": "pass",
         "visualReview": "not-requested",
         "provenance": "current",
-        "deliveryReceiptId": "73043d11-67a1-45fb-b734-8317dd2d116d",
+        "deliveryReceiptId": "69f6947c-3fa6-4361-8d30-e467015e7c56",
         "artifact": {
           "path": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
-          "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
-          "bytes": 841282
+          "sha256": "99e36b895428c77ec239d3412e5f5ef2b2765cc6b0731cbf27d3db45a799be15",
+          "bytes": 841356
         },
         "state": {
           "detail": "read",
@@ -981,8 +981,8 @@
     "browserCheckReceipt": "/home/user/talklate/.archify/secuencia-voz/secuencia_voz.browser-check.json"
   },
   "visualReview": "not-requested",
-  "finishedAt": "2026-11-12T21:45:56.468Z",
-  "durationMs": 2817,
+  "finishedAt": "2026-11-12T22:15:16.036Z",
+  "durationMs": 3303,
   "update": {
     "status": "current",
     "installedVersion": "3.2.0",

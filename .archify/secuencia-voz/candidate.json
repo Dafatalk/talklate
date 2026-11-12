@@ -38,10 +38,10 @@
       "sublabel": "voz a texto"
     },
     {
-      "id": "qwen",
-      "type": "backend",
-      "label": "Ollama + Qwen",
-      "sublabel": "traduccion cultural"
+      "id": "claude",
+      "type": "external",
+      "label": "Claude Sonnet",
+      "sublabel": "Google Vertex AI"
     },
     {
       "id": "db",
@@ -92,14 +92,14 @@
     {
       "id": "m4",
       "from": "api",
-      "to": "qwen",
+      "to": "claude",
       "y": 272,
       "label": "2. traduce: tono, region y glosario",
       "variant": "emphasis"
     },
     {
       "id": "m5",
-      "from": "qwen",
+      "from": "claude",
       "to": "api",
       "y": 300,
       "label": "JSON: traduccion, tono, nota, genero",

@@ -70,14 +70,14 @@ Lean primero los marcados con (*): son los que mas preguntan. Para cada uno, la 
 
 ## 5. Donde nos pueden cuestionar
 
-Revision hecha el 11/11/2026 comparando los documentos con el codigo. Ordenado de mas a menos grave. La columna "Que hacer" es la propuesta; nada de esto esta corregido todavia salvo lo indicado.
+Revision hecha el 11/11/2026 y actualizada el 12/11/2026 (integracion del pull request 53 de Julian: traduccion con Claude en Vertex). Ordenado de mas a menos grave. Lo marcado **Corregido** ya esta en la rama `integracion/vertex-sonnet`.
 
 ### ALTA
 
 | # | Problema | Evidencia | Pregunta probable | Que hacer |
 | --- | --- | --- | --- | --- |
-| 1 | **Los documentos de la entrega describen VoiceStudio como el motor de voz, pero el codigo usa ElevenLabs.** El ADR-019 (que revierte VoiceStudio) esta en `arquitectura/decisiones.md` pero no en `entrega/fuente/11` | VoiceStudio aparece en 11 de los 19 documentos de la entrega; ElevenLabs en ninguno | "El documento dice voz local y el codigo llama a una API en la nube. Cual es la verdad?" | Actualizar los documentos 01, 05, 06, 07, 08, 09, 10, 11, 16, 17 y 18, agregar ADR-019 y regenerar Word y PDF. Es ademas un cambio de privacidad: el texto traducido sale a un tercero |
-| 2 | Cifras desactualizadas | Documentos 18 y README de la entrega dicen 51 pruebas unitarias; hoy son 68 (63 del backend y 5 del frontend) | "Cuantas pruebas tienen?" | Actualizar a 68 y la cobertura (96.3 %) |
+| 1 | **Corregido 12/11.** Los documentos de la entrega decian VoiceStudio y Qwen como motor principal; el codigo usa ElevenLabs y Claude en Vertex | Se agregaron ADR-019 y ADR-020, se actualizaron 11 documentos, la politica de datos y la matriz, y se regeneraron los Word y PDF | "El documento dice una cosa y el codigo otra" | Nada; solo mantener las dos copias iguales |
+| 2 | **Corregido 12/11.** Cifras de pruebas | Ahora 78 unitarias (73 del backend y 5 del frontend), 29 de integracion y 4 de punta a punta; 96.5 % de cobertura | "Cuantas pruebas tienen?" | Volver a contarlas cada vez que cambien |
 | 3 | El estado del framework dice una cosa y el repo otra | `.softverse/estado_fases.json`: F7 y F8 "desbloqueadas", F9 y F10 "bloqueadas", pero ya hay pruebas de punta a punta y CI | "Dicen que usan SoftVerse; su propio estado contradice lo construido" | Actualizar las fases y la bitacora; F10 (despliegue) si se declara pendiente, que sea explicito |
 | 4 | Uso de IA | Muchos commits con coautor Claude | "Quien escribio este codigo?" | Ya esta declarado en el marco metodologico. Lo que deben hacer: poder explicar el backend, la arquitectura y las pruebas sin ayuda |
 
@@ -85,10 +85,10 @@ Revision hecha el 11/11/2026 comparando los documentos con el codigo. Ordenado d
 
 | # | Problema | Evidencia | Que hacer |
 | --- | --- | --- | --- |
-| 5 | La medicion de calidad es circular | `medicion_traduccion.md` se hizo con el motor de reglas, construido con esos mismos 15 modismos; nunca se midio con Qwen | Correr `npm run medir` con Qwen y con modismos nuevos; mientras tanto, decirlo como "linea base" |
+| 5 | La medicion de calidad es circular | `medicion_traduccion.md` se hizo con el motor de reglas, construido con esos mismos 15 modismos; nunca se midio con el motor de produccion (Claude en Vertex) | Correr `npm run medir` con Claude y modismos nuevos; mientras tanto, decirlo como "linea base" |
 | 6 | El glosario cultural no esta validado | 196 entradas, 0 con `native_validated: true` | Que un paisa y un neoyorquino lo revisen; o presentarlo como "investigado, pendiente de validar" |
-| 7 | OWASP LLM Top 10 no se habia aplicado formalmente | No habia ninguna mencion en el proyecto | Ya esta revisado en `calidad/owasp_llm_top10.md`: 2 cubiertos, 1 no aplica, 7 parciales. Cerrar las brechas de bajo esfuerzo |
-| 8 | Administrador por defecto con contrasena conocida | `Admin123!` en el codigo y los README; correo personal en el codigo | Exigir `ADMIN_PASSWORD` en produccion y sacar el correo personal |
+| 7 | OWASP LLM Top 10 | **Revisado** en `calidad/owasp_llm_top10.md` (documento 20 de la entrega): 3 cubiertos, 1 no aplica y 6 parciales. Se cerraron 4 brechas el 12/11 | Cerrar las que quedan (prompt, SBOM, tope de gasto, aviso en la app) |
+| 8 | **Corregido en produccion 12/11.** Administrador por defecto con contrasena conocida | En produccion el servidor exige `ADMIN_PASSWORD`; en desarrollo se conserva `Admin123!`. Falta sacar el correo personal del codigo | No mostrar `Admin123!` en pantalla durante la demo |
 | 9 | La app no se ha probado en celular fisico | `estado_fases.json` F8: "falta probar en celular fisico"; las pruebas de punta a punta corren en la web | Probar en Expo Go con celular antes de la sustentacion y dejar evidencia (capturas) |
 | 10 | No hay despliegue | No hay Dockerfile ni infraestructura como codigo (Trivy lo dice) | Declarar el alcance: el MVP corre local y en CI; despliegue es trabajo futuro |
 
@@ -98,6 +98,8 @@ Revision hecha el 11/11/2026 comparando los documentos con el codigo. Ordenado d
 | --- | --- | --- |
 | 11 | Dos copias de cada texto (carpeta de trabajo y `entrega/fuente/`) se pueden separar | Antes de cada entrega, correr la lista de la seccion 6 |
 | 12 | "Miami" sigue en `arquitectura/revision_recomendaciones.md` | Es historia de una revision; basta con no citarlo como ejemplo actual |
+| 13 | **Nuevo, de privacidad:** con Claude en Vertex, el texto de cada mensaje sale a Google Cloud (antes, con Qwen local, no salia) | Esta en la politica de datos y la matriz desde el 12/11; falta un aviso en la app | Decirlo de frente: es el cambio de privacidad mas grande del proyecto |
+| 14 | **Nuevo:** la traduccion depende de internet y de credenciales de Google; si Claude falla, el motor de reglas solo traduce modismos conocidos | Cambio de ADR-020 | Probar antes de exponer con internet y credenciales activas |
 | 13 | Los limites de uso estan en memoria | Declararlo: el MVP corre en una sola instancia |
 
 ## 6. Lista para antes de entregar

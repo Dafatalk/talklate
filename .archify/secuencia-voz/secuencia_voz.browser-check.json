@@ -6,11 +6,11 @@
   "status": "pass",
   "visualReview": "not-requested",
   "provenance": "current",
-  "deliveryReceiptId": "73043d11-67a1-45fb-b734-8317dd2d116d",
+  "deliveryReceiptId": "69f6947c-3fa6-4361-8d30-e467015e7c56",
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
-    "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
-    "bytes": 841282
+    "sha256": "99e36b895428c77ec239d3412e5f5ef2b2765cc6b0731cbf27d3db45a799be15",
+    "bytes": 841356
   },
   "state": {
     "detail": "read",

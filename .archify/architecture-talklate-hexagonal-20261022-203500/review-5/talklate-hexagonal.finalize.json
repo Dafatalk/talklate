@@ -5,16 +5,16 @@
   "status": "pass",
   "type": "architecture",
   "quality": "showcase",
-  "startedAt": "2026-11-12T21:44:41.708Z",
+  "startedAt": "2026-11-12T22:15:24.389Z",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-    "sha256": "3eb33d5666f94429f6fdd4738f4a56dc0ecefac01afbc05b657921f8aa662b8b",
-    "bytes": 13764
+    "sha256": "6f0f6915b120c7916f576bf0f74ca72b00bf9f904fc2465bebe9586625e7723d",
+    "bytes": 13863
   },
   "artifact": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
-    "bytes": 877215
+    "sha256": "399b4af1b7f4ae9448cecd8417d8b1e908d796b671f234af737e46f7e8ec1fc3",
+    "bytes": 877379
   },
   "stages": {
     "validate": {
@@ -40,8 +40,8 @@
         "ok": true,
         "command": "validate",
         "specification": {
-          "sha256": "3eb33d5666f94429f6fdd4738f4a56dc0ecefac01afbc05b657921f8aa662b8b",
-          "bytes": 13764
+          "sha256": "6f0f6915b120c7916f576bf0f74ca72b00bf9f904fc2465bebe9586625e7723d",
+          "bytes": 13863
         },
         "validation": {
           "checksPassed": 9,
@@ -56,7 +56,7 @@
     "deliver": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 728,
+      "durationMs": 665,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -72,19 +72,19 @@
       ],
       "receipt": {
         "schemaVersion": 1,
-        "receiptId": "d3d58cce-faf2-400a-a299-c6a6750daabd",
+        "receiptId": "85c05db9-d398-46bf-b5d1-832c2074df8e",
         "ok": true,
         "command": "deliver",
         "type": "architecture",
         "input": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
         "output": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
         "specification": {
-          "sha256": "3eb33d5666f94429f6fdd4738f4a56dc0ecefac01afbc05b657921f8aa662b8b",
-          "bytes": 13764
+          "sha256": "6f0f6915b120c7916f576bf0f74ca72b00bf9f904fc2465bebe9586625e7723d",
+          "bytes": 13863
         },
         "artifact": {
-          "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
-          "bytes": 877215
+          "sha256": "399b4af1b7f4ae9448cecd8417d8b1e908d796b671f234af737e46f7e8ec1fc3",
+          "bytes": 877379
         },
         "validation": {
           "checksPassed": 9,
@@ -97,7 +97,7 @@
         "evidence": {
           "verified": true,
           "repository": "https://github.com/Dafatalk/talklate",
-          "revision": "54a348ed0ba6a23d407b22a092f295f672fe9881",
+          "revision": "092c3cdeb5409ef94c568b7221e9c4e2564aecb2",
           "references": 26
         },
         "update": {
@@ -116,7 +116,7 @@
     "check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 212,
+      "durationMs": 254,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -128,8 +128,8 @@
         "ok": true,
         "file": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
         "artifact": {
-          "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
-          "bytes": 877215
+          "sha256": "399b4af1b7f4ae9448cecd8417d8b1e908d796b671f234af737e46f7e8ec1fc3",
+          "bytes": 877379
         },
         "checks": [
           {
@@ -270,13 +270,13 @@
           "issues": []
         },
         "provenance": "current",
-        "deliveryReceiptId": "d3d58cce-faf2-400a-a299-c6a6750daabd"
+        "deliveryReceiptId": "85c05db9-d398-46bf-b5d1-832c2074df8e"
       }
     },
     "browser-check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 2538,
+      "durationMs": 2732,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -296,11 +296,11 @@
         "status": "pass",
         "visualReview": "not-requested",
         "provenance": "current",
-        "deliveryReceiptId": "d3d58cce-faf2-400a-a299-c6a6750daabd",
+        "deliveryReceiptId": "85c05db9-d398-46bf-b5d1-832c2074df8e",
         "artifact": {
           "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-          "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
-          "bytes": 877215
+          "sha256": "399b4af1b7f4ae9448cecd8417d8b1e908d796b671f234af737e46f7e8ec1fc3",
+          "bytes": 877379
         },
         "state": {
           "detail": "read",
@@ -1023,8 +1023,8 @@
     "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/review-5/talklate-hexagonal.browser-check.json"
   },
   "visualReview": "not-requested",
-  "finishedAt": "2026-11-12T21:44:45.272Z",
-  "durationMs": 3563,
+  "finishedAt": "2026-11-12T22:15:28.157Z",
+  "durationMs": 3767,
   "update": {
     "status": "current",
     "installedVersion": "3.2.0",

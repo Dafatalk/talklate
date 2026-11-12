@@ -95,7 +95,7 @@ Ejemplo: la persona escribe *"Hay que ponerse las pilas con el trabajo"*.
 | 3 | Valida el contenido: de 1 a 5000 caracteres | `dominio/validaciones.js` |
 | 4 | Si es el **primer mensaje**, **detecta el idioma de origen** (palabras comunes del espanol contra las del ingles, tildes, enie, signos de apertura) y lo fija: **ya no cambia** en esa conversacion. Tambien intenta reconocer la region de origen por regionalismos ("parce" -> Antioquia) | `dominio/analisis.js`, `asegurarOrigen` |
 | 5 | Calcula el **tono por las palabras** (senales como "idiota", "urgente", "felicidades", "estimado"; MAYUSCULAS sostenidas o "!!" indican enojo) | `dominio/analisis.js` `detectarTono` |
-| 6 | Llama al **servicio de traduccion**, que prueba los motores en orden: **Qwen -> Claude -> reglas** (ver parte 5) | `aplicacion/traduccion.js` |
+| 6 | Llama al **servicio de traduccion**, que prueba los motores en orden: **Claude (Vertex) -> reglas** (ver parte 5) | `aplicacion/traduccion.js` |
 | 7 | El motor devuelve un JSON: traduccion, tono, genero de quien escribe, nota cultural, region de origen | `adaptadores/traduccion/prompt.js` |
 | 8 | **Cifra** el original y la traduccion con AES-256-GCM y los guarda como dos filas: `mensaje_original` y `mensaje_destino` | `adaptadores/cifrado/aesGcm.js` |
 | 9 | Responde con el mensaje, la traduccion, la nota cultural, el tono, la configuracion y los datos de entrega (si hay que reproducir audio, a que velocidad, con que genero) | `enviarMensaje` |
@@ -120,7 +120,7 @@ Es el mismo flujo, con pasos extra al inicio y al final:
 | 6 | Sigue el flujo del mensaje escrito, pero el prompt incluye como hablo la persona ("hablo fuerte, rapido, con mucha variacion") |
 | 7 | La respuesta indica `reproducir_audio: true`. La app llama `POST /voz` con el texto traducido, el tono, el genero y el ritmo |
 | 8 | El servidor pide la voz a **ElevenLabs**, guarda el mp3 **en memoria 5 minutos** y devuelve una URL con un identificador aleatorio de 128 bits |
-| 9 | La app reproduce el audio. Si no hay voz natural disponible, usa la **voz del celular** con tono y velocidad ajustados |
+| 9 | La app reproduce el audio. Si no hay voz natural disponible, usa la **voz del celular** con tono y velocidad ajustados. Al pulsar "Escuchar" de nuevo, **reusa el audio ya generado** (no vuelve a sintetizar durante unos minutos) |
 
 **Regla de "mismo canal":** quien escribe recibe texto; quien habla recibe voz (historia HU0005).
 
@@ -146,10 +146,10 @@ Alrededor hay servicios externos. Los que corren en el **servidor del equipo** (
 
 | Servicio | Donde corre | Para que | Sale informacion del servidor? |
 | --- | --- | --- | --- |
-| **Ollama + Qwen** (`qwen2.5:7b`) | Servidor de TalkLate | Traducir (motor principal) | No |
 | **Whisper** | Servidor de TalkLate | Voz a texto | No (por defecto) |
 | **ffmpeg** | Servidor de TalkLate | Medir el pitch de la voz | No |
-| **Claude Sonnet** | Nube (Anthropic) | Traducir **solo si Qwen falla** | Si: el **texto** del mensaje |
+| **Claude Sonnet en Google Vertex AI** | Nube (Google Cloud) | Traducir (**motor principal**) | Si: el **texto** del mensaje y el contexto del prompt |
+| Ollama + Qwen (`qwen2.5:7b`) | Servidor de TalkLate | Traducir (**alternativo, hoy no se usa**) | No |
 | **ElevenLabs** | Nube | Convertir la traduccion en voz con emocion | Si: el **texto traducido** |
 | Azure Speech / OpenAI | Nube | Voz de respaldo (solo si estan configurados) | Si: el texto traducido |
 
@@ -169,8 +169,8 @@ En TalkLate:
 - Los **adaptadores** son los que hablan con el mundo real y cumplen esos contratos.
 
 **Para que sirve (y que preguntaran):**
-1. **Cambiar una tecnologia sin tocar las reglas.** Se paso de VoiceStudio a ElevenLabs cambiando **un solo archivo** (el adaptador); los casos de uso no se enteraron. Lo mismo con SQLite y SurrealDB.
-2. **Probar sin internet ni claves.** Los casos de uso se prueban con adaptadores falsos; por eso hay 68 pruebas unitarias que corren en menos de 2 segundos.
+1. **Cambiar una tecnologia sin tocar las reglas.** Se paso de VoiceStudio a ElevenLabs, y de Qwen a Claude en Vertex, agregando **un adaptador** cada vez; los casos de uso no se enteraron. Lo mismo con SQLite y SurrealDB.
+2. **Probar sin internet ni claves.** Los casos de uso se prueban con adaptadores falsos; por eso hay 78 pruebas unitarias que corren en menos de 2 segundos.
 3. **Que no se rompa por descuido.** `npm run arch:check` (dependency-cruiser) falla si alguien hace que el nucleo importe algo de afuera. Corre en el CI.
 
 ![Arquitectura hexagonal](../entrega/diagramas/img/archify_hexagonal.png)
@@ -182,7 +182,7 @@ En TalkLate:
 | Puerto | Para que sirve | Quien lo cumple hoy |
 | --- | --- | --- |
 | `Repositorio` | Guardar y leer usuarios, conversaciones, mensajes, catalogo, reportes | SurrealDB (real) y SQLite (pruebas) |
-| `MotorTraduccion` | Traducir un mensaje | Qwen, Claude, motor de reglas |
+| `MotorTraduccion` | Traducir un mensaje | Claude (Vertex o API directa), Qwen, motor de reglas |
 | `Transcriptor` | Pasar audio a texto | Whisper |
 | `Sintetizador` | Pasar texto a voz con emocion | ElevenLabs, Azure, OpenAI-compatible |
 | `DetectorGenero` | Estimar el genero de quien habla por el pitch | ffmpeg + autocorrelacion |
@@ -205,7 +205,7 @@ backend/src/
   adaptadores/    Todo lo que toca el exterior
     http/           Express: rutas, sesion, limites de uso
     persistencia/   surreal/ y sqlite/
-    traduccion/     qwen, claude, reglas, prompt, glosario
+    traduccion/     vertex, claude, qwen, reglas, prompt, glosario
     transcripcion/  whisper
     sintesis/       elevenlabs, azure, openai
     audio/          genero (pitch con ffmpeg)
@@ -216,7 +216,7 @@ backend/src/
   server.js       Arranca el servidor
 ```
 
-**`composicion.js` es la pieza que "enchufa" todo.** Por ejemplo: `TRADUCTOR=auto` arma la cadena Qwen -> Claude -> reglas; `VOZ_MOTOR=auto` arma ElevenLabs -> Azure -> OpenAI. Cambiar de motor es cambiar una variable, no codigo.
+**`composicion.js` es la pieza que "enchufa" todo.** Por ejemplo: `TRADUCTOR=claude` (la configuracion del equipo) arma Claude (Vertex) -> reglas, y `TRADUCTOR=auto` arma Qwen -> Claude -> reglas; `VOZ_MOTOR=auto` arma ElevenLabs -> Azure -> OpenAI. Cambiar de motor es cambiar una variable, no codigo.
 
 ### 4.5 La API
 
@@ -230,6 +230,7 @@ Es una API REST bajo `/api/v1`, documentada con **OpenAPI 3.0** (visible en `/ap
 | Mensajes | `POST /conversaciones/:id/mensajes` (texto), `/mensajes/voz` (audio) |
 | Voz | `POST /voz`, `GET /voz/audio/:id` |
 | Reportes | `POST /reportes`; admin: `GET /admin/reportes`, `PATCH /admin/reportes/:id` |
+| Problemas de la app | `POST /problemas` (10 por hora por usuario); admin: `GET /admin/problemas`, `PATCH /admin/problemas/:id` |
 | Administracion | `POST /admin/idiomas` y `GET`/`PATCH /admin/idiomas/:id` (consultar, modificar y activar); `POST /admin/regiones` y `GET /admin/regiones/:id` |
 | Salud | `GET /health` (estado de la base y de los motores) |
 
@@ -239,25 +240,26 @@ Es una API REST bajo `/api/v1`, documentada con **OpenAPI 3.0** (visible en `/ap
 
 ### 5.1 La cadena de motores y el Circuit Breaker
 
-El servicio de traduccion (`aplicacion/traduccion.js`) recibe una lista de motores y usa **el primero que responda**:
+El servicio de traduccion (`aplicacion/traduccion.js`) recibe una lista de motores y usa **el primero que responda**. La configuracion del equipo (`./run-talklate.sh`, `TRADUCTOR=claude`) es:
 
-1. **Qwen 2.5 (7B)** en Ollama, local. Es el principal: cuesta cero por mensaje y el texto no sale del servidor. Se le pide JSON, temperatura 0.2 (poca aleatoriedad) y un tiempo limite de 60 s.
-2. **Claude Sonnet** (Anthropic), en la nube. Respaldo. Solo se usa si hay clave configurada. Tiempo limite de 30 s.
-3. **Motor de reglas**: un traductor propio espanol <-> ingles con un diccionario de modismos. No es inteligente, pero **siempre responde**. Sus traducciones se marcan como **aproximadas** y la app lo avisa al usuario.
+1. **Claude Sonnet en Google Vertex AI.** Es el motor principal (ADR-020). Se autentica con las credenciales de Google (ADC), no con una clave en el codigo. Tiempo limite de 30 s y **sin reintentos** del SDK. Es de nube: **el texto del mensaje sale a Google Cloud** y cada traduccion cuesta.
+2. **Motor de reglas**: un traductor propio espanol <-> ingles con un diccionario de modismos. **Solo traduce si el texto trae al menos un modismo o frase conocida**; sin coincidencias **falla con un error** ("No pudimos traducir tu mensaje en este momento") en vez de entregar una traduccion palabra por palabra. Cuando traduce con palabras sin traducir, se marca como **aproximada** y la app lo avisa.
 
-**Circuit Breaker (cortacircuitos).** Si un motor falla, se **salta durante 60 segundos** para no esperar su tiempo limite en cada mensaje siguiente. Es la respuesta al driver de continuidad (DRV-05): **si la IA se cae, el servicio sigue funcionando**, con menos calidad pero sin error.
+**Alternativas ya construidas:** Qwen 2.5 (7B) en Ollama, local (sin costo y sin sacar el texto del servidor), disponible con `TRADUCTOR=auto` o `qwen`, pero **hoy no se usa**; y Claude por la API directa de Anthropic (`ANTHROPIC_API_KEY`). Cambiar de motor es cambiar una variable de entorno.
+
+**Circuit Breaker (cortacircuitos).** Si un motor falla, se **salta durante 60 segundos** para no esperar su tiempo limite en cada mensaje siguiente. Es la respuesta al driver de continuidad (DRV-05), pero **ahora de forma parcial**: si Claude se cae, el motor de reglas solo traduce los modismos que conoce; en los demas mensajes la persona recibe un error claro. Con Qwen local en la cadena el respaldo era mas amplio.
 
 ### 5.2 El prompt
 
-El prompt (`adaptadores/traduccion/prompt.js`) es compartido por Qwen y Claude. Le dice al modelo:
-- que **no traduzca palabra por palabra** y conserve intencion, tono y modismos;
+El prompt (`adaptadores/traduccion/prompt.js`) es compartido por todos los modelos. Es un prompt de **transcreacion cultural**: le dice al modelo:
+- que **no traduzca palabra por palabra**: primero entienda la intencion, la situacion y el tono, y lo reexprese como lo diria un nativo de la region destino, conservando el registro (informal con jerga, formal con formalidad);
 - el idioma origen y destino, con la **region** de cada uno;
 - los tonos posibles;
 - si el mensaje llego por voz, **como hablo** la persona;
 - que responda **solo con un JSON**: `traduccion`, `tono`, `genero`, `nota_cultural`, `region_origen`;
-- los **modismos detectados** del glosario con su equivalente (ver abajo).
+- los **modismos detectados** del glosario con su equivalente **y un ejemplo real de uso** (few-shot; ver abajo).
 
-Despues, `leerRespuesta` **valida** lo que devuelve el modelo: la traduccion debe ser texto no vacio y el tono debe estar en la lista permitida; si no, lo descarta.
+Despues, `leerRespuesta` **valida** lo que devuelve el modelo: la traduccion debe ser texto no vacio, el tono debe estar en la lista permitida y la nota cultural y la region solo se aceptan como texto de largo acotado; si no, lo descarta.
 
 ### 5.3 El glosario cultural
 
@@ -396,14 +398,14 @@ Cada regla tiene un codigo (Usuario-RN-1, Conversacion-RN-3...) y una prueba:
 | Audio | 10 MB |
 | Peticion JSON | 1 MB (15 MB solo en el endpoint de voz) |
 
-Todas las llamadas externas tienen **tiempo limite** (Qwen 60 s, Claude 30 s, Whisper 30 s, ElevenLabs 20 s, ffmpeg 15 s). **Limitacion:** los contadores estan **en memoria**; sirven para una sola instancia del servidor.
+Todas las llamadas externas tienen **tiempo limite** (Claude por Vertex 30 s y sin reintentos, Whisper 30 s, ElevenLabs 20 s, ffmpeg 15 s; Qwen 60 s si se usa) y tope de salida de 1024 tokens. **Limitacion:** los contadores estan **en memoria**; sirven para una sola instancia del servidor.
 
 ### 8.4 Trivy: escaneo de seguridad (ADR-018)
 
 Trivy revisa **dependencias con vulnerabilidades conocidas, secretos en el codigo y configuraciones inseguras**. Corre en **cada pull request, cada push a develop y main, y cada lunes**. Si hay algo alto o critico, **bloquea el merge**.
 
-- Primer resultado: 1 alta en el backend y 1 critica y 50 altas en el frontend (casi todas en librerias internas de Expo). **Todas corregidas** con `overrides` de npm a versiones parchadas de la misma version mayor.
-- Hoy: **0 altas o criticas abiertas**, y **una excepcion documentada** (`decode-uri-component`, con vencimiento 28/02/2027): la version parchada rompe la navegacion de la app y el riesgo es bajo.
+- Primer resultado (05/11): 1 alta en el backend y 1 critica y 50 altas en el frontend (casi todas en librerias internas de Expo). **Todas corregidas** con `overrides` de npm a versiones parchadas de la misma version mayor.
+- **Reescaneo del 12/11/2026**, despues de integrar la dependencia nueva de Vertex: **0 vulnerabilidades, 0 secretos y 0 configuraciones inseguras**. Hoy: **0 altas o criticas abiertas**, y **una excepcion documentada** (`decode-uri-component`, con vencimiento 28/02/2027): la version parchada rompe la navegacion de la app y el riesgo es bajo.
 - **No se usa la accion oficial `trivy-action`**, porque fue comprometida en marzo de 2026. El CI descarga el binario oficial y **verifica su checksum**.
 
 ### 8.5 OWASP Top 10 para aplicaciones con LLM (edicion 2026)
@@ -414,9 +416,9 @@ Es la lista de los 10 riesgos de seguridad propios de usar modelos de lenguaje. 
 
 | Estado | Riesgos |
 | --- | --- |
-| Cubierto | LLM03 Excessive Agency (el modelo no tiene herramientas), LLM08 Hidden Context Exposure (el prompt no tiene secretos) |
+| Cubierto | LLM03 Excessive Agency (el modelo no tiene herramientas), LLM08 Hidden Context Exposure (el prompt no tiene secretos), LLM10 Improper Output Handling (la salida se valida) |
 | No aplica | LLM09 Vector and Embedding Weaknesses (no hay RAG) |
-| Parcial | LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM04 Supply Chain, LLM05 Data and Model Poisoning, LLM06 Unbounded Consumption, LLM07 Misinformation, LLM10 Improper Output Handling |
+| Parcial | LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM04 Supply Chain, LLM05 Data and Model Poisoning, LLM06 Unbounded Consumption, LLM07 Misinformation |
 
 Las brechas concretas estan en la parte 12.
 
@@ -437,10 +439,12 @@ Las brechas concretas estan en la parte 12.
 | Pantalla | Para que |
 | --- | --- |
 | Welcome, Login, Signup, Recuperar contrasena | Entrar a la cuenta |
-| **Chat** (pantalla principal, dentro del menu lateral) | Traducir: tiene dos modos |
+| **Inicio** (pantalla principal tras iniciar sesion) | **Lista de conversaciones**: retomar cualquiera sin crear una nueva. Barra inferior con perfil, **busqueda** (tolera tildes, puntuacion y errores de tipeo) y el boton **+** para una nueva. Cada tarjeta tiene menu de tres puntos (renombrar, eliminar) y efecto de vidrio |
+| **Chat** (se abre desde una conversacion) | Traducir: tiene dos modos |
 | Historial | Ver y abrir conversaciones anteriores, renombrar, eliminar |
 | Perfil y Politica de datos | Datos de la cuenta, consentimiento, borrar cuenta |
-| Admin idiomas / Admin reportes | Solo para el rol `admin` |
+| Reportar un problema | Formulario en la app (descripcion, categoria y contacto opcional) para problemas generales, no de una traduccion |
+| Admin idiomas / Admin reportes / Admin problemas | Solo para el rol `admin` |
 
 ### 9.3 El chat: dos modos
 
@@ -468,11 +472,11 @@ Tres niveles, como una piramide: **muchas pruebas rapidas abajo, pocas y caras a
 
 | Nivel | Cantidad | Que prueba | Velocidad |
 | --- | --- | --- | --- |
-| **Unitarias** | 68 (63 backend + 5 frontend) | Una regla a la vez, con piezas falsas | Menos de 2 s |
-| **Integracion** | 18 (por duplicado: SQLite y SurrealDB) | La API entera por HTTP con una base real | ~3 s |
+| **Unitarias** | 78 (73 backend + 5 frontend) | Una regla a la vez, con piezas falsas | Menos de 2 s |
+| **Integracion** | 29 (18 de la API por duplicado, SQLite y SurrealDB, y 11 de problemas) | La API entera por HTTP con una base real | ~3 s |
 | **Punta a punta** | 4 (2 de la API, 2 del navegador con Playwright) | El recorrido real de un usuario | ~1 min |
 
-- **Cobertura del backend:** 96.3 % de lineas. El minimo exigido es 80 % y el CI falla si baja.
+- **Cobertura del backend:** 96.5 % de lineas. El minimo exigido es 80 % y el CI falla si baja.
 - **Prueba del navegador:** abre la app en Chromium con pantalla de celular, inicia sesion, crea una conversacion a Ingles / New York, escribe *"Hay que ponerse las pilas con el trabajo"* y comprueba que sale *"We need to get cracking on the work"*.
 - **CI (GitHub Actions):** `backend`, `backend-surreal`, `frontend`, `e2e-web` y `trivy`. Cada pull request debe pasarlos todos para poder hacer merge.
 - **Regla del equipo:** nunca se desactiva una prueba para que pase; se arregla la causa.
@@ -507,12 +511,12 @@ Un **driver** es un requisito que **obliga a tomar decisiones de arquitectura** 
 | DRV-02 Calidad cultural | 80 % de los modismos del glosario de prueba adaptados | Prompt de equivalencia cultural y glosario |
 | DRV-03 Privacidad | Mensajes cifrados, solo el dueno los ve, logs sin PII | JWT, AES-256-GCM, consentimiento, borrar cuenta |
 | DRV-04 Crecimiento de idiomas | Agregar un idioma sin tocar codigo | Catalogo en datos |
-| DRV-05 Continuidad ante fallas | Si la IA falla, el servicio sigue | Circuit Breaker y motor de reglas |
-| DRV-06 Costo y abuso | Qwen sin costo por mensaje; 30 mensajes por minuto | Qwen local y limites de uso |
+| DRV-05 Continuidad ante fallas | Si la IA falla, el servicio sigue (hoy de forma parcial) | Circuit Breaker y motor de reglas |
+| DRV-06 Costo y abuso | Limites por usuario; ya no hay traduccion sin costo (Vertex y ElevenLabs cobran) | Limites de uso (falta un tope de gasto) |
 | DRV-07 Multiplataforma | Una base de codigo para iOS, Android y web | Expo |
 | DRV-08 Facilidad de prueba | Cobertura de 80 % o mas, sin internet ni claves | Puertos y repositorio de dos motores |
 
-### 11.4 Las 19 decisiones de arquitectura (ADR)
+### 11.4 Las 20 decisiones de arquitectura (ADR)
 
 Un **ADR** (*Architecture Decision Record*) documenta una decision con su contexto, las alternativas que se compararon y las consecuencias.
 
@@ -521,7 +525,7 @@ Un **ADR** (*Architecture Decision Record*) documenta una decision con su contex
 | 001 | App movil con Expo (React Native) y NativeWind |
 | 002 | Backend monolitico en Node + Express, REST sincrona |
 | 003 | SQLite como base inicial (luego reemplazada por la 012) |
-| 004 | Traduccion con Qwen local, Claude de respaldo y motor de reglas |
+| 004 | Traduccion con Qwen local, Claude de respaldo y motor de reglas (ajustada por la 020) |
 | 005 | Voz: dictado en el cliente (reemplazada en parte por la 014) |
 | 006 | JWT de acceso corto con refresco rotativo |
 | 007 | Interfaz basada en el template Luna |
@@ -537,6 +541,7 @@ Un **ADR** (*Architecture Decision Record*) documenta una decision con su contex
 | 017 | Piramide de pruebas en tres niveles, todos en el CI |
 | 018 | Escaneo de seguridad con Trivy en el CI |
 | 019 | ElevenLabs como motor de voz (reemplaza a la 016) |
+| 020 | Claude Sonnet en Google Vertex AI como motor de traduccion principal |
 
 ### 11.5 Como esta organizada la documentacion
 
@@ -555,38 +560,44 @@ Un **ADR** (*Architecture Decision Record*) documenta una decision con su contex
 
 Esta parte es la mas util antes de exponer. Esta ordenada de mas a menos peligrosa. **Nada de esto es motivo de panico: lo que importa es conocerlo y decirlo antes de que lo descubran.**
 
-### 12.1 Cosas que dicen una cosa en el papel y otra en el codigo
+### 12.1 Lo que decian los papeles y ya se corrigio (12/11/2026)
 
-| # | Problema | Evidencia | Como responder |
-| --- | --- | --- | --- |
-| 1 | **Los documentos de la entrega dicen VoiceStudio; el codigo usa ElevenLabs** | 11 de 19 documentos nombran VoiceStudio; el ADR-019 no esta en la entrega | "Cambiamos de motor al medir que VoiceStudio era inviable en la Mac (ADR-016 revertida, ADR-019). Los documentos de la entrega se estan actualizando." **Corregir antes de entregar** |
-| 2 | Las cifras de pruebas estan viejas | Documentos dicen 51 unitarias; hoy son 68 | Actualizar a 68 y 96.3 % |
-| 3 | El documento de stack esta desactualizado | Dice Expo SDK 57 y React Native 0.86; hoy son 58 y 0.88. Describe la voz como "dictado del teclado" | Actualizar `tech_stack.md` |
-| 4 | Los documentos dicen 8 puertos | Hay 9 (se agrego `DetectorGenero`) | Actualizar |
-| 5 | El estado de fases de SoftVerse no refleja lo construido | F7 y F8 "desbloqueadas", F9 y F10 "bloqueadas", pero ya hay pruebas de punta a punta y CI | Actualizar `.softverse/estado_fases.json` |
-| 6 | El documento de vision dice que frances y portugues existen inactivos | En el codigo solo existen espanol e ingles | Corregir la frase |
+Los documentos de la entrega decian VoiceStudio, Qwen como motor principal, 51 pruebas, 8 puertos, Expo SDK 57 y que frances y portugues existian inactivos. **Se corrigieron** al integrar el cambio a Claude en Vertex: se agregaron los ADR-019 y ADR-020, se actualizaron los 11 documentos afectados, la politica de datos y la matriz de sensibilidad, y se regeneraron los Word y PDF (version 1.2 de la entrega, con el documento 20 de OWASP).
+
+Lo que **sigue pendiente** en este grupo:
+
+| # | Problema | Como responder |
+| --- | --- | --- |
+| 1 | El estado de fases de SoftVerse (`.softverse/estado_fases.json`) no refleja lo construido: F7 y F8 "desbloqueadas", F9 y F10 "bloqueadas", pero ya hay pruebas de punta a punta y CI | Actualizar el archivo con el equipo (no es decision mia declarar una fase completada) |
+| 2 | Los modelos por defecto no coinciden: `claude-sonnet-4-6` en el adaptador de Vertex y `claude-sonnet-5-5` en la API directa | Fijar uno y comprobar que exista en la region configurada |
+| 3 | El script `run-talklate.sh` trae por defecto el identificador del proyecto de Google Cloud escrito | Leerlo del entorno; un identificador no es un secreto, pero es mejor no dejarlo escrito |
 
 ### 12.2 Cosas que no estan medidas o validadas
 
 | # | Problema | Como responder |
 | --- | --- | --- |
-| 7 | **La calidad de traduccion no esta medida con Qwen.** La medicion (14 de 15, 93 %) se hizo con el motor de reglas, que se construyo con esos mismos 15 modismos: es una **linea base, no una evidencia de calidad** | "Es la linea base. La medicion valida es con Qwen y modismos distintos; esta pendiente." **Correr `npm run medir` con Qwen antes de exponer** |
-| 8 | **El glosario no esta validado por nativos** (0 de 196) | "Esta investigado con fuente por entrada; la validacion con hablantes nativos es trabajo pendiente" |
-| 9 | **El tiempo de respuesta (DRV-01) no esta medido con Qwen** en la maquina de la demo | Medir en la Mac M5 antes de exponer |
-| 10 | **La app no se ha probado en celular fisico** (las pruebas automaticas corren en la web) | Probar en Expo Go y llevar capturas |
-| 11 | La deteccion de tono por la voz es **heuristica** | "Es una estimacion por volumen, ritmo y variacion; no reconoce emociones por IA" |
+| 4 | **La calidad de traduccion no esta medida con el motor de produccion.** La medicion (14 de 15, 93 %) se hizo con el motor de reglas, que se construyo con esos mismos 15 modismos: es una **linea base, no una evidencia de calidad** | "Es la linea base. La medicion valida es con Claude en Vertex y modismos distintos; esta pendiente." **Correr `npm run medir` con el motor de produccion antes de exponer** |
+| 5 | **El glosario no esta validado por nativos** (0 de 196), y ahora sus ejemplos van al prompt | "Esta investigado con fuente por entrada; la validacion con hablantes nativos es trabajo pendiente" |
+| 6 | **El tiempo de respuesta (DRV-01) no esta medido** con Claude por Vertex ni con ElevenLabs en la maquina de la demo | Medir antes de exponer |
+| 7 | **La app no se ha probado en celular fisico** (las pruebas automaticas corren en la web) | Probar en Expo Go y llevar capturas |
+| 8 | La deteccion de tono por la voz es **heuristica** | "Es una estimacion por volumen, ritmo y variacion; no reconoce emociones por IA" |
+| 9 | **La traduccion depende de internet y de credenciales de Google** | Probar antes de exponer; decirlo como limite del MVP |
 
-### 12.3 Brechas de seguridad conocidas (del analisis OWASP)
+### 12.3 Brechas de seguridad (del analisis OWASP)
+
+Corregidas el 12/11/2026: validacion de `nota_cultural` y `region_origen` (LLM10), tope de salida de Qwen y tiempo limite de Vertex (LLM06), limite de 10 reportes de problemas por hora (LLM06), terceros y genero de la voz en la politica de datos y la matriz (LLM02), y el administrador por defecto en produccion (`ADMIN_PASSWORD` obligatorio).
+
+Siguen abiertas:
 
 | # | Brecha | Riesgo | Gravedad real |
 | --- | --- | --- | --- |
-| 12 | El texto del usuario entra al prompt sin marcarlo como "dato, no instruccion" y no hay pruebas de inyeccion | LLM01 | Baja: el atacante solo afecta su propia traduccion |
-| 13 | `nota_cultural` y `region_origen` salen del modelo y se guardan sin validar tipo ni largo | LLM10 | Baja, facil de corregir |
-| 14 | **ElevenLabs recibe el texto traducido y la politica de datos solo menciona a Anthropic** | LLM02 | **Media: es un tema de privacidad que hay que documentar** |
-| 15 | Qwen no tiene limite de tokens de salida; el modelo se baja por etiqueta (`qwen2.5:7b`), no por huella fija; no hay SBOM | LLM06, LLM04 | Baja |
-| 16 | Los limites de uso estan en memoria y no hay tope de gasto para los servicios de pago | LLM06 | Baja para un MVP de una instancia |
-| 17 | El **genero inferido de la voz** se guarda por mensaje y **no esta clasificado en la matriz de sensibilidad** ni en la politica de datos | Privacidad (fuera de la lista OWASP) | Media: es un dato inferido de la voz de una persona; hay que clasificarlo y mencionarlo en la politica |
-| 18 | Al arrancar, se crea un **administrador con contrasena `Admin123!`** y un correo personal escritos en el codigo y los README, si no se definen `ADMIN_PASSWORD` y `ADMIN_CORREO` | Fuera de OWASP LLM | **Media: lo primero que un revisor probaria** |
+| 10 | El texto del usuario entra al prompt sin marcarlo como "dato, no instruccion" y no hay pruebas de inyeccion | LLM01 | Baja: el atacante solo afecta su propia traduccion. No se toco el prompt sin poder probarlo con el modelo real |
+| 11 | **El texto de cada mensaje sale a Google Cloud** y la app no se lo recuerda a la persona | LLM02 | **Media: es el cambio de privacidad mas grande del proyecto; esta documentado, falta el aviso en la app** |
+| 12 | No hay tope de gasto para Vertex ni ElevenLabs y los limites estan en memoria | LLM06 | Media ahora que cada mensaje cuesta |
+| 13 | No hay SBOM; falta revisar los terminos de Google, Anthropic y ElevenLabs (retencion y entrenamiento) | LLM04 | Baja |
+| 14 | El **genero inferido de la voz** se guarda por mensaje | Privacidad | Media: ya esta clasificado en la matriz, pero hay que decidir si hace falta guardarlo |
+| 15 | El correo personal del administrador por defecto sigue escrito en el codigo y los README | Fuera de OWASP LLM | Baja |
+| 16 | El campo `contacto` del reporte de problemas es texto libre (puede traer un correo) | Privacidad | Baja: se borra con la cuenta y solo lo ve el administrador |
 
 ### 12.4 Limites de alcance (decirlos tu primero)
 
@@ -595,7 +606,7 @@ Esta parte es la mas util antes de exponer. Esta ordenada de mas a menos peligro
 - La region de origen se reconoce por vocabulario, no por acento.
 - No hay despliegue en produccion: el MVP corre local y en CI (no hay Dockerfile).
 - No hay envio real de correos: el codigo de recuperacion de contrasena sale por consola.
-- La voz natural depende de un servicio de pago (ElevenLabs).
+- La voz natural depende de un servicio de pago (ElevenLabs) y la traduccion de la nube de Google (Vertex AI): sin internet o sin credenciales no hay traduccion general.
 - El proyecto se construyo con apoyo de IA, declarado en el marco metodologico.
 
 ---
@@ -614,14 +625,14 @@ Alcance de dos personas y seis meses, una traduccion por turno y nada que exija 
 **Por que SurrealDB y no PostgreSQL?**
 El dominio es una cadena de relaciones que SurrealDB guarda como enlaces nativos sin JOIN, el esquema deja las reglas dentro de la base y es multimodelo. Se evaluo PostgreSQL en la revision del 22/10 y se mantuvo SurrealDB por esas razones (ADR-012).
 
-**Por que Qwen local?**
-Privacidad (el texto no sale del servidor), costo cero por mensaje y control. Claude queda de respaldo y el motor de reglas como ultimo recurso.
+**Por que cambiaron de Qwen local a Claude Sonnet en Vertex?**
+La prioridad del producto es la calidad cultural de la traduccion (DRV-02), y el ADR-004 ya preveia volver a Claude si el modelo local no funcionaba. El costo de esa decision, que hay que decir de frente: el texto de cada mensaje sale a Google Cloud, cada traduccion cuesta y sin internet o sin credenciales de Google no hay traduccion general. Qwen sigue construido como alternativa para recuperar el enfoque 100 % local.
 
 **Que pasa si la IA falla?**
-El Circuit Breaker salta el motor caido por 60 segundos y pasa al siguiente. Si Qwen y Claude fallan, traduce el motor de reglas, de forma aproximada, y la app avisa.
+El Circuit Breaker salta el motor caido por 60 segundos y pasa al siguiente. Si Claude falla, el motor de reglas solo traduce los modismos que conoce; en los demas mensajes la persona recibe un error claro, no una traduccion literal de mala calidad.
 
 **Como saben que traduce bien?**
-Hoy hay: reportes de usuarios, notas culturales, un glosario con fuente por entrada y una medicion de linea base. Falta medir con Qwen y validar el glosario con hablantes nativos; esta identificado como trabajo pendiente.
+Hoy hay: reportes de usuarios, notas culturales, un glosario con fuente por entrada y una medicion de linea base. Falta medir con Claude (Vertex) y validar el glosario con hablantes nativos; esta identificado como trabajo pendiente.
 
 **Detecta emociones?**
 Estima el tono (6 opciones) por las palabras y, en voz, por volumen, ritmo y variacion. Es una heuristica, no un modelo de reconocimiento de emociones.
@@ -630,7 +641,7 @@ Estima el tono (6 opciones) por las palabras y, en voz, por volumen, ritmo y var
 Mensajes cifrados con AES-256-GCM, contrasenas con bcrypt, JWT de 15 minutos con refresco rotativo, aislamiento por usuario, consentimiento y borrado de cuenta (Ley 1581), logs sin datos personales, limites de uso y Trivy en cada pull request.
 
 **Que datos salen a terceros?**
-El texto a Anthropic solo si Qwen falla, y el texto traducido a ElevenLabs para generar la voz. Lo segundo hay que agregarlo a la politica de datos.
+El texto del mensaje a Google Cloud (Vertex AI), que lo procesa con Claude, y el texto traducido a ElevenLabs para generar la voz. El audio original no sale del servidor. Ambos estan en la politica de datos desde el 12/11/2026.
 
 **Aplicaron OWASP LLM Top 10?**
 Los controles existian y ahora estan contrastados con la lista 2026: 2 riesgos cubiertos, 1 no aplica y 7 parciales con brechas identificadas. El modelo no tiene herramientas ni acceso a datos, por eso el impacto de un ataque es bajo.
@@ -642,7 +653,7 @@ VoiceStudio corria en CPU en la Mac y tardaba 30 segundos por frase. ElevenLabs 
 El equipo con apoyo de un asistente de IA, declarado en el marco metodologico. Cada decision esta en un ADR y cada regla tiene su prueba; podemos explicar cualquier parte.
 
 **Que sigue?**
-Medir con Qwen, validar el glosario con hablantes nativos, probar en celular fisico, desplegar y agregar el envio real de correos.
+Medir con Claude (Vertex), validar el glosario con hablantes nativos, probar en celular fisico, desplegar y agregar el envio real de correos.
 
 ---
 
@@ -654,17 +665,17 @@ Medir con Qwen, validar el glosario con hablantes nativos, probar en celular fis
 2. **La solucion (30 s):** "TalkLate traduce intencion, tono y modismos, adaptados a una region: paisa y New York."
 3. **Demo en vivo (2 min):** crear la conversacion, escribir el modismo, mostrar la traduccion con su nota cultural; hablar un mensaje y escuchar la traduccion con emocion.
 4. **Como funciona (1 min):** mostrar el diagrama hexagonal y decir "el nucleo no sabe que tecnologia hay afuera".
-5. **Confianza (1 min):** piramide de pruebas (68 + 18 + 4, 96 % de cobertura), Trivy y OWASP.
-6. **Honestidad (30 s):** "Lo que falta: medir con Qwen, validar el glosario con nativos, probar en celular fisico."
+5. **Confianza (1 min):** piramide de pruebas (78 + 29 + 4, 96 % de cobertura), Trivy y OWASP.
+6. **Honestidad (30 s):** "Lo que falta: medir con Claude en Vertex, validar el glosario con nativos, probar en celular fisico."
 
 ### Antes de la demo (lista)
 
-- [ ] Servidor encendido: `./run-talklate.sh --full` levanta backend, Expo, Ollama y Whisper.
-- [ ] Modelo de Qwen descargado (`ollama pull qwen2.5:7b`) y Whisper `small` disponible.
+- [ ] Servidor encendido: `./run-talklate.sh --full` levanta backend, Expo y Whisper (ya no levanta Ollama).
+- [ ] Credenciales de Google activas (`gcloud auth application-default login`) y el proyecto de Vertex AI con acceso a Claude; Whisper `small` disponible.
 - [ ] `ELEVENLABS_API_KEY` y las voces configuradas (requiere plan pago).
 - [ ] Celular con Expo Go en la misma red que el servidor.
 - [ ] Contrasena del administrador cambiada (no usar `Admin123!` en pantalla).
-- [ ] Plan B si falla la voz: la app cae sola a la voz del celular; si falla Qwen, a Claude o al motor de reglas. **Decirlo en voz alta como ventaja**, es el Circuit Breaker funcionando.
+- [ ] Plan B si falla la voz: la app cae sola a la voz del celular; si falla Claude, el motor de reglas solo cubre los modismos conocidos, asi que **probar antes con internet y credenciales**. Si cae la voz, decirlo como ventaja: es el respaldo funcionando.
 - [ ] Diagramas abiertos en el navegador: `entrega/diagramas/arquitectura_hexagonal.html`, `arquitectura_talklate.html`, `secuencia_voz.html`, `modelo_datos.html`.
 
 ---
@@ -686,7 +697,7 @@ Medir con Qwen, validar el glosario con hablantes nativos, probar en celular fis
 | **Hash** | Resultado de una funcion que no se puede revertir; sirve para guardar contrasenas |
 | **Interlocutor** | La otra persona de la conversacion, sin cuenta |
 | **JWT** | Token firmado que prueba quien eres sin consultar la base en cada peticion |
-| **LLM** | Modelo de lenguaje grande (Qwen, Claude) |
+| **LLM** | Modelo de lenguaje grande (Claude, Qwen) |
 | **MVP** | Producto minimo viable |
 | **Monolito modular** | Una sola aplicacion dividida por dentro en modulos con limites claros |
 | **Ollama** | Programa para correr modelos de lenguaje en tu propio computador |
@@ -698,7 +709,10 @@ Medir con Qwen, validar el glosario con hablantes nativos, probar en celular fis
 | **Prompt injection** | Ataque donde el texto del usuario intenta cambiar las instrucciones del modelo |
 | **Prosodia** | Como se dice algo: volumen, ritmo, entonacion |
 | **Puerto** | Contrato que el nucleo exige al exterior ("necesito algo que traduzca") |
-| **Qwen** | Modelo de lenguaje abierto que usamos para traducir, local |
+| **Qwen** | Modelo de lenguaje abierto que se uso para traducir en local; hoy es un adaptador alternativo |
+| **Vertex AI** | Plataforma de Google Cloud desde la que se usa Claude |
+| **ADC** | Credenciales por defecto de aplicacion de Google: el programa se autentica sin clave escrita en el codigo |
+| **Transcreacion** | Traducir recreando la intencion y el tono para otra cultura, no palabra por palabra |
 | **Refresh token** | Token de larga duracion que sirve para pedir otro de acceso |
 | **Repositorio (patron)** | Capa que esconde como se guardan los datos detras de un contrato |
 | **SBOM** | Lista de todos los componentes de software de un sistema |

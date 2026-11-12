@@ -40,6 +40,7 @@ const DOCS = [
   ['17_politica_tratamiento_datos', 'Politica de tratamiento de datos personales'],
   ['18_piramide_de_pruebas', 'Piramide de pruebas'],
   ['19_seguridad_trivy', 'Seguridad con Trivy'],
+  ['20_owasp_llm_top10', 'OWASP Top 10 para aplicaciones con LLM'],
 ];
 const NOMBRE = Object.fromEntries(DOCS.map(([f, t], i) => [f + '.md', `documento ${i + 1} (${t})`]));
 

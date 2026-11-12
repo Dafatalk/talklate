@@ -6,11 +6,11 @@
   "status": "pass",
   "visualReview": "not-requested",
   "provenance": "current",
-  "deliveryReceiptId": "987894f4-47b5-4944-987b-6ec99f76665b",
+  "deliveryReceiptId": "57ea3718-be26-4dd1-a697-5869a22c1d3d",
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
-    "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
-    "bytes": 849210
+    "sha256": "e563b1c3bbf81f674def7d40dc47d49531cc3d157e92c141b0e8f6e920bfb326",
+    "bytes": 846382
   },
   "state": {
     "detail": "read",

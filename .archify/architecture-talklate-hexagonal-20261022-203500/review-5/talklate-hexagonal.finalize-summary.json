@@ -7,13 +7,13 @@
   "quality": "showcase",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-    "sha256": "3eb33d5666f94429f6fdd4738f4a56dc0ecefac01afbc05b657921f8aa662b8b",
-    "bytes": 13764
+    "sha256": "6f0f6915b120c7916f576bf0f74ca72b00bf9f904fc2465bebe9586625e7723d",
+    "bytes": 13863
   },
   "artifact": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
-    "bytes": 877215
+    "sha256": "399b4af1b7f4ae9448cecd8417d8b1e908d796b671f234af737e46f7e8ec1fc3",
+    "bytes": 877379
   },
   "gates": {
     "validate": "pass",
@@ -43,7 +43,7 @@
     "noticeText": null
   },
   "visualReview": "not-requested",
-  "durationMs": 3563,
+  "durationMs": 3767,
   "browserCheck": {
     "requested": true,
     "ran": true

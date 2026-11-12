@@ -6,11 +6,11 @@
   "status": "pass",
   "visualReview": "not-requested",
   "provenance": "current",
-  "deliveryReceiptId": "d3d58cce-faf2-400a-a299-c6a6750daabd",
+  "deliveryReceiptId": "85c05db9-d398-46bf-b5d1-832c2074df8e",
   "artifact": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
-    "bytes": 877215
+    "sha256": "399b4af1b7f4ae9448cecd8417d8b1e908d796b671f234af737e46f7e8ec1fc3",
+    "bytes": 877379
   },
   "state": {
     "detail": "read",

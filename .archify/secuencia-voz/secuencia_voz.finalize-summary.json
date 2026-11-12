@@ -7,13 +7,13 @@
   "quality": "showcase",
   "specification": {
     "path": "/home/user/talklate/.archify/secuencia-voz/candidate.json",
-    "sha256": "ba5f517376852a728d04506e68e157b6610e83a452b77b6f55771dde03c98ed9",
-    "bytes": 3338
+    "sha256": "56de1f3b0d206065d281a32e79ec0efe3c21797b19f3e39aa64c74e524a610e4",
+    "bytes": 3342
   },
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
-    "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
-    "bytes": 841282
+    "sha256": "99e36b895428c77ec239d3412e5f5ef2b2765cc6b0731cbf27d3db45a799be15",
+    "bytes": 841356
   },
   "gates": {
     "validate": "pass",
@@ -43,7 +43,7 @@
     "noticeText": null
   },
   "visualReview": "not-requested",
-  "durationMs": 2817,
+  "durationMs": 3303,
   "browserCheck": {
     "requested": true,
     "ran": true
