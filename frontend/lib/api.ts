@@ -35,6 +35,11 @@ export type Reporte = {
   id: string; motivo: string; sugerencia: string | null; estado: 'abierto' | 'revisado' | 'descartado'; nota_admin: string | null; fecha: string;
   original: string; traduccion: string; nota_cultural: string | null; motor: string; idioma_origen: string; idioma_destino: string; reportado_por: string;
 };
+// Reporte de un problema general de la app (no atado a un mensaje): lo envia el usuario desde "Reportar un problema"
+export type Problema = {
+  id: string; categoria: string | null; descripcion: string; contacto: string | null;
+  estado: 'abierto' | 'revisado' | 'descartado'; nota_admin: string | null; fecha: string; reportado_por: string;
+};
 
 export class ApiError extends Error {
   estado: number;
@@ -154,4 +159,10 @@ export const api = {
     pedir<{ id: string; mensaje: string }>('POST', '/reportes', { mensaje_destino_id: destinoId, motivo, sugerencia }),
   reportes: (estado?: string) => pedir<Pagina<Reporte>>('GET', `/admin/reportes?limit=100${estado ? `&estado=${estado}` : ''}`),
   resolverReporte: (id: string, estado: 'abierto' | 'revisado' | 'descartado', nota_admin?: string) => pedir<Reporte>('PATCH', `/admin/reportes/${id}`, { estado, nota_admin }),
+
+  // Reportar un problema general de la app (formulario "Reportar un problema")
+  reportarProblema: (b: { descripcion: string; categoria?: string; contacto?: string }) =>
+    pedir<{ id: string; mensaje: string }>('POST', '/problemas', b),
+  problemas: (estado?: string) => pedir<Pagina<Problema>>('GET', `/admin/problemas?limit=100${estado ? `&estado=${estado}` : ''}`),
+  resolverProblema: (id: string, estado: 'abierto' | 'revisado' | 'descartado', nota_admin?: string) => pedir<Problema>('PATCH', `/admin/problemas/${id}`, { estado, nota_admin }),
 };
