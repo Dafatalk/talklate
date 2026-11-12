@@ -205,9 +205,9 @@ test('mensaje grabado por voz: se transcribe, la voz define el tono si el texto 
   const ruta = `/conversaciones/${c.datos.id}/mensajes/voz`;
   // voz fuerte y pareja sobre un texto neutro -> Enojado (lo decide la voz)
   const fuerte = { duracion_ms: 2000, volumen_promedio_db: -12, volumen_max_db: -3, variacion_db: 3 };
-  const r = await api('POST', ruta, { audio_base64: audio('Necesito ir al centro manana temprano'), tipo: 'audio/m4a', prosodia: fuerte }, token);
+  const r = await api('POST', ruta, { audio_base64: audio('Necesito ayuda para ir al centro'), tipo: 'audio/m4a', prosodia: fuerte }, token);
   assert.equal(r.estado, 201);
-  assert.equal(r.datos.transcripcion, 'Necesito ir al centro manana temprano');
+  assert.equal(r.datos.transcripcion, 'Necesito ayuda para ir al centro');
   assert.equal(r.datos.mensaje.canal, 'Voz');
   assert.equal(r.datos.mensaje.tono, 'Enojado');
   assert.equal(r.datos.entrega.reproducir_audio, true);

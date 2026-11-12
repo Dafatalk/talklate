@@ -25,6 +25,17 @@ test('el motor local marca como aproximada la traduccion con palabras desconocid
   assert.equal(traducirLocal('Hola zzzzz', 'es', 'en', 'US').aproximada, true);
 });
 
+test('motor de reglas: solo adapta modismos del diccionario; sin coincidencias falla honesto (no "¿eat go?")', async () => {
+  const { crearMotorReglas } = require('../../src/adaptadores/traduccion/reglas');
+  const motor = crearMotorReglas();
+  const base = { origen: { codigo: 'es' }, destino: { codigo: 'en' }, regionDestino: { paisCodigo: 'US' }, tonos: ['Neutral'] };
+  // con un modismo ("ponerse las pilas") responde normalmente
+  const r = await motor.traducir({ ...base, texto: 'Hay que ponerse las pilas con el trabajo' });
+  assert.equal(r.traduccion, 'We need to get cracking on the work');
+  // sin ningun modismo seria palabra-por-palabra: falla honesto en vez de entregar basura
+  await assert.rejects(motor.traducir({ ...base, texto: 'Hola, ¿cómo vas? ¿Cómo vas a ir?' }), /solo adapta modismos/);
+});
+
 test('deteccion de idioma, tono y region', () => {
   assert.equal(detectarIdioma('Quiero ir a la casa de mi amigo'), 'es');
   assert.equal(detectarIdioma('I want to go to my friend house'), 'en');
