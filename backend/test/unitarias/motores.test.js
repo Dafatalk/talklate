@@ -74,14 +74,14 @@ test('adaptador Vertex traduce con Sonnet por el SDK de Google (ADC) y lee el JS
       },
     },
   };
-  const motor = crearMotorVertex({ cliente: clienteFalso, modelo: 'claude-sonnet-4-6' });
+  const motor = crearMotorVertex({ cliente: clienteFalso, modelo: 'claude-sonnet-5-5' });
   assert.equal(motor.disponible(), true);
   const r = await motor.traducir({ texto: 'Parce', origen: { codigo: 'es', nombre: 'Espanol' }, destino: { codigo: 'en', nombre: 'Ingles' }, regionDestino: { nombre: 'California', paisCodigo: 'US' }, tonos: ['Neutral', 'Amigable'] });
   assert.equal(r.traduccion, 'Hey buddy');
   assert.equal(r.tono, 'Amigable');
-  assert.equal(enviado.model, 'claude-sonnet-4-6');
+  assert.equal(enviado.model, 'claude-sonnet-5-5');
   assert.match(enviado.messages[0].content, /California/);
-  assert.equal(motor.etiqueta(), 'vertex:claude-sonnet-4-6');
+  assert.equal(motor.etiqueta(), 'vertex:claude-sonnet-5-5');
   assert.equal(crearMotorVertex({}).disponible(), false); // sin proyecto ni cliente no se usa
   // el cliente del SDK se construye perezosamente: nunca en el factory, solo cuando hace falta traducir
   let construido = 0;
@@ -92,11 +92,11 @@ test('adaptador Vertex traduce con Sonnet por el SDK de Google (ADC) y lee el JS
 });
 
 test('composicion: con ANTHROPIC_USE_VERTEX el motor Claude se sirve por Vertex (ADC, sin API key)', () => {
-  const env = { TRADUCTOR: 'claude', ANTHROPIC_USE_VERTEX: '1', ANTHROPIC_VERTEX_PROJECT_ID: 'cerebro-481401', ANTHROPIC_DEFAULT_SONNET_MODEL: 'claude-sonnet-4-6' };
+  const env = { TRADUCTOR: 'claude', ANTHROPIC_USE_VERTEX: '1', ANTHROPIC_VERTEX_PROJECT_ID: 'cerebro-481401', ANTHROPIC_DEFAULT_SONNET_MODEL: 'claude-sonnet-5-5' };
   const [claude] = crearMotores(env);
   assert.equal(claude.nombre, 'claude');
   assert.equal(claude.disponible(), true);
-  assert.equal(claude.etiqueta(), 'vertex:claude-sonnet-4-6');
+  assert.equal(claude.etiqueta(), 'vertex:claude-sonnet-5-5');
   // sin la bandera sigue siendo la API directa de Anthropic (que necesita ANTHROPIC_API_KEY)
   const [claudeApi] = crearMotores({ TRADUCTOR: 'claude', ANTHROPIC_API_KEY: 'k' });
   assert.match(claudeApi.etiqueta(), /^claude:/);
