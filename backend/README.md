@@ -26,7 +26,7 @@ entonaciones (Neutral, Amigable, Alegre, Preocupado, Enojado, Formal).
 
 ## Motor de traduccion
 
-`TRADUCTOR=auto` (por defecto) prueba los motores en este orden y usa el primero que responde:
+`TRADUCTOR=auto` (por defecto del codigo) prueba los motores en este orden y usa el primero que responde. **La configuracion del equipo (`./run-talklate.sh`) arranca con `TRADUCTOR=claude`: Claude Sonnet en Google Vertex AI y, si falla, el motor de reglas** (ADR-020); Qwen queda como alternativa.
 
 1. **Qwen local con Ollama.** Instala [Ollama](https://ollama.com), baja el modelo y dejalo corriendo:
    ```bash
@@ -34,21 +34,29 @@ entonaciones (Neutral, Amigable, Alegre, Preocupado, Enojado, Formal).
    ollama serve                # normalmente ya queda corriendo solo
    ```
    Variables: `OLLAMA_URL` (por defecto `http://localhost:11434`), `QWEN_MODEL`, `QWEN_TIMEOUT_MS`.
-2. **Claude Sonnet**, si hay `ANTHROPIC_API_KEY` (`TALKLATE_MODEL`, por defecto `claude-sonnet-5-5`).
+2. **Claude Sonnet**, por dos caminos:
+   - **Google Vertex AI** (el que usa el equipo): `ANTHROPIC_USE_VERTEX=1`, `ANTHROPIC_VERTEX_PROJECT_ID` y credenciales de Google (ADC: `gcloud auth application-default login`). Region con `TALKLATE_VERTEX_REGION` (por defecto `global`; Claude no se sirve en todas las regiones). Tiempo limite de 30 s y sin reintentos del SDK. Modelo por defecto `claude-sonnet-4-6`.
+   - **API directa de Anthropic**, si hay `ANTHROPIC_API_KEY` (`TALKLATE_MODEL`, por defecto `claude-sonnet-5-5`).
 3. **Motor de reglas** (`src/adaptadores/traduccion/reglas.js`), espanol <-> ingles: cambia modismos y frases hechas por su
-   equivalente cultural (con variantes por pais) y el resto lo traduce palabra por palabra; si quedan palabras sin
-   traducir marca la traduccion como `aproximada`. Sirve para probar sin nada instalado, no para produccion.
+   equivalente cultural (con variantes por pais). **Solo traduce si el texto trae al menos un modismo o frase conocida**; sin
+   coincidencias falla con un error en vez de entregar una traduccion palabra por palabra. Si quedan palabras sin
+   traducir marca la traduccion como `aproximada`. Sirve para probar sin nada instalado y como respaldo parcial, no para produccion.
 
-Los dos modelos reciben el mismo prompt (`src/adaptadores/traduccion/prompt.js`): conservar intencion, tono y modismos, usar el
-equivalente cultural de la region destino y devolver `traduccion`, `tono`, `nota_cultural` y `region_origen`.
+Los modelos reciben el mismo prompt (`src/adaptadores/traduccion/prompt.js`) de **transcreacion cultural**: entender la intencion, la
+situacion y el tono, reexpresarlo como lo diria un nativo de la region destino (con ejemplos reales del glosario para los
+modismos detectados) y devolver `traduccion`, `tono`, `nota_cultural` y `region_origen`. Lo que devuelve el modelo se valida:
+la nota y la region solo se aceptan como texto de largo acotado.
 Si un motor falla se pasa al siguiente y no se vuelve a intentar durante un minuto (para no esperar en cada
 mensaje). Cada traduccion guarda que motor la hizo (`qwen:qwen2.5:7b`, `claude:...` o `local`) y `/health` muestra
 la cadena activa. `TRADUCTOR=qwen|claude|local` fuerza otra opcion.
 
 Con Qwen o Claude se aceptan idiomas distintos de espanol e ingles; con solo el motor de reglas no.
 
-> La conexion real con Ollama y con Claude esta cubierta por pruebas con respuestas simuladas; falta probarla con
-> el modelo corriendo en tu computador (calidad y tiempo de respuesta).
+> La conexion real con Ollama, con Claude y con Vertex esta cubierta por pruebas con respuestas simuladas; falta medir con el
+> motor de produccion la calidad y el tiempo de respuesta (`npm run medir`).
+>
+> **Privacidad:** con Vertex, el texto de cada mensaje sale hacia Google Cloud; con ElevenLabs, el texto traducido sale hacia ese
+> servicio. El audio original no sale del servidor (Whisper corre local).
 
 ## API
 

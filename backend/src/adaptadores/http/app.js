@@ -50,6 +50,7 @@ function crearApp(servicios, opciones = {}) {
   v1.use('/', require('./rutas/catalogo')(servicios));
   v1.use('/', require('./rutas/conversaciones')(servicios));
   v1.use('/', require('./rutas/reportes')(servicios));
+  v1.use('/', require('./rutas/problemas')(servicios));
   if (servicios.voz) v1.use('/', require('./rutas/voz')(servicios));
   app.use('/api/v1', v1);
 

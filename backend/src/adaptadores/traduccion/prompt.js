@@ -1,8 +1,9 @@
 const { buscarTerminos, localeDe } = require('./glosario');
 
 // Arma las lineas de glosario cultural: los modismos del glosario que aparecen en el mensaje, con su
-// equivalente natural en la variedad destino. Asi el motor sabe como decirlo un nativo y no traduce
-// literal. Si no hay coincidencias no agrega nada. (Ver glosario.js.)
+// equivalente natural en la variedad destino y un ejemplo real de uso (few-shot tomado del diccionario,
+// ver glosario.json). Asi el motor sabe como lo diria un nativo y no traduce literal. Si no hay
+// coincidencias no agrega nada. (Ver glosario.js.)
 function lineasGlosario({ texto, origen, destino }) {
   const matches = buscarTerminos(texto, localeDe(origen.codigo));
   if (!matches.length) return [];
@@ -12,19 +13,27 @@ function lineasGlosario({ texto, origen, destino }) {
     `Modismos detectados en el mensaje. Usa el equivalente cultural natural en ${dest} (nunca la traduccion literal) y respeta el registro del hablante:`,
     ...matches.map((m) => {
       const eq = m.equivalent ? ` -> en ${dest}: ${m.equivalent}` : '';
+      const ej = m.example ? ` | asi lo usa un nativo: "${m.example}"` : '';
       const flag = m.sensitive ? ' [sensible: cuida el registro, puede ofender fuera de contexto]' : '';
-      return `- "${m.term}" = ${m.meaning_es}${eq}${flag}`;
+      return `- "${m.term}" = ${m.meaning_es}${eq}${ej}${flag}`;
     }),
   ];
 }
 
-// Prompt comun para los motores de IA (Qwen y Claude): conservar intencion, tono y modismos
+// Prompt comun para los motores de IA (Qwen y Claude): transcreacion cultural, no traduccion literal.
+// Es agnostico al par de idiomas: el origen, el destino y sus regiones llegan de la configuracion de la
+// conversacion (no se hardcodean).
 function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tonos, prosodia }) {
+  const dest = destino.nombre || destino.codigo;
   return [
-    'Eres el motor de traduccion de TalkLate. No traduzcas palabra por palabra: conserva la intencion, el tono, el estilo y los modismos del hablante.',
-    'Si el mensaje tiene jerga o modismos, usa el equivalente cultural en la region destino en vez de una traduccion literal.',
+    'Eres el motor de transcreacion cultural en tiempo real de TalkLate. Tu trabajo NO es traducir palabra por palabra:',
+    'primero entiende la INTENCION, la SITUACION y el TONO del hablante, y luego exprésalo como lo diria de forma natural un nativo de la region destino.',
+    'Reglas:',
+    '- Nunca hagas sustitucion literal ni morfologica palabra por palabra; reescribe la idea completa.',
+    '- Conserva el registro del hablante: si habla informal o callejero, usa la jerga y los modismos naturales e informales de la region destino (no una version neutra y acartonada); si es formal, manten lo formal.',
+    '- Usa solo la puntuacion propia del idioma destino; no copies signos del idioma origen (por ejemplo, el ingles no lleva los signos de apertura ¿ ni ¡).',
     `Idioma origen: ${origen.nombre || origen.codigo}${regionOrigen ? ` (region: ${regionOrigen})` : ''}.`,
-    `Idioma destino: ${destino.nombre || destino.codigo}${regionDestino ? ` (region: ${regionDestino})` : ''}.`,
+    `Idioma destino: ${dest}${regionDestino ? ` (region: ${regionDestino})` : ''}.`,
     `Tonos posibles: ${tonos.join(', ')}.`,
     ...(prosodia ? [`El mensaje llego por voz: la persona ${prosodia.descripcion}. Usa tambien eso para elegir el tono y conservalo en la traduccion.`] : []),
     'Responde SOLO con un JSON: {"traduccion": string, "tono": uno de los tonos posibles, "genero": "masculino" | "femenino" | null (el genero de quien ESCRIBE el mensaje, inferido por pistas del texto como la concordancia en espanol -cansada/cansado- o como se nombra; null si no hay pistas), "nota_cultural": string o null (explica en espanol breve cualquier modismo adaptado), "region_origen": string o null}.',
@@ -34,6 +43,9 @@ function armarPrompt({ texto, origen, destino, regionDestino, regionOrigen, tono
     texto,
   ].join('\n');
 }
+
+// La salida del modelo es entrada no confiable: solo se aceptan textos, con largo acotado
+const textoAcotado = (v, max) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
 
 // Lee el JSON de la respuesta aunque el modelo lo envuelva en texto o en un bloque de codigo
 function leerRespuesta(bruto, tonos) {
@@ -49,8 +61,8 @@ function leerRespuesta(bruto, tonos) {
     traduccion: json.traduccion.trim(),
     tono: tonos.includes(json.tono) ? json.tono : null,
     genero,
-    nota: json.nota_cultural || null,
-    regionOrigen: json.region_origen || null,
+    nota: textoAcotado(json.nota_cultural, 500),
+    regionOrigen: textoAcotado(json.region_origen, 80),
     aproximada: false,
   };
 }

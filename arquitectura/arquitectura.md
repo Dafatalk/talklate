@@ -1,33 +1,31 @@
-# Arquitectura de TalkLate - Documento maestro
+# Arquitectura de TalkLate
 
-**Fase 3 - Arquitectura de Software & Base de Datos**
+**Fase 3 - Arquitectura de software y base de datos**
+
+**Version:** 1.0 (29/10/2026)
 
 Este es el documento de entrada a la arquitectura de TalkLate. Describe la **arquitectura
-actual** (la que esta construida, no un ideal) y **justifica cada decision contra su ADR**
-(`decisiones.md`) y el driver que la obliga (`drivers.md`). Para el detalle de cada parte,
-enlaza a los documentos especializados en vez de repetirlos.
+construida** y **justifica cada decision con su ADR** (`11_decisiones_de_arquitectura_ADR.md`)
+y el driver que la obliga (`06_drivers_de_arquitectura.md`). Cada afirmacion apunta al codigo
+real (`backend/src`, `frontend/`).
 
-**Metodo:** como autorizo el mentor, primero se construyo y despues se justifico
-(`seguimiento/records/2026-10-14-reunion-presencial.md`). Cada afirmacion de este documento
-apunta al codigo real (`backend/src`, `frontend/`), al ADR que la sustenta y al driver que la motiva.
-
-## Como leer esta carpeta
+## Como leer esta entrega
 
 | Documento | Vista C4 / tema | Contenido |
 | --- | --- | --- |
-| `arquitectura.md` (este) | Sintesis y justificacion | Todas las vistas amarradas y justificadas por ADR |
-| `drivers.md` | Drivers | Requisitos que obligan decisiones (DRV-01 a DRV-08) |
-| `decisiones.md` | Decisiones | 13 ADR con contexto, alternativas y consecuencias |
-| `c4.md` | C4 Niveles 1 y 2 | Contexto del sistema y contenedores |
-| `componentes.md` | C4 Nivel 3 (API) | Componentes internos de la API TalkLate |
-| `modelo_datos.md` | Datos | Modelo de dominio, reglas y correspondencia con la base |
-| `tech_stack.md` | Stack | Tecnologia por capa y alternativas evaluadas |
-| `medicion_traduccion.md` | Evidencia | Medicion de tiempo y calidad (DRV-01, DRV-02) |
-| `revision_recomendaciones.md` | Revision critica | Analisis de las recomendaciones de la revision del 22/10/2026 y orden propuesto |
-
----
+| `07_arquitectura.md` (este) | Sintesis y justificacion | Todas las vistas amarradas y justificadas por ADR |
+| `06_drivers_de_arquitectura.md` | Drivers | Requisitos que obligan decisiones (DRV-01 a DRV-08) |
+| `08_stack_tecnologico.md` | Stack | Tecnologia por capa y alternativas evaluadas |
+| `09_diagramas_c4.md` | C4 Niveles 1 y 2 | Contexto del sistema y contenedores |
+| `10_componentes.md` | C4 Nivel 3 (API) | Componentes internos de la API TalkLate |
+| `11_decisiones_de_arquitectura_ADR.md` | Decisiones | 18 ADR con contexto, alternativas y consecuencias |
+| `12_modelo_de_datos.md` | Datos | Modelo de dominio, reglas y correspondencia con la base |
+| `../entrega/diagramas/arquitectura_talklate.html` | Vista general interactiva | Diagrama de arquitectura (Archify) con el flujo de voz |
+| `../entrega/diagramas/arquitectura_hexagonal.html` | Vista interactiva del backend | Nucleo, 9 puertos y adaptadores (Archify) |
 
 ## 1. Estilo arquitectonico
+
+![Vista general de la arquitectura de TalkLate con el flujo de voz (Archify)](../entrega/diagramas/img/archify_general.png)
 
 TalkLate es una arquitectura **cliente-servidor** de tres contenedores:
 
@@ -35,70 +33,87 @@ TalkLate es una arquitectura **cliente-servidor** de tres contenedores:
   Android y web (ADR-001, responde a DRV-07).
 - **API TalkLate**, un **monolito modular** en Node.js 22 + Express con API REST sincrona
   `/api/v1` (ADR-002, ADR-011, responde a DRV-01, DRV-08).
-- **Base de datos** SurrealDB 3.x en la nube, detras de un patron **Repository** que permite
-  cambiar a SQLite en pruebas (ADR-012, responde a DRV-04, DRV-08).
+- **Base de datos** SurrealDB 3.x, detras de un patron **Repository** que permite usar SQLite
+  en pruebas (ADR-012, responde a DRV-04, DRV-08).
 
-El corazon del producto -traducir conservando tono, intencion y modismos- vive en un
-**subsistema de traduccion** que encadena motores con el patron **Circuit Breaker**:
-Qwen local -> Claude Sonnet -> motor de reglas (ADR-004, responde a DRV-01, DRV-02, DRV-05).
+El corazon del producto -traducir conservando tono, intencion, emocion y modismos- vive en tres
+subsistemas que dependen de motores de IA, cada uno detras de un puerto y con respaldo:
+
+| Subsistema | Puerto | Motores (en orden) | ADR | Drivers |
+| --- | --- | --- | --- | --- |
+| Transcripcion de voz | `Transcriptor` | Whisper (API compatible con OpenAI: whisper.cpp o faster-whisper locales) | ADR-014 | DRV-01, DRV-06 |
+| Traduccion cultural | `MotorTraduccion` | Claude Sonnet en Google Vertex AI -> motor de reglas, con Circuit Breaker (Qwen local queda como adaptador alternativo) | ADR-004, ADR-020 | DRV-01, DRV-02, DRV-05 |
+| Voz con emocion | `Sintetizador` | ElevenLabs -> Azure Speech -> OpenAI -> voz del celular | ADR-015, ADR-019 | DRV-02, DRV-05, DRV-06 |
+| Genero de quien habla | `DetectorGenero` | Pitch del audio con ffmpeg; si no se decide, lo infiere el modelo desde el texto | - | DRV-02 |
+
+La entonacion de un mensaje hablado se estima en el dominio (`dominio/prosodia.js`) con el
+volumen, la variacion y la velocidad de la voz, y se combina con el tono de las palabras. Ese
+tono viaja al prompt de traduccion y al sintetizador, que lo convierte en emocion audible
+(`dominio/voz.js`).
 
 Por dentro, la API sigue una **arquitectura hexagonal (puertos y adaptadores)** (ADR-013): el
 dominio y los casos de uso estan en el centro y no dependen de Express, de la base ni de los
 motores de IA; cada dependencia externa entra por un puerto (`Repositorio`, `MotorTraduccion`,
-`Notificador`, `Cifrador`) y se conecta con un adaptador. Es la respuesta a "y si manana crece?":
-no se parte en servicios, se separa bien por dentro.
+`Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador`, `FirmadorTokens`) y se conecta con un adaptador. Las
+reglas de dependencia entre capas se verifican con dependency-cruiser
+(`npm run arch:check`). El chequeo corre en el CI en cada pull request y hoy no marca ninguna violacion: el hash de contrasenas (bcrypt) y los tokens (JWT) tambien entran por puertos (`Hasheador` y `FirmadorTokens`).
+
+![Backend hexagonal: nucleo, 9 puertos y adaptadores (Archify)](../entrega/diagramas/img/archify_hexagonal.png)
 
 ```mermaid
 flowchart LR
     http["Adaptador HTTP<br/>(Express)"] --> apl
     subgraph nucleo["Nucleo"]
-        apl["Casos de uso<br/>(aplicacion)"] --> dom["Dominio"]
+        apl["Casos de uso<br/>(aplicacion)"] --> dom["Dominio<br/>prosodia, voz, reglas"]
         apl --> p{{"Puertos"}}
     end
-    q["Qwen / Claude / reglas"] -.cumplen.-> p
-    r["SurrealDB / SQLite"] -.cumplen.-> p
+    w["Whisper"] -.cumple Transcriptor.-> p
+    q["Claude (Vertex) / Qwen / reglas"] -.cumplen MotorTraduccion.-> p
+    v["ElevenLabs / Azure / OpenAI"] -.cumplen Sintetizador.-> p
+    g["ffmpeg (pitch)"] -.cumple DetectorGenero.-> p
+    r["SurrealDB / SQLite"] -.cumplen Repositorio.-> p
     o["Correo / Cifrado"] -.cumplen.-> p
     c["Composicion"] -.arma.-> apl
 ```
 
 ---
 
-## 2. Como la arquitectura responde a los drivers (justificacion)
+## 2. Como la arquitectura responde a los drivers
 
-Esta es la tabla central: por cada driver, que se decidio (ADR), con que mecanismo del codigo
-se realiza, y con que evidencia se comprueba hoy.
+Por cada driver: que se decidio (ADR), con que mecanismo del codigo se realiza y como se comprueba.
 
-| Driver | Decision (ADR) | Mecanismo en el codigo | Evidencia |
+| Driver | Decision (ADR) | Mecanismo en el codigo | Como se comprueba |
 | --- | --- | --- | --- |
-| DRV-01 Tiempo de respuesta | ADR-002 (REST por turno), ADR-004 (motores en cadena, sin reintentos dentro de la peticion) | `aplicacion/traduccion.js`: al fallar un motor no se reintenta, se pasa al siguiente; el circuito evita esperar el timeout en cada mensaje (falta acotar el tiempo de espera de Qwen, ver `revision_recomendaciones.md`) | `npm run medir` + evento `traduccion` con `duracion_ms`; linea base en `medicion_traduccion.md` (**falta medir con Qwen**) |
-| DRV-02 Calidad cultural | ADR-004 (prompt de equivalencia cultural) | `adaptadores/traduccion/prompt.js` arma el prompt con tono y region destino; devuelve nota cultural y marca de aproximada | `npm run medir` (14/15 con reglas, pero ese glosario esta dentro del motor de reglas; la medicion valida es con Qwen y un glosario aparte) |
-| DRV-03 Privacidad | ADR-006 (JWT + refresco), ADR-010 (proteccion de datos) | `adaptadores/cifrado/aesGcm.js` (AES-256-GCM en reposo), `compartido/log.js` (JSON sin PII), aislamiento por usuario en los casos de uso, eliminar cuenta | `test/api.test.js`, `test/seguridad.test.js` |
-| DRV-04 Crecimiento de idiomas | ADR-003/ADR-012 (catalogo en datos), ADR-008 (LenguajeRegion N:M) | `aplicacion/catalogo.js` + puerto `Repositorio.catalogo`: alta/activacion de idiomas y regiones sin tocar codigo | Prueba del administrador que activa un idioma y agrega una region |
-| DRV-05 Continuidad ante fallas | ADR-004 (Circuit Breaker con degradacion aceptable) | `aplicacion/traduccion.js`: circuito abierto 60 s por motor; `adaptadores/traduccion/reglas.js` como ultimo recurso | `test/motores.test.js`: Qwen falla -> Claude -> reglas, y el caso de uso probado con motores falsos |
-| DRV-06 Costo y abuso | ADR-004 (Qwen local sin costo por mensaje), ADR-010 (limites) | `adaptadores/http/limites.js`: 30 msg/min por usuario, limites de registro y recuperacion | Pruebas de seguridad |
-| DRV-07 Multiplataforma | ADR-001 (Expo), ADR-007 (template Luna) | Una base de codigo en `frontend/`; `lib/api.ts` resuelve el host en web, Expo Go y emulador | Compila para web; **falta probar en celular fisico con Expo Go** |
-| DRV-08 Facilidad de prueba | ADR-002, ADR-012 (Repository de dos motores), ADR-013 (puertos) | El adaptador SQLite corre sin servidor ni claves y cumple el mismo puerto que el de SurrealDB; los casos de uso se prueban con adaptadores falsos | ~97 % de cobertura (`npm run coverage`), CI contra los dos motores |
+| DRV-01 Tiempo por turno | ADR-002 (REST por turno), ADR-004 (motores en cadena, sin reintentos), ADR-014, ADR-019, ADR-020 | `aplicacion/traduccion.js`: al fallar un motor se pasa al siguiente y el circuito evita esperar el timeout en cada mensaje; Whisper corre local; Claude (Vertex) y ElevenLabs son llamadas a la nube, con tiempo limite y su latencia por medir | `npm run medir` y `npm run medir:voz`; evento de log `traduccion` con `duracion_ms` |
+| DRV-02 Calidad cultural y emocional | ADR-004 (prompt de equivalencia cultural), ADR-014 (entonacion), ADR-015 y ADR-016 (voz con emocion) | `adaptadores/traduccion/prompt.js` arma el prompt con tono, prosodia y region destino; `dominio/voz.js` traduce el tono a estilo SSML, instruccion o vector de emocion | `npm run medir` con glosario de prueba; audios de `npm run medir:voz`; prueba de escucha |
+| DRV-03 Privacidad | ADR-006 (JWT + refresco), ADR-010 (proteccion de datos) | `adaptadores/cifrado/aesGcm.js` (AES-256-GCM en reposo), `compartido/log.js` (JSON sin datos personales), aislamiento por usuario, eliminar cuenta; los audios de voz solo viven en memoria 5 minutos | `test/api.test.js`, `test/seguridad.test.js` |
+| DRV-04 Crecimiento de idiomas | ADR-008 (LenguajeRegion N:M), ADR-012 (catalogo en datos) | `aplicacion/catalogo.js` + puerto `Repositorio.catalogo`: alta y activacion de idiomas y regiones sin tocar codigo | Prueba del administrador |
+| DRV-05 Continuidad ante fallas | ADR-004 (Circuit Breaker), ADR-015 (cadena de voz) | Circuito abierto 60 s por motor; motor de reglas y voz del celular como ultimo recurso | `test/motores.test.js` |
+| DRV-06 Costo y abuso | ADR-004, ADR-010, ADR-020 | Whisper local sin costo; Claude (Vertex) y ElevenLabs cuestan por uso, asi que `adaptadores/http/limites.js` pone limites: 30 mensajes por minuto, limites de registro, recuperacion y voz | Pruebas de seguridad |
+| DRV-07 Multiplataforma | ADR-001 (Expo), ADR-007 (template Luna) | Una base de codigo en `frontend/`; grabacion con `expo-audio`, que funciona en Expo Go | Compilacion web y Expo Go |
+| DRV-08 Facilidad de prueba | ADR-002, ADR-012, ADR-013 | Adaptador SQLite sin servidor ni claves; casos de uso probados con adaptadores falsos; dependency-cruiser verifica las capas | `npm run coverage` (cercana al 96 %), `npm run arch:check`, CI contra SQLite y SurrealDB |
 
 ---
 
 ## 3. Vista de contexto (C4 Nivel 1)
 
 Quien usa TalkLate (Cliente Traductor, Interlocutor, Administrador) y con que sistemas externos
-habla (Ollama+Qwen, Claude, voz del dispositivo, correo pendiente). Diagrama completo en
-[`c4.md`](c4.md#nivel-1---contexto-del-sistema).
+habla: Claude Sonnet (Google Vertex AI), Whisper, ElevenLabs (con Azure Speech u OpenAI de respaldo) y la
+voz del dispositivo. Diagrama completo en `09_diagramas_c4.md`.
 
 ---
 
 ## 4. Vista de contenedores (C4 Nivel 2)
 
-Tres contenedores (App, API, Base de datos) y su comunicacion. Diagrama completo en
-[`c4.md`](c4.md#nivel-2---contenedores). Justificacion por contenedor:
+Tres contenedores propios (App, API, Base de datos) y los servicios de IA (uno local y dos en la nube). Diagrama
+completo en `09_diagramas_c4.md`. Justificacion por contenedor:
 
 | Contenedor | Decision | ADR |
 | --- | --- | --- |
-| App movil (Expo) | Una base de codigo multiplataforma, reusa el template Luna | ADR-001, ADR-007 |
-| API TalkLate (Node + Express) | Monolito modular, REST sincrona por turno | ADR-002, ADR-011 |
-| Base de datos (SurrealDB) | Fuente de verdad detras de un repositorio; enlaces nativos y ASSERT | ADR-012 |
+| App movil (Expo) | Una base de codigo multiplataforma, reusa el template Luna; graba la voz con `expo-audio` | ADR-001, ADR-007, ADR-014 |
+| API TalkLate (Node + Express) | Monolito modular hexagonal, REST sincrona por turno | ADR-002, ADR-011, ADR-013 |
+| Base de datos (SurrealDB) | Fuente de verdad detras de un repositorio; enlaces nativos, ASSERT y UNIQUE | ADR-012 |
+| Servicios de IA | Whisper corre en el servidor de TalkLate; la traduccion (Claude en Google Vertex AI) y la voz (ElevenLabs) son servicios de nube que reciben solo texto | ADR-014, ADR-019, ADR-020 |
 
 ---
 
@@ -106,11 +121,12 @@ Tres contenedores (App, API, Base de datos) y su comunicacion. Diagrama completo
 
 ### 5.1 API TalkLate
 
-Detalle completo (20 componentes C01-C20, bounded contexts y trazabilidad REQ->componente) en
-[`componentes.md`](componentes.md). En resumen, en capas hexagonales: Adaptador HTTP (rutas,
-sesion, limites) -> Casos de uso (cuentas, sesiones, conversaciones, traduccion, catalogo,
-reportes) -> Dominio y Puertos <- Adaptadores de salida (motores Qwen, Claude y reglas;
-repositorios SurrealDB y SQLite; notificador; cifrador), conectados por la Composicion.
+Detalle completo (componentes, bounded contexts y trazabilidad requisito -> componente) en
+`10_componentes.md`. En resumen, en capas hexagonales: Adaptador HTTP (rutas, sesion, limites)
+-> Casos de uso (cuentas, sesiones, conversaciones, traduccion, voz, catalogo, reportes) ->
+Dominio (reglas, prosodia, voz) y Puertos <- Adaptadores de salida (motores Claude (Vertex), Qwen y
+reglas; transcriptor Whisper; sintetizadores ElevenLabs, Azure y OpenAI; detector de genero; repositorios
+SurrealDB y SQLite; notificador; cifrador), conectados por la Composicion.
 
 ### 5.2 App movil
 
@@ -135,6 +151,7 @@ flowchart TB
         end
         subgraph comp["Componentes TalkLate"]
             chat["ChatView"]
+            bvoz["BurbujaVoz"]
             input["TranslatorInput"]
             burbuja["MessageBubble"]
             nueva["NuevaConversacion"]
@@ -142,16 +159,21 @@ flowchart TB
         end
         subgraph libf["Libreria (lib)"]
             apicli["<b>Cliente API</b><br/>[api.ts]<br/>REST + refresco de token"]
-            vozc["<b>Voz</b><br/>[voz.ts]<br/>TTS + dictado"]
+            grab["<b>Grabacion</b><br/>[grabacion.ts]<br/>expo-audio + volumen"]
+            vozc["<b>Voz</b><br/>[voz.ts]<br/>voz natural + respaldo"]
             reglas["Reglas cliente [reglas.ts]"]
         end
     end
     apiback["<b>API TalkLate</b><br/>[Contenedor]"]
-    vozsys["<b>Voz del dispositivo</b><br/>[Sistema externo]"]
+    vozsys["<b>Voz y microfono del dispositivo</b><br/>[Sistema externo]"]
 
     nav --> pant
     pChat --> chat
-    chat --> input & burbuja
+    chat --> bvoz & input & burbuja
+    bvoz --> grab
+    input --> grab
+    grab --> vozsys
+    vozc -->|POST /voz| apiback
     pChat --> nueva
     pant -.->|consumen| estado
     chat --> apicli
@@ -167,29 +189,32 @@ flowchart TB
     classDef componente fill:#85BBF0,stroke:#5D82A8,color:#000000
     class apiback contenedor
     class vozsys externo
-    class nav,pAuth,pChat,pHist,pAdmin,pPerfil,auth,convs,tema,chat,input,burbuja,nueva,sel,apicli,vozc,reglas componente
+    class nav,pAuth,pChat,pHist,pAdmin,pPerfil,auth,convs,tema,chat,bvoz,input,burbuja,nueva,sel,apicli,grab,vozc,reglas componente
 ```
 
 | Componente | Responsabilidad | Archivo(s) | ADR |
 | --- | --- | --- | --- |
 | Navegacion | Rutas y layout (drawer, pantallas) | `app/_layout.tsx`, `app/(drawer)/`, `app/[...404].tsx` | ADR-001 |
-| Pantallas | Una vista por etapa del journey (ver [`especificacion_vistas_ui.md`](../componentes/especificacion_vistas_ui.md)) | `app/screens/*` | ADR-007 |
+| Pantallas | Una vista por etapa del journey (ver `13_especificacion_vistas_ui.md`) | `app/screens/*` | ADR-007 |
 | AuthContext | Sesion en memoria + persistencia en AsyncStorage; renueva usuario al abrir | `app/contexts/AuthContext.tsx` | ADR-006 |
 | ConversacionesContext | Historial del usuario para el menu lateral y la pantalla de historial | `app/contexts/ConversacionesContext.tsx` | ADR-007 |
-| ChatView + TranslatorInput + MessageBubble | Flujo de chat: capturar (voz/texto), enviar, mostrar y reproducir la traduccion | `components/talklate/*` | ADR-005, ADR-007 |
+| ChatView | Pantalla del traductor con dos modos: burbuja de voz (por defecto) y chat | `components/talklate/ChatView.tsx` | ADR-007, ADR-014 |
+| BurbujaVoz | Burbuja animada que representa la IA: escucha (ondas), traduce (gira) y habla | `components/talklate/BurbujaVoz.tsx` | ADR-014 |
+| TranslatorInput + MessageBubble | Modo chat: escribir o grabar, mostrar y reproducir la traduccion | `components/talklate/*` | ADR-007 |
+| Grabacion | Graba con `expo-audio`, mide el volumen cada 100 ms y detecta el fin de la frase (1.5 s de silencio) | `lib/grabacion.ts` | ADR-014 |
 | Cliente API | REST a `/api/v1`; **refresco automatico del token** (401 -> renueva una vez con guardia single-flight -> repite) | `lib/api.ts` | ADR-006, ADR-011 |
-| Voz | TTS con `expo-speech` (pitch/rate segun entonacion) y dictado del navegador (solo web) | `lib/voz.ts` | ADR-005 |
+| Voz | Pide la voz natural con emocion a la API (`POST /voz`) y la reproduce; si no hay motor, usa `expo-speech` con tono y velocidad ajustados | `lib/voz.ts` | ADR-015 |
 
-> Justificacion: la App es delgada a proposito (ADR-002: la logica vive en la API). El dictado
-> es del cliente y el reconocimiento de region es por vocabulario, no por el sonido de la voz
-> (ADR-005, ver `../contexto.md`).
+> Justificacion: la App es delgada a proposito (ADR-002: la logica vive en la API). La app solo
+> graba y reproduce; transcribir, estimar la entonacion, traducir y sintetizar la voz ocurre en
+> el servidor (ADR-014, ADR-015). La region de origen se reconoce por el vocabulario.
 
 ---
 
 ## 6. Vista de datos
 
 Modelo de dominio (10 objetos + relacion N:M `LenguajeRegion` + tablas de soporte) y su
-correspondencia con la base, en [`modelo_datos.md`](modelo_datos.md). Justificacion:
+correspondencia con la base, en `12_modelo_de_datos.md`. Justificacion:
 
 | Decision | ADR |
 | --- | --- |
@@ -205,7 +230,7 @@ correspondencia con la base, en [`modelo_datos.md`](modelo_datos.md). Justificac
 El flujo central (HU0003). Muestra el Circuit Breaker (ADR-004), el cifrado al persistir
 (ADR-010) y la entrega por el mismo canal (REQ-TRAD-005).
 
-> Fuente editable: [`diagramas/secuencia_traduccion.drawio`](diagramas/secuencia_traduccion.drawio). El diagrama Mermaid de abajo es una copia para leer rapido en GitHub.
+> Fuente editable: `diagramas/secuencia_traduccion.drawio`.
 
 ```mermaid
 sequenceDiagram
@@ -213,8 +238,7 @@ sequenceDiagram
     participant A as App (ChatView + api.ts)
     participant API as API (rutas + caso de uso Conversaciones)
     participant F as Caso de uso Traduccion
-    participant Q as Qwen (Ollama)
-    participant CL as Claude
+    participant CL as Claude (Vertex AI)
     participant R as Motor de reglas
     participant DB as SurrealDB
 
@@ -222,23 +246,57 @@ sequenceDiagram
     A->>API: POST /conversaciones/:id/mensajes (JWT)
     Note over API: Si falta el idioma origen,<br/>lo detecta con el 1er mensaje (RN-2)
     API->>F: traducir(texto, origen, destino, region, tonos)
-    F->>Q: traducir (si el circuito esta cerrado)
-    alt Qwen responde
-        Q-->>F: traduccion + tono + nota cultural
-    else Qwen falla
+    F->>CL: traducir (si el circuito esta cerrado)
+    alt Claude responde
+        CL-->>F: traduccion + tono + nota cultural
+    else Claude falla (30 s o error)
         Note over F: Abre el circuito 60 s (ADR-004)
-        F->>CL: traducir (si hay ANTHROPIC_API_KEY)
-        alt Claude responde
-            CL-->>F: traduccion
-        else Claude tambien falla
-            F->>R: traducir (degradacion aceptable)
+        F->>R: traducir (solo modismos conocidos)
+        alt hay modismos conocidos
             R-->>F: traduccion aproximada
+        else sin coincidencias
+            R-->>F: error (no entrega palabra por palabra)
         end
     end
     F-->>API: resultado + motor usado
     API->>DB: guarda mensaje (contenido cifrado AES-256-GCM)
     API-->>A: 201 mensaje + entrega (canal, reproducir_audio)
     A->>U: Muestra y, si el canal es Voz, reproduce con expo-speech
+```
+
+### 7.1 Mensaje hablado (burbuja de voz)
+
+```mermaid
+sequenceDiagram
+    actor U as Cliente Traductor
+    participant A as App (BurbujaVoz + grabacion.ts)
+    participant API as API (caso de uso Conversaciones)
+    participant W as Whisper
+    participant F as Caso de uso Traduccion
+    participant V as Caso de uso Voz
+    participant EL as ElevenLabs
+
+    U->>A: Toca la burbuja y habla
+    Note over A: Ondas mientras escucha,<br/>mide el volumen cada 100 ms
+    Note over A: 1.5 s de silencio: fin de la frase
+    A->>API: POST /conversaciones/:id/mensajes/voz (audio + volumen)
+    Note over A: La burbuja gira (traduciendo)
+    API->>W: transcribir(audio, idioma)
+    W-->>API: texto
+    Note over API: dominio/prosodia: tono de la voz<br/>+ tono de las palabras<br/>ffmpeg mide el pitch: genero de quien habla
+    API->>F: traducir(texto, tono, prosodia)
+    F-->>API: traduccion + tono
+    API-->>A: 201 mensaje + transcripcion + ritmo_voz
+    A->>API: POST /voz (traduccion, idioma, pais, tono, ritmo, genero)
+    API->>V: sintetizar
+    V->>EL: texto, tono, genero y velocidad
+    alt ElevenLabs responde
+        EL-->>V: audio mp3
+    else falla o no esta configurado
+        Note over V: Azure Speech -> OpenAI,<br/>si ninguno, la app usa la voz del celular
+    end
+    V-->>A: URL del audio (vence en 5 min)
+    A->>U: Reproduce la traduccion con la misma emocion
 ```
 
 > El token de acceso dura 15 minutos. Si vence a mitad del flujo, `lib/api.ts` responde al 401
@@ -249,71 +307,74 @@ sequenceDiagram
 
 ## 8. Vista de despliegue
 
-Donde corre cada pieza. Justifica que Qwen vive en el **servidor** (ADR-004) y que SurrealDB es
-una instancia **remota** gestionada (ADR-012); la voz es del **dispositivo** (ADR-005).
+Donde corre cada pieza. La API y Whisper viven en el **servidor** de TalkLate (ADR-014); la
+traduccion (Claude en Google Vertex AI, ADR-020) y la voz (ElevenLabs, ADR-019) son servicios de
+**nube**; SurrealDB es una instancia **remota** gestionada (ADR-012). Equipo de referencia para la
+demostracion: Mac con chip M5 y 32 GB de RAM; se arranca con `./run-talklate.sh`.
 
-> Fuente editable: [`diagramas/despliegue.drawio`](diagramas/despliegue.drawio). El diagrama Mermaid de abajo es una copia para leer rapido en GitHub.
+> Fuente editable: `diagramas/despliegue.drawio`. Vista interactiva: `../entrega/diagramas/arquitectura_talklate.html`.
 
 ```mermaid
 flowchart LR
     subgraph disp["Dispositivo del Cliente Traductor"]
         appd["<b>App TalkLate</b><br/>Expo Go / web / build"]
-        vozd["Voz del dispositivo<br/>dictado + TTS"]
+        vozd["Microfono y voz<br/>del dispositivo"]
     end
     subgraph srv["Servidor de TalkLate"]
         apin["<b>API TalkLate</b><br/>Node.js 22 - puerto 3000"]
-        oll["<b>Ollama + Qwen</b>"]
+        wh["<b>Whisper</b><br/>whisper.cpp - puerto 9000"]
     end
     cloud[("<b>SurrealDB Cloud</b><br/>gestionado")]
-    anth["<b>API de Anthropic</b><br/>Claude Sonnet"]
+    vtx["<b>Google Vertex AI</b><br/>Claude Sonnet"]
+    eleven["<b>ElevenLabs</b><br/>voz con emocion"]
+    azu["<b>Azure Speech / OpenAI</b><br/>voz de respaldo"]
 
     appd -->|HTTPS /api/v1| apin
     appd --> vozd
-    apin -->|HTTP local /api/chat| oll
+    apin -->|HTTP local /v1/audio/transcriptions| wh
+    apin -->|HTTPS, solo el texto traducido| eleven
     apin -->|HTTP /sql + token de sesion| cloud
-    apin -.->|HTTPS, solo si hay clave| anth
+    apin -->|HTTPS, credenciales de Google, solo el texto| vtx
+    apin -.->|HTTPS, solo si hay clave| azu
 
     classDef comp fill:#85BBF0,stroke:#5D82A8,color:#000000
     classDef ext fill:#999999,stroke:#6B6B6B,color:#FFFFFF
-    class appd,vozd,apin,oll comp
-    class cloud,anth ext
+    class appd,vozd,apin,wh comp
+    class cloud,vtx,eleven,azu ext
 ```
-
-> Pendiente (F10): desplegar la API y Ollama en un servidor real y medir con Qwen
-> (`drivers.md`, DRV-01/DRV-02). El servicio de correo para el codigo de recuperacion tambien
-> queda pendiente (ADR-006).
 
 ---
 
 ## 9. Patrones aplicados
 
-Del catalogo `../convenciones/patrones-arquitectonicos.md`:
+Patrones del catalogo de la convencion del proyecto:
 
 | Patron | Donde | ADR |
 | --- | --- | --- |
 | Request-Reply | API REST sincrona por turno | ADR-002, ADR-011 |
 | Circuit Breaker (con degradacion aceptable) | Caso de uso de traduccion (`aplicacion/traduccion.js`) | ADR-004 |
+| Cadena de respaldo (fallback) | Caso de uso de voz (`aplicacion/voz.js`): ElevenLabs -> Azure -> OpenAI -> voz del celular | ADR-015 |
 | Token-Based Authentication | Sesion JWT + refresco rotativo | ADR-006 |
 | Repository | Puerto `Repositorio` con dos adaptadores (`adaptadores/persistencia/`) | ADR-012 |
 | Puertos y adaptadores (hexagonal) | Toda la API: dominio, casos de uso, puertos, adaptadores y composicion | ADR-013 |
 | Structured Logging | Logs JSON sin PII (`compartido/log.js`) | ADR-010 |
 
 Patrones del catalogo que **no** se usan y por que (microservicios, API Gateway, BFF, CQRS,
-Event Sourcing, Strangler Fig): ver la nota en [`decisiones.md`](decisiones.md).
+Event Sourcing, Strangler Fig): ver la nota en `11_decisiones_de_arquitectura_ADR.md`.
 
 ---
 
 ## 10. Indice de decisiones (ADR)
 
-Detalle completo en [`decisiones.md`](decisiones.md). Resumen de que resuelve cada una:
+Detalle completo en `11_decisiones_de_arquitectura_ADR.md`. Resumen de que resuelve cada una:
 
 | ADR | Decision | Driver |
 | --- | --- | --- |
 | ADR-001 | App Expo (React Native) + NativeWind | DRV-07 |
 | ADR-002 | Backend monolitico Node + Express, REST sincrona | DRV-07, DRV-08 |
 | ADR-003 | SQLite inicial (reemplazada por ADR-012; queda para pruebas) | DRV-04, DRV-08 |
-| ADR-004 | Traduccion Qwen -> Claude -> reglas (Circuit Breaker) | DRV-01, DRV-02, DRV-05, DRV-06, DRV-08 |
-| ADR-005 | Voz: dictado en el cliente + expo-speech | DRV-07 |
+| ADR-004 | Traduccion con motores en cadena (Circuit Breaker); ajustada por ADR-020 | DRV-01, DRV-02, DRV-05, DRV-06, DRV-08 |
+| ADR-005 | Voz en el cliente con expo-speech (la entrada por voz la reemplaza ADR-014) | DRV-07 |
 | ADR-006 | JWT de acceso corto + refresco rotativo | DRV-03 |
 | ADR-007 | Interfaz basada en el template Luna | - |
 | ADR-008 | Ajustes al modelo de dominio (LenguajeRegion, soporte) | DRV-04 |
@@ -322,23 +383,27 @@ Detalle completo en [`decisiones.md`](decisiones.md). Resumen de que resuelve ca
 | ADR-011 | API v1 REST + OpenAPI | - |
 | ADR-012 | SurrealDB como fuente de verdad detras de un repositorio | DRV-01, DRV-03, DRV-04, DRV-08 |
 | ADR-013 | Arquitectura hexagonal (puertos y adaptadores) dentro del monolito | DRV-04, DRV-05, DRV-08 |
+| ADR-014 | Voz en Expo Go: grabacion en el celular, Whisper en el servidor y entonacion por texto y voz | DRV-01, DRV-02, DRV-07 |
+| ADR-015 | Voz natural con emocion en el servidor (puerto Sintetizador) | DRV-02, DRV-05 |
+| ADR-016 | VoiceStudio local como motor de voz (revertida, ver ADR-019) | DRV-02, DRV-06 |
+| ADR-017 | Piramide de pruebas en tres niveles, todos en el CI | DRV-08 |
+| ADR-018 | Escaneo de seguridad con Trivy en el CI | DRV-03 |
+| ADR-019 | ElevenLabs como motor de voz (reemplaza a ADR-016) | DRV-01, DRV-02 |
+| ADR-020 | Claude Sonnet en Google Vertex AI como motor de traduccion principal | DRV-02, DRV-03, DRV-05, DRV-06 |
 
 ---
 
-## 11. Riesgos y pendientes
+## 11. Riesgos tecnicos y mitigaciones
 
-| Tema | Estado | Referencia |
+| Riesgo | Impacto | Mitigacion |
 | --- | --- | --- |
-| Medir tiempo y calidad **con Qwen** (no solo reglas) y un glosario aparte | pendiente, es la evidencia valida de DRV-01/DRV-02 | `medicion_traduccion.md`, `revision_recomendaciones.md` |
-| Tiempo de espera de Qwen (60 s) mayor que el limite de DRV-01 | ajustar | `revision_recomendaciones.md` |
-| Gestion de claves (custodia, rotacion, fuerza) | proponer politica | `revision_recomendaciones.md` |
-| SurrealDB o PostgreSQL | decidido: se mantiene SurrealDB (enlaces nativos, reglas en el esquema, multimodelo) | ADR-012 |
-| Desplegar API + Ollama (F10) | pendiente | seccion 8 |
-| Servicio de correo para recuperacion | pendiente (hoy el codigo vuelve en la respuesta en dev) | ADR-006 |
-| Consultas por enlaces sin indice en SurrealDB | revisar con mas datos | ADR-012 |
-| Reconocimiento de region por sonido de voz | evolucion futura (hoy por vocabulario) | ADR-005, `../contexto.md` |
-| ADR-008 marcada **validar con el mentor** | pendiente de confirmacion (ADR-012 ya quedo cerrada: se mantiene SurrealDB) | `decisiones.md` |
-| Probar en celular fisico con Expo Go | pendiente | DRV-07 |
+| La latencia de Claude (Vertex), Whisper y ElevenLabs supera DRV-01 | Conversacion lenta | Medicion con `npm run medir` y `npm run medir:voz` antes de cada demostracion; si la voz natural tarda, la app usa la voz del celular |
+| El tiempo de espera de Claude (30 s) es mayor que el limite de DRV-01 | Un turno puede tardar demasiado si Claude se cuelga | El Circuit Breaker abre el circuito y los mensajes siguientes van directo al respaldo |
+| El texto sale a terceros (Google Cloud para traducir, ElevenLabs para la voz) | Privacidad de los mensajes | Solo viaja texto (nunca el audio original); politica de datos y matriz actualizadas; consentimiento al registrarse; Whisper sigue local |
+| Costo por uso de Claude (Vertex) y ElevenLabs, y dependencia de internet | Gasto no controlado o servicio caido | Limites de 30 mensajes y 40 voces por minuto por usuario; respaldo de voz en el celular; falta un tope de gasto diario |
+| Consultas por enlaces sin indice en SurrealDB | Lentitud con muchos datos | Indices sobre los campos de enlace al crecer el volumen (ADR-012) |
+| Servicio de correo para recuperacion | El codigo de recuperacion no llega por correo en produccion | Puerto `Notificador` listo para un proveedor SMTP; en desarrollo el codigo se muestra en la respuesta (ADR-006) |
+| Reconocer la region por el sonido de la voz | Precision regional limitada al vocabulario | Evolucion futura sobre el mismo puerto `Transcriptor` |
 
 ---
 
@@ -346,8 +411,8 @@ Detalle completo en [`decisiones.md`](decisiones.md). Resumen de que resuelve ca
 
 La cadena completa que recorre el proyecto:
 
-**Vision** (`../contexto.md`) -> **Driver** (`drivers.md`) -> **ADR** (`decisiones.md`) ->
-**Componente** (`componentes.md` y seccion 5.2) -> **Evidencia** (`medicion_traduccion.md`,
-pruebas del backend). La trazabilidad requerimiento -> componente esta en
-[`componentes.md`](componentes.md#trazabilidad-requerimiento---componente) y
-requerimiento -> HU en [`../requerimientos/req.md`](../requerimientos/req.md).
+**Vision** (`01_vision_y_contexto.md`) -> **Impacto** (`02_mapa_de_impacto.md`) -> **Historia**
+(`03_historias_de_usuario.md`) -> **Requisito** (`05_requisitos_funcionales_y_no_funcionales.md`)
+-> **Driver** (`06_drivers_de_arquitectura.md`) -> **ADR** (`11_decisiones_de_arquitectura_ADR.md`)
+-> **Componente** (`10_componentes.md` y seccion 5.2) -> **Evidencia** (pruebas del backend,
+`npm run medir` y `npm run medir:voz`).

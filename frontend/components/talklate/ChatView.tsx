@@ -76,7 +76,7 @@ export default function ChatView({ id }: { id: string }) {
   const reproducir = (m: Mensaje, config: Configuracion, opciones: { ritmo?: number; genero?: 'hombre' | 'mujer' | null; alTerminar?: () => void } = {}) => {
     if (!m.traduccion) return opciones.alTerminar?.();
     const hacia = idiomaDeEntrega(m.remitente, config);
-    if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono, { ...opciones, genero: opciones.genero ?? m.genero ?? null });
+    if (hacia) hablar(m.traduccion.contenido, hacia.codigo, hacia.pais, m.tono, { ...opciones, genero: opciones.genero ?? m.genero ?? null, claveCache: m.traduccion.id });
     else opciones.alTerminar?.();
   };
 

@@ -25,7 +25,7 @@ vetCare) — ver [`AGENTS.md`](AGENTS.md) para el detalle de fases y orquestaci�
 
 ## Probar la aplicación
 
-Arranque rapido en local: `./run-talklate.sh` (backend + Expo; `--full` levanta tambien Ollama y Whisper).
+Arranque rapido en local: `./run-talklate.sh` (backend + Expo; `--full` levanta tambien Whisper).
 
 ```bash
 # Terminal 1: API (Node 22.5 o superior)
@@ -35,8 +35,7 @@ cd backend && npm install && npm start
 cd frontend && npm install --legacy-peer-deps && npm run web
 ```
 
-Usuario administrador de prueba: `dafa123.daf@gmail.com` / `Admin123!`. La traducción usa **Qwen local (Ollama)**, luego Claude Sonnet si hay `ANTHROPIC_API_KEY`, y si ninguno
-responde un motor de reglas (español ⇄ inglés). Para Qwen: `ollama pull qwen2.5:7b` (ver `backend/README.md`).
+Usuario administrador de prueba (solo desarrollo): `dafa123.daf@gmail.com` / `Admin123!`. En producción (`NODE_ENV=production`) el servidor exige `ADMIN_PASSWORD`. La traducción la hace **Claude Sonnet en Google Vertex AI** (necesita credenciales de Google, ver `backend/README.md`) y, si falla, un motor de reglas que solo adapta modismos conocidos; Qwen local (Ollama) queda como adaptador alternativo. La voz usa **ElevenLabs** (con voz del celular de respaldo).
 
 ## Cómo se trabaja
 

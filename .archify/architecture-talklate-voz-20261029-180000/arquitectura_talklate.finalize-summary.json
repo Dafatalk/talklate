@@ -7,13 +7,13 @@
   "quality": "showcase",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
-    "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
-    "bytes": 3008
+    "sha256": "595fbd79b17668d11ca89fa4b961424e0ae3bac595d7c99609de93d1f37eccf9",
+    "bytes": 4339
   },
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
-    "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-    "bytes": 846096
+    "sha256": "e563b1c3bbf81f674def7d40dc47d49531cc3d157e92c141b0e8f6e920bfb326",
+    "bytes": 846382
   },
   "gates": {
     "validate": "pass",
@@ -37,13 +37,13 @@
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "checkedAt": "2026-11-12T21:43:55.703Z",
     "source": "cache",
     "noticeRequired": false,
     "noticeText": null
   },
   "visualReview": "not-requested",
-  "durationMs": 3334,
+  "durationMs": 2948,
   "browserCheck": {
     "requested": true,
     "ran": true

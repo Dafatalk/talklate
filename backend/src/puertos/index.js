@@ -30,6 +30,7 @@ const REPOSITORIO = {
   conversaciones: ['crearConfigurada', 'porId', 'delUsuario', 'listarDeUsuario', 'renombrar', 'eliminar', 'lpcDe', 'contarLpc', 'crearLpc'],
   mensajes: ['deConversacion', 'ultimo', 'contar', 'crear'],
   reportes: ['mensajeDestinoPropio', 'existe', 'crear', 'listar', 'porId', 'actualizar'],
+  problemas: ['crear', 'listar', 'porId', 'actualizar'],
 };
 
 /**

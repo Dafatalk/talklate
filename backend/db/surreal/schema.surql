@@ -144,6 +144,19 @@ DEFINE INDEX IF NOT EXISTS idx_translated_message_original ON translated_message
 DEFINE INDEX IF NOT EXISTS idx_translated_message_cl ON translated_message FIELDS conversation_language;
 DEFINE INDEX IF NOT EXISTS idx_report_user ON report FIELDS user;
 
+-- ---------------------------------------------------------------------------
+-- General app issue reports (not tied to a specific message)
+-- ---------------------------------------------------------------------------
+DEFINE TABLE IF NOT EXISTS problem_report SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS user ON problem_report TYPE record<user>;
+DEFINE FIELD IF NOT EXISTS category ON problem_report TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS description ON problem_report TYPE string;
+DEFINE FIELD IF NOT EXISTS contact ON problem_report TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS status ON problem_report TYPE string DEFAULT 'abierto' ASSERT $value INSIDE ['abierto', 'revisado', 'descartado'];
+DEFINE FIELD IF NOT EXISTS admin_note ON problem_report TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS created_at ON problem_report TYPE string;
+DEFINE INDEX IF NOT EXISTS idx_problem_report_user ON problem_report FIELDS user;
+
 -- =============================================================================
 -- End of TalkLate operational schema (SurrealDB)
 -- =============================================================================

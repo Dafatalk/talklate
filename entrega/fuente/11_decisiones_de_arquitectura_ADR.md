@@ -11,7 +11,7 @@
 | ADR-001 | App movil con Expo (React Native) y NativeWind | - | aceptada |
 | ADR-002 | Backend monolitico en Node.js con Express, API REST sincrona | Request-Reply (2.3) | aceptada |
 | ADR-003 | SQLite como base de datos inicial | - | reemplazada por ADR-012 (queda para pruebas sin servidor) |
-| ADR-004 | Traduccion con Qwen local, Claude Sonnet de respaldo y motor de reglas | Circuit Breaker (4.1) con degradacion aceptable | aceptada |
+| ADR-004 | Traduccion con Qwen local, Claude Sonnet de respaldo y motor de reglas | Circuit Breaker (4.1) con degradacion aceptable | aceptada; el motor principal cambio por ADR-020 |
 | ADR-005 | Voz: dictado en el cliente y expo-speech para la salida | - | reemplazada en la entrada por ADR-014 y en la salida por ADR-015 (expo-speech queda de respaldo) |
 | ADR-006 | Autenticacion con JWT de acceso corto y token de refresco rotativo | Token-Based Authentication (5.1) | aceptada |
 | ADR-007 | Interfaz basada en el template Luna | - | aceptada |
@@ -23,9 +23,11 @@
 | ADR-013 | Arquitectura hexagonal (puertos y adaptadores) dentro del monolito modular | Puertos y adaptadores | aceptada |
 | ADR-014 | Voz en Expo Go: grabacion en el celular, Whisper en el servidor y entonacion por texto y voz | - | aceptada |
 | ADR-015 | Voz natural con emocion en el servidor (puerto Sintetizador) | Cadena de respaldo | aceptada |
-| ADR-016 | VoiceStudio local como primer motor de voz con emocion | - | aceptada |
+| ADR-016 | VoiceStudio local como primer motor de voz con emocion | - | revertida (05/11/2026), reemplazada por ADR-019 |
 | ADR-017 | Piramide de pruebas en tres niveles, todos en el CI | - | aceptada |
 | ADR-018 | Escaneo de seguridad con Trivy en el CI | - | aceptada |
+| ADR-019 | ElevenLabs (nube) como motor de voz; se revierte VoiceStudio | Cadena de respaldo | aceptada |
+| ADR-020 | Claude Sonnet en Google Vertex AI como motor de traduccion principal | Circuit Breaker | aceptada |
 
 Patrones del catalogo que **no** se usan y por que: Database per Service, API Gateway y BFF (un solo cliente y un solo backend; el catalogo lo indica asi para el MVP), Strangler Fig (no hay sistema legado), CQRS y Event Sourcing (el historial es un CRUD simple; no hay requisito de auditoria completa). Se revisaran si crece el volumen o aparecen nuevos clientes.
 
@@ -279,7 +281,7 @@ Organizar la API en capas de **puertos y adaptadores** (Alistair Cockburn), sin 
 - **Dominio** (`src/dominio`): validaciones, errores de negocio, analisis de texto, prosodia de la voz y expresion de cada tono. No depende de nada externo.
 - **Aplicacion** (`src/aplicacion`): un caso de uso por epica (cuentas, sesiones, conversaciones, traduccion, voz, catalogo, reportes). Solo importa el dominio y los puertos.
 - **Puertos** (`src/puertos`): contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador` y `FirmadorTokens`, verificados al arrancar.
-- **Adaptadores** (`src/adaptadores`): de entrada, HTTP con Express; de salida, SurrealDB y SQLite, Qwen, Claude y reglas, Whisper, VoiceStudio, Azure y OpenAI, correo y AES-GCM.
+- **Adaptadores** (`src/adaptadores`): de entrada, HTTP con Express; de salida, SurrealDB y SQLite, Claude (Vertex), Qwen y reglas, Whisper, ElevenLabs, Azure y OpenAI, detector de genero, correo y AES-GCM.
 - **Composicion** (`src/composicion.js`): unico lugar que conoce los adaptadores concretos; los elige segun el entorno y arma los casos de uso.
 
 El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso de uso aplica el Circuit Breaker (ADR-004) sobre cualquier lista de motores, sin saber cuales son.
@@ -331,7 +333,7 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 
 ## ADR-016: VoiceStudio local como primer motor de voz con emocion
 
-**Estado:** Aceptada (29/10/2026). Extiende ADR-015.
+**Estado:** Revertida (05/11/2026), reemplazada por ADR-019. Fue aceptada el 29/10/2026 y extendia ADR-015. Motivo: IndexTTS 2 no soporta Metal/MPS y en la Mac corre solo en CPU (unos 30 s por frase), inviable en una conversacion en vivo.
 
 **Contexto:** Azure y OpenAI dan voz natural, pero cobran o piden clave y salen a internet. El proyecto ya traduce con Qwen local (ADR-004), y una voz local mantiene la misma linea: sin costo por uso y sin enviar la voz a terceros. VoiceStudio (github.com/debpalash/VoiceStudio) reune motores de voz locales; su motor IndexTTS 2 acepta la emocion como un vector de 8 pesos y habla espanol e ingles.
 
@@ -340,7 +342,7 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
   - Con IndexTTS 2 usa `POST /generate` con `emo_vector`. Con los otros motores usa `POST /v1/audio/speech` (compatible con OpenAI) y manda la emocion como instruccion en texto.
 - Con `VOZ_MOTOR=auto` el orden es VoiceStudio, luego Azure, luego OpenAI, y al final la voz del celular.
 - El equipo de despliegue de referencia es una Mac con chip M5 y 32 GB de RAM, con instalacion nativa (Metal/MLX). En un equipo Intel sin GPU NVIDIA, IndexTTS en CPU tarda decenas de segundos por frase; ahi el primer motor es Azure (`VOZ_MOTOR=azure`).
-- La guia de montaje y medicion esta en `backend/VOICESTUDIO_MAC.md` (`npm run medir:voz`).
+- La guia de montaje y medicion estaba en `backend/VOICESTUDIO_MAC.md` (archivo retirado con ADR-019); `npm run medir:voz` se conserva.
 
 **Consecuencias:**
 - Voz con emocion gratis y local, y la posibilidad de clonar una voz con permiso.
@@ -358,14 +360,14 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - Organizar las pruebas como piramide: **base** de unitarias (dominio, casos de uso y adaptadores con dobles; `backend/test/unitarias/` y `frontend/test/`), **medio** de integracion (API HTTP con base real; `backend/test/integracion/`, contra SQLite y SurrealDB) y **punta** de punta a punta (servidor real como proceso en `backend/test/e2e/` y app web con Playwright en `e2e/`).
 - Un script por nivel (`test:unitarias`, `test:integracion`, `test:e2e`) y un paso por nivel en el CI; la app web corre en un job aparte (`e2e-web`) que solo arranca si los niveles de abajo pasaron.
 - Cobertura minima de 80 % en unitarias + integracion, y `arch:check` (dependency-cruiser) en el CI. Para que pase, bcrypt y jsonwebtoken entran por los puertos `Hasheador` y `FirmadorTokens`.
-- En las pruebas de punta a punta, los servicios de IA (Whisper, VoiceStudio) se reemplazan por servidores HTTP falsos que hablan su mismo protocolo: se prueban los adaptadores reales sin depender de modelos pesados.
+- En las pruebas de punta a punta, los servicios de IA (Whisper y el motor de voz) se reemplazan por servidores HTTP falsos que hablan su mismo protocolo: se prueban los adaptadores reales sin depender de modelos pesados.
 
 **Alternativas:**
 - **Jest o Vitest en el backend:** mas funciones, pero `node:test` ya viene con Node 22, no agrega dependencias y tiene cobertura incluida.
 - **Cypress para la web:** maduro, pero Playwright es mas liviano en CI, emula celulares y ya era la herramienta usada para revisar la app.
 - **Detox o Maestro en el celular:** prueban la app nativa, pero exigen emuladores en CI; la app web comparte el mismo codigo (ADR-001) y cubre el recorrido.
 
-**Consecuencias:** 51 unitarias, 18 de integracion (x2 bases) y 4 de punta a punta; cobertura de lineas de 96.6 %. Cada falla dice en que nivel esta el problema. Detalle en `calidad/piramide_de_pruebas.md`.
+**Consecuencias:** 78 unitarias (73 del backend y 5 del frontend), 29 de integracion (18 de la API contra SQLite y SurrealDB, 11 de problemas contra SQLite) y 4 de punta a punta; cobertura de lineas del backend de 96.5 %. Cada falla dice en que nivel esta el problema. Detalle en `calidad/piramide_de_pruebas.md`.
 
 ## ADR-018: Escaneo de seguridad con Trivy en el CI
 
@@ -384,3 +386,45 @@ El subsistema de traduccion queda detras del puerto `MotorTraduccion`: el caso d
 - **Dependabot o Snyk:** utiles, pero dependen de la configuracion de la organizacion en GitHub o de un servicio externo; Trivy corre igual en local y en CI.
 
 **Consecuencias:** Se corrigieron 1 HIGH en el backend y 1 CRITICAL + 50 HIGH en el frontend (produccion y desarrollo). Queda 1 excepcion documentada (`decode-uri-component`, vence el 28/02/2027). Detalle en `calidad/seguridad_trivy.md`.
+
+## ADR-019: ElevenLabs (nube) como motor de voz; se revierte VoiceStudio
+
+**Estado:** Aceptada (05/11/2026). Reemplaza ADR-016; extiende ADR-015.
+
+**Contexto:** VoiceStudio con IndexTTS 2 (ADR-016) daba voz local con emocion, pero IndexTTS no soporta Metal/MPS: en la Mac (Apple Silicon) corre solo en CPU, ~30 s por frase, inviable para una conversacion en vivo. Los motores de VoiceStudio que si usan la GPU (omnivoice, mlx-audio) no hacen emocion real. Se necesita voz natural, con emocion, con acento regional (paisa, New York) y rapida.
+
+**Decision:**
+- Se elimina el adaptador VoiceStudio y se agrega `adaptadores/sintesis/elevenlabs.js` (puerto `Sintetizador`), que llama la API REST de ElevenLabs (`POST /v1/text-to-speech/{voice_id}`, modelo `eleven_multilingual_v2`) con `fetch` (sin SDK, igual que azure/openai).
+- La emocion va en `voice_settings` (menos `stability` = mas expresivo; `style` exagera modismos) y la velocidad en `speed`, derivadas del tono y la prosodia que ya se detectaban (ADR-015).
+- La voz se elige por locale y genero: es-CO = paisa (hombre/mujer), en-US = New York (hombre/mujer). El genero lo infiere el mismo modelo de traduccion local (campo `genero` en su JSON, sin llamada extra) y viaja por `entrega.genero` hasta el adaptador; si no hay pista usa `ELEVENLABS_GENERO` (default hombre).
+- Config: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOZ_PAISA_HOMBRE/MUJER`, `ELEVENLABS_VOZ_NY_HOMBRE/MUJER`, `ELEVENLABS_GENERO`, `ELEVENLABS_MODELO`. Con `VOZ_MOTOR=auto` el orden es ElevenLabs -> Azure -> OpenAI -> voz del celular.
+
+**Consecuencias:**
+- Voz natural, con emocion y acento regional, y rapida (1-5 s por frase).
+- Es un servicio en la nube: cambia el enfoque local-first de ADR-015/016 (el texto traducido sale a ElevenLabs). Las voces de la Voice Library requieren plan pago para usarse via API (el plan free las bloquea).
+- La deteccion de genero por texto es imperfecta, sobre todo en ingles; cuando no hay pista usa el genero por defecto. Detectar el genero por el tono de voz (pitch) o persistirlo por mensaje quedan como mejoras futuras.
+- Los limites de creditos, el uso comercial y la atribucion dependen del plan de ElevenLabs contratado.
+
+## ADR-020: Claude Sonnet en Google Vertex AI como motor de traduccion principal
+
+**Estado:** aceptada (12/11/2026). Ajusta ADR-004. **Responde a:** DRV-02, DRV-05. **Riesgos nuevos:** DRV-03, DRV-06.
+
+**Contexto:** ADR-004 dejo prevista esta salida: se empezaba con Qwen local y se volveria a Claude Sonnet si no funcionaba. La prioridad del producto es la calidad cultural de la traduccion (DRV-02). El equipo adopto Claude Sonnet como motor principal, servido por Google Vertex AI (pull request 53).
+
+**Decision:**
+- Nuevo adaptador `adaptadores/traduccion/vertex.js` del puerto `MotorTraduccion`, con el SDK oficial de Anthropic para Vertex. Se autentica con las credenciales de Google (ADC), no con una clave de API en el codigo. Variables: `ANTHROPIC_USE_VERTEX`, `ANTHROPIC_VERTEX_PROJECT_ID` y `TALKLATE_VERTEX_REGION` (por defecto `global`: Claude no se sirve en todas las regiones). Modelo por defecto del adaptador: `claude-sonnet-4-6`, configurable con `TALKLATE_MODEL`.
+- La configuracion del equipo (`run-talklate.sh`) arranca con `TRADUCTOR=claude`: Claude (Vertex) -> motor de reglas. Qwen (Ollama) sigue disponible como adaptador (`TRADUCTOR=auto` o `qwen`), pero no se usa.
+- El prompt pasa a **transcreacion cultural**: primero entiende la intencion, la situacion y el tono, y luego lo reexpresa como lo diria un nativo de la region destino; incluye ejemplos reales del glosario (few-shot) para los modismos detectados.
+- El adaptador tiene tiempo limite de 30 s y desactiva los reintentos del SDK: si falla, el Circuit Breaker pasa al siguiente motor (ADR-004).
+- **El motor de reglas deja de traducir sin modismos conocidos:** si el texto no contiene ninguna frase del diccionario, falla con un error claro en vez de entregar una traduccion palabra por palabra.
+
+**Alternativas:**
+- **Seguir solo con Qwen local:** sin costo por mensaje y sin datos a terceros, pero con la capacidad de un modelo de 7B parametros.
+- **API directa de Anthropic:** el adaptador `claude.js` sigue disponible (necesita `ANTHROPIC_API_KEY`); Vertex evita guardar esa clave y usa las credenciales de Google.
+
+**Consecuencias:**
+- **Privacidad (DRV-03):** el texto de cada mensaje sale del servidor hacia Google Cloud para que Claude lo procese. Ya no es cierto que la traduccion no envie datos a terceros; la politica de tratamiento de datos y la matriz de sensibilidad se actualizan.
+- **Costo (DRV-06):** cada traduccion tiene costo por uso y hace falta un proyecto de Google Cloud con facturacion. Se mantienen los limites por usuario; falta un tope de gasto diario.
+- **Continuidad (DRV-05):** el respaldo es parcial. Si Claude falla, el motor de reglas solo traduce los modismos que conoce; en los demas casos la persona recibe un mensaje de error y no una traduccion literal de mala calidad.
+- **Dependencia de la nube:** sin internet o sin credenciales de Google no hay traduccion general.
+- **Pendiente:** medir calidad y tiempo (DRV-01, DRV-02) con este motor.

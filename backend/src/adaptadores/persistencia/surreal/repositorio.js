@@ -92,6 +92,7 @@ async function sembrar() {
   const correo = (process.env.ADMIN_CORREO || 'dafa123.daf@gmail.com').toLowerCase();
   const existe = await usuarios.porCorreo(correo);
   if (!existe) {
+    if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_PASSWORD) throw new Error('Falta ADMIN_PASSWORD en produccion: no se crea el administrador con la contrasena de desarrollo');
     const ahora = new Date().toISOString();
     await usuarios.crear({
       id: randomUUID(),
@@ -142,6 +143,7 @@ const usuarios = {
     const u = lit(rid('user', id));
     await S.consulta([
       'BEGIN TRANSACTION;',
+      `DELETE problem_report WHERE user = ${u};`,
       `DELETE report WHERE user = ${u} OR translated_message.conversation_language.conversation.user = ${u};`,
       `DELETE translated_message WHERE conversation_language.conversation.user = ${u};`,
       `DELETE original_message WHERE conversation_language.conversation.user = ${u};`,
@@ -485,6 +487,42 @@ const reportes = {
   },
 };
 
+// --- problemas generales de la app -------------------------------------------------------
+function selectProblema(where) {
+  return `SELECT category AS categoria, description AS descripcion, contact AS contacto,
+    status AS estado, admin_note AS nota_admin, created_at AS fecha,
+    user.first_name AS u_nombre, user.last_name AS u_apellido, id
+    FROM problem_report ${where};`;
+}
+function mapProblema(f) {
+  if (!f) return null;
+  return {
+    id: idPlano(f.id), categoria: f.categoria ?? null, descripcion: f.descripcion,
+    contacto: f.contacto ?? null, estado: f.estado, nota_admin: f.nota_admin ?? null,
+    fecha: f.fecha, reportado_por: `${f.u_nombre} ${f.u_apellido}`,
+  };
+}
+const problemas = {
+  async crear({ id, usuarioId, categoria, descripcion, contacto, estado, fecha }) {
+    return crearRegistro('problem_report', id, {
+      user: rid('user', usuarioId), category: categoria ?? null, description: descripcion,
+      contact: contacto ?? null, status: estado || 'abierto', created_at: fecha,
+    });
+  },
+  async listar({ estado }) {
+    const where = estado ? `WHERE status = ${lit(estado)}` : '';
+    const filas = (await S.filas(selectProblema(where))).map(mapProblema);
+    filas.sort((a, b) => (a.estado === 'abierto' ? 0 : 1) - (b.estado === 'abierto' ? 0 : 1) || String(b.fecha).localeCompare(String(a.fecha)));
+    return filas;
+  },
+  async porId(id) {
+    return mapProblema(await S.fila(selectProblema(`WHERE id = ${lit(rid('problem_report', id))}`)));
+  },
+  async actualizar(id, estado, nota) {
+    await S.consulta(`UPDATE ${lit(rid('problem_report', id))} SET status = ${lit(estado)}, admin_note = ${lit(nota ?? null)};`);
+  },
+};
+
 module.exports = function crearRepoSurreal() {
-  return { inicializar, usuarios, tokens, sesiones, recuperaciones, catalogo, conversaciones, mensajes, reportes, _surreal: S };
+  return { inicializar, usuarios, tokens, sesiones, recuperaciones, catalogo, conversaciones, mensajes, reportes, problemas, _surreal: S };
 };

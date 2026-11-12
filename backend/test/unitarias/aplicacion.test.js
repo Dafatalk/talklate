@@ -6,6 +6,7 @@ const assert = require('node:assert/strict');
 const { crearServicioTraduccion } = require('../../src/aplicacion/traduccion');
 const { crearServicioVoz } = require('../../src/aplicacion/voz');
 const { paginar } = require('../../src/aplicacion/paginacion');
+const { crearServicioProblemas } = require('../../src/aplicacion/problemas');
 
 const silencio = { advertencia() {}, info() {}, error() {} };
 const ES = { codigo: 'es', nombre: 'Espanol' };
@@ -103,6 +104,77 @@ test('voz: valida texto, idioma y tono antes de llamar a un motor', async () => 
   const sinMotores = crearServicioVoz({ sintetizadores: [apagado], log: silencio });
   assert.equal(sinMotores.disponible(), false);
   assert.deepEqual(sinMotores.motores(), []);
+});
+
+function crearRepoProblemasDoble() {
+  const filas = [];
+  return {
+    problemas: {
+      async crear(p) { filas.push({ ...p, estado: p.estado || 'abierto', nota_admin: null, reportado_por: 'Test Usuario' }); },
+      async listar({ estado }) { return estado ? filas.filter((f) => f.estado === estado) : [...filas]; },
+      async porId(id) { return filas.find((f) => f.id === id) || null; },
+      async actualizar(id, estado, nota) {
+        const p = filas.find((f) => f.id === id);
+        if (p) { p.estado = estado; p.nota_admin = nota ?? null; }
+      },
+    },
+  };
+}
+
+test('problemas: reportar valida la descripcion (5-1000 chars)', async () => {
+  const repo = crearRepoProblemasDoble();
+  const s = crearServicioProblemas({ repo, log: silencio });
+  const usuario = { id: 'u1' };
+  await assert.rejects(s.reportar(usuario, { descripcion: '' }), (e) => e.estado === 400);
+  await assert.rejects(s.reportar(usuario, { descripcion: 'abc' }), (e) => e.estado === 400);
+  await assert.rejects(s.reportar(usuario, { descripcion: 'x'.repeat(1001) }), (e) => e.estado === 400);
+  const r = await s.reportar(usuario, { descripcion: 'La app falla cuando uso voz larga' });
+  assert.ok(r.id);
+  assert.match(r.mensaje, /Gracias/);
+});
+
+test('problemas: reportar recorta categoria (max 60) y contacto (max 120)', async () => {
+  const repo = crearRepoProblemasDoble();
+  const s = crearServicioProblemas({ repo, log: silencio });
+  const usuario = { id: 'u1' };
+  await s.reportar(usuario, {
+    descripcion: 'Error al traducir mensajes de voz en espanol',
+    categoria: 'c'.repeat(80),
+    contacto: 'k'.repeat(150),
+  });
+  const guardado = (await repo.problemas.listar({}))[0];
+  assert.equal(guardado.categoria.length, 60);
+  assert.equal(guardado.contacto.length, 120);
+});
+
+test('problemas: listar filtra por estado valido y descarta estados desconocidos', async () => {
+  const repo = crearRepoProblemasDoble();
+  const s = crearServicioProblemas({ repo, log: silencio });
+  const u = { id: 'u1' };
+  await s.reportar(u, { descripcion: 'Problema numero uno en la traduccion' });
+  await repo.problemas.actualizar((await repo.problemas.listar({}))[0].id, 'revisado', null);
+  await s.reportar(u, { descripcion: 'Problema numero dos en la traduccion' });
+  const todos = await s.listar(u, undefined);
+  assert.equal(todos.length, 2);
+  const abiertos = await s.listar(u, 'abierto');
+  assert.equal(abiertos.length, 1);
+  const revisados = await s.listar(u, 'revisado');
+  assert.equal(revisados.length, 1);
+  // estado desconocido -> sin filtro
+  const sinFiltro = await s.listar(u, 'inventado');
+  assert.equal(sinFiltro.length, 2);
+});
+
+test('problemas: actualizar valida estado y lanza 404 si no existe', async () => {
+  const repo = crearRepoProblemasDoble();
+  const s = crearServicioProblemas({ repo, log: silencio });
+  const u = { id: 'u1' };
+  const { id } = await s.reportar(u, { descripcion: 'Problema para actualizar en este test' });
+  await assert.rejects(s.actualizar(u, id, { estado: 'invalido' }), (e) => e.estado === 400);
+  await assert.rejects(s.actualizar(u, 'no-existe', { estado: 'revisado' }), (e) => e.estado === 404);
+  const r = await s.actualizar(u, id, { estado: 'descartado', nota_admin: 'No es un problema' });
+  assert.equal(r.estado, 'descartado');
+  assert.equal(r.nota_admin, 'No es un problema');
 });
 
 test('paginacion: limites por defecto, maximo de 100 y paginas fuera de rango', () => {

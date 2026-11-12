@@ -34,6 +34,23 @@ let turno = 0;
 // Si el servidor dice que no hay voz natural, no se le vuelve a preguntar en un rato
 let sinVozNaturalHasta = 0;
 
+// Cache de la URL del audio ya sintetizado por mensaje (clave = id de la traduccion). Asi "volver a
+// reproducir" reusa el mismo audio sin re-sintetizar (sin gastar cuota de voz). El servidor conserva el
+// audio ~5 min, por eso usamos una ventana mas corta para no pedir una URL ya vencida.
+const cacheAudio = new Map<string, { url: string; vence: number }>();
+const VIDA_CACHE_MS = 4 * 60 * 1000;
+function leerCacheAudio(clave?: string): string | null {
+  if (!clave) return null;
+  const e = cacheAudio.get(clave);
+  if (e && e.vence > Date.now()) return e.url;
+  if (e) cacheAudio.delete(clave);
+  return null;
+}
+function guardarCacheAudio(clave: string | undefined, url: string) {
+  if (!clave) return;
+  cacheAudio.set(clave, { url, vence: Date.now() + VIDA_CACHE_MS });
+}
+
 function terminar(de = turno) {
   if (de !== turno) return;
   const fn = alTerminarActual;
@@ -55,11 +72,18 @@ function hablarCelular(texto: string, codigo: string, pais: string | null | unde
   });
 }
 
-async function hablarNatural(texto: string, codigo: string, pais: string | null | undefined, tono: string, ritmo: number, genero?: 'hombre' | 'mujer' | null): Promise<boolean> {
-  if (Date.now() < sinVozNaturalHasta) return false;
+async function hablarNatural(texto: string, codigo: string, pais: string | null | undefined, tono: string, ritmo: number, genero?: 'hombre' | 'mujer' | null, claveCache?: string): Promise<boolean> {
+  // Si ya tenemos el audio de este mensaje en cache y sigue vigente, lo reproducimos sin re-sintetizar.
+  const cacheada = leerCacheAudio(claveCache);
+  if (Date.now() < sinVozNaturalHasta && !cacheada) return false;
   const mio = turno;
   try {
-    const { url } = await api.sintetizarVoz({ texto, idioma: codigo, pais, tono, ritmo, genero: genero ?? null });
+    let url = cacheada;
+    if (!url) {
+      const r = await api.sintetizarVoz({ texto, idioma: codigo, pais, tono, ritmo, genero: genero ?? null });
+      url = r.url;
+      guardarCacheAudio(claveCache, url);
+    }
     await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
     if (mio !== turno) return true; // la detuvieron mientras se generaba el audio
     const p = createAudioPlayer({ uri: url });
@@ -77,12 +101,12 @@ async function hablarNatural(texto: string, codigo: string, pais: string | null 
 
 // La traduccion sale con la misma entonacion del mensaje; "ritmo" (1 = normal) imita la velocidad
 // con que hablo la persona en los mensajes de voz. alTerminar se llama una sola vez al acabar.
-export async function hablar(texto: string, codigoIdioma: string, paisNombre?: string | null, tono = 'Neutral', opciones: { ritmo?: number; genero?: 'hombre' | 'mujer' | null; alTerminar?: () => void } = {}) {
+export async function hablar(texto: string, codigoIdioma: string, paisNombre?: string | null, tono = 'Neutral', opciones: { ritmo?: number; genero?: 'hombre' | 'mujer' | null; claveCache?: string; alTerminar?: () => void } = {}) {
   detenerVoz();
   turno += 1;
   alTerminarActual = opciones.alTerminar;
   const ritmo = opciones.ritmo && Number.isFinite(opciones.ritmo) ? opciones.ritmo : 1;
-  if (!(await hablarNatural(texto, codigoIdioma, paisNombre, tono, ritmo, opciones.genero))) hablarCelular(texto, codigoIdioma, paisNombre, tono, ritmo);
+  if (!(await hablarNatural(texto, codigoIdioma, paisNombre, tono, ritmo, opciones.genero, opciones.claveCache))) hablarCelular(texto, codigoIdioma, paisNombre, tono, ritmo);
 }
 
 export function detenerVoz() {

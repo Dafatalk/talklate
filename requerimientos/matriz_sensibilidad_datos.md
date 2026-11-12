@@ -22,12 +22,19 @@ Clasificaciones: **Publico**, **Interno** (solo usuarios autenticados), **Confid
 | MensajeDestino | nota cultural, motor, estado | Interno | JWT | - |
 | Reporte | motivo, sugerencia | PII | Solo el autor (al crearlo) y el administrador; se borra con la cuenta | `aplicacion/reportes.js` |
 | Lenguaje, Region, Pais, Canal, Entonacion | catalogo | Interno | JWT para leer; solo administrador para cambiar | `aplicacion/catalogo.js` |
+| Genero inferido de la voz | hombre o mujer, estimado por el pitch del audio | PII (dato inferido) | Se guarda por mensaje (`mensaje_original.genero`) solo para elegir la voz de salida y viaja a ElevenLabs; no se muestra a terceros; se borra con la cuenta | `adaptadores/audio/genero.js` |
+| Problema de la app | descripcion, categoria, contacto (texto libre) | PII | Solo el autor (al crearlo) y el administrador; maximo 10 por hora por usuario; se borra con la cuenta | `aplicacion/problemas.js` |
 | Logs | eventos | Interno | JSON, solo identificadores (nunca correo, contrasena, token, codigo ni contenido) | `compartido/log.js` |
 
 ## Envio a terceros
 
-- **Qwen local (Ollama):** corre en el servidor de TalkLate; el contenido no sale a terceros.
-- **Claude Sonnet (respaldo):** si se usa, el texto del mensaje se envia a Anthropic para traducirlo. Se informa en la politica de tratamiento de datos (`politica_tratamiento_datos.md`), que el usuario acepta al registrarse.
+- **Claude Sonnet en Google Vertex AI (traduccion):** es el motor principal (ADR-020). El texto del mensaje y el contexto del prompt (idiomas, region, tono y, en voz, una descripcion de como hablo la persona) se envian a Google Cloud para traducirlo.
+- **Qwen local (Ollama):** adaptador alternativo que corre en el servidor de TalkLate y no envia nada a terceros; no se usa en la configuracion actual.
+- **Whisper local:** corre en el servidor de TalkLate; el audio original no sale a terceros.
+- **ElevenLabs (voz):** recibe el texto ya traducido, el tono, el genero de quien habla y la velocidad para generar el audio; nunca recibe el audio original.
+- **Azure Speech u OpenAI (respaldo de voz):** si se usan, reciben solo el texto ya traducido para convertirlo en voz.
+
+Todo esto se informa en la politica de tratamiento de datos (`politica_tratamiento_datos.md`), que el usuario acepta al registrarse.
 
 ## Retencion
 

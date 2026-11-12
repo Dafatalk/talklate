@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "TalkLate — Arquitectura hexagonal (backend) con voz",
-    "subtitle": "Puertos y adaptadores (ADR-013): el nucleo depende de 8 contratos, no de tecnologia; la voz entra por Transcriptor y sale por Sintetizador, y las credenciales pasan por Hasheador y FirmadorTokens",
+    "subtitle": "Puertos y adaptadores (ADR-013): el nucleo depende de 9 contratos, no de tecnologia; la voz entra por Transcriptor, se mide con DetectorGenero y sale por Sintetizador, y las credenciales pasan por Hasheador y FirmadorTokens",
     "output": ".archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
     "locale": "es",
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/Dafatalk/talklate",
       "provider": "github",
-      "revision": "efd0498a5296b32c8e3c67cbec50ead1d636b8b6"
+      "revision": "092c3cdeb5409ef94c568b7221e9c4e2564aecb2"
     }
   },
   "components": [
@@ -152,14 +152,14 @@
       "type": "backend",
       "label": "Puertos",
       "sublabel": "contratos de salida",
-      "tag": "8 contratos",
+      "tag": "9 contratos",
       "pos": [
         760,
         110
       ],
       "size": [
         160,
-        672
+        750
       ],
       "sources": [
         {
@@ -217,7 +217,7 @@
       "id": "traduccion",
       "type": "backend",
       "label": "Adaptador traducción",
-      "sublabel": "qwen → claude → reglas",
+      "sublabel": "claude (vertex) → reglas",
       "pos": [
         1010,
         290
@@ -228,10 +228,6 @@
       ],
       "sources": [
         {
-          "path": "backend/src/adaptadores/traduccion/qwen.js",
-          "label": "qwen"
-        },
-        {
           "path": "backend/src/adaptadores/traduccion/claude.js",
           "label": "claude"
         },
@@ -239,6 +235,10 @@
           "path": "backend/src/adaptadores/traduccion/reglas.js",
           "line": 313,
           "label": "reglas"
+        },
+        {
+          "path": "backend/src/adaptadores/traduccion/vertex.js",
+          "label": "vertex"
         }
       ]
     },
@@ -246,7 +246,7 @@
       "id": "sintesis",
       "type": "backend",
       "label": "Adaptador síntesis",
-      "sublabel": "voicestudio → azure → openai",
+      "sublabel": "elevenlabs → azure → openai",
       "pos": [
         1010,
         420
@@ -257,9 +257,9 @@
       ],
       "sources": [
         {
-          "path": "backend/src/adaptadores/sintesis/voicestudio.js",
-          "line": 9,
-          "label": "voicestudio"
+          "path": "backend/src/adaptadores/sintesis/elevenlabs.js",
+          "line": 17,
+          "label": "elevenlabs"
         },
         {
           "path": "backend/src/adaptadores/sintesis/azure.js",
@@ -280,7 +280,7 @@
       "sublabel": "AES-256-GCM",
       "pos": [
         1010,
-        540
+        600
       ],
       "size": [
         184,
@@ -301,7 +301,7 @@
       "sublabel": "consola / correo",
       "pos": [
         1010,
-        630
+        690
       ],
       "size": [
         184,
@@ -321,7 +321,7 @@
       "sublabel": "bcrypt · jwt",
       "pos": [
         1010,
-        720
+        780
       ],
       "size": [
         184,
@@ -370,7 +370,7 @@
       "id": "ollama",
       "type": "external",
       "label": "Ollama · Qwen",
-      "sublabel": "LLM local",
+      "sublabel": "alternativo, no se usa",
       "pos": [
         1300,
         268
@@ -383,8 +383,8 @@
     {
       "id": "claudeapi",
       "type": "external",
-      "label": "Claude API",
-      "sublabel": "Anthropic",
+      "label": "Claude · Vertex AI",
+      "sublabel": "Google Cloud",
       "pos": [
         1300,
         336
@@ -395,10 +395,10 @@
       ]
     },
     {
-      "id": "voicestudio",
+      "id": "elevenlabs",
       "type": "external",
-      "label": "VoiceStudio",
-      "sublabel": "IndexTTS 2 local",
+      "label": "ElevenLabs",
+      "sublabel": "voz con emoción · nube",
       "pos": [
         1300,
         404
@@ -420,6 +420,26 @@
       "size": [
         150,
         58
+      ]
+    },
+    {
+      "id": "genero",
+      "type": "backend",
+      "label": "Adaptador género de voz",
+      "sublabel": "pitch con ffmpeg",
+      "pos": [
+        1010,
+        510
+      ],
+      "size": [
+        184,
+        62
+      ],
+      "sources": [
+        {
+          "path": "backend/src/adaptadores/audio/genero.js",
+          "label": "crearDetectorGeneroPitch()"
+        }
       ]
     }
   ],
@@ -548,9 +568,10 @@
       "id": "traduccion-ollama",
       "from": "traduccion",
       "to": "ollama",
-      "label": "HTTP",
+      "label": "alterno",
       "fromSide": "right",
-      "toSide": "left"
+      "toSide": "left",
+      "variant": "dashed"
     },
     {
       "id": "traduccion-claude",
@@ -562,12 +583,13 @@
       "toSide": "left"
     },
     {
-      "id": "sintesis-voicestudio",
+      "id": "sintesis-elevenlabs",
       "from": "sintesis",
-      "to": "voicestudio",
-      "label": "emo_vector",
+      "to": "elevenlabs",
+      "label": "HTTPS",
       "fromSide": "right",
-      "toSide": "left"
+      "toSide": "left",
+      "variant": "security"
     },
     {
       "id": "sintesis-nube",
@@ -577,6 +599,12 @@
       "variant": "security",
       "fromSide": "right",
       "toSide": "left"
+    },
+    {
+      "id": "genero-puertos",
+      "from": "genero",
+      "to": "puertos",
+      "variant": "dashed"
     }
   ],
   "cards": [
@@ -592,7 +620,7 @@
       "dot": "cyan",
       "title": "Puertos y adaptadores",
       "items": [
-        "8 contratos: Repositorio, MotorTraducción, Transcriptor, Sintetizador, Notificador, Cifrador, Hasheador, FirmadorTokens",
+        "9 contratos: Repositorio, MotorTraducción, Transcriptor, Sintetizador, DetectorGénero, Notificador, Cifrador, Hasheador, FirmadorTokens",
         "asegurarPuerto() valida el contrato al arrancar, no en mitad de una petición",
         "Las flechas punteadas hacia Puertos significan \"implementa el contrato\""
       ]
@@ -602,7 +630,8 @@
       "title": "Flujo de voz",
       "items": [
         "Whisper transcribe; la prosodia (volumen y ritmo) ajusta el tono",
-        "La traducción sale con la emoción: VoiceStudio → Azure → OpenAI → voz del celular"
+        "El género de quien habla sale del pitch del audio (ffmpeg) y elige la voz",
+        "La traducción sale con la emoción: ElevenLabs → Azure → OpenAI → voz del celular"
       ]
     },
     {
@@ -610,7 +639,7 @@
       "title": "Composición",
       "items": [
         "composicion.js elige cada adaptador por variables de entorno",
-        "TRADUCTOR, TRANSCRIPCION_URL y VOZ_MOTOR"
+        "TRADUCTOR (claude en la configuracion del equipo), TRANSCRIPCION_URL y VOZ_MOTOR"
       ]
     }
   ]

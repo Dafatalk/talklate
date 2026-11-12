@@ -269,6 +269,7 @@ function traducirLocal(texto, origen, destino, paisDestino) {
   const pais = CODIGOS_PAIS.has(paisDestino) ? paisDestino : null;
   let salida = previo;
   let sinTraducir = 0;
+  let frasesUsadas = 0; // cuantas frases/modismos del diccionario matchearon (vs. palabra suelta)
   let i = 0;
   while (i < tokens.length) {
     let usado = false;
@@ -278,6 +279,7 @@ function traducirLocal(texto, origen, destino, paisDestino) {
       if (hallada) {
         salida += elegirVariante(hallada.dest, pais) + tokens[i + n - 1].despues;
         if (hallada.nota && !notas.includes(hallada.nota)) notas.push(hallada.nota);
+        frasesUsadas += 1;
         i += n;
         usado = true;
       }
@@ -304,7 +306,7 @@ function traducirLocal(texto, origen, destino, paisDestino) {
   }
   if (destino === 'es') salida = restaurarAcentos(salida);
   const nota = notas.join(' ') || null;
-  return { traduccion: salida, nota: nota && restaurarAcentos(nota), aproximada: sinTraducir > 0 };
+  return { traduccion: salida, nota: nota && restaurarAcentos(nota), aproximada: sinTraducir > 0, frases: frasesUsadas };
 }
 
 const PARES_LOCALES = ['es>en', 'en>es'];
@@ -318,7 +320,12 @@ function crearMotorReglas() {
     soportaPar: (origen, destino) => PARES_LOCALES.includes(`${origen}>${destino}`),
     async traducir(entrada) {
       const pais = entrada.regionDestino && entrada.regionDestino.paisCodigo;
-      return traducirLocal(entrada.texto, entrada.origen.codigo, entrada.destino.codigo, pais);
+      const r = traducirLocal(entrada.texto, entrada.origen.codigo, entrada.destino.codigo, pais);
+      // Solo adapta modismos/frases conocidos del diccionario. Sin ninguna coincidencia seria
+      // sustitucion palabra por palabra (el origen del "¿eat go?"): falla honesto para que el
+      // servicio reporte error en vez de entregar una traduccion basura. (Ver ADR-004.)
+      if (!r.frases) throw new Error('El motor local solo adapta modismos conocidos; sin coincidencias no traduce este texto');
+      return r;
     },
   };
 }

@@ -10,6 +10,7 @@ import Avatar from './Avatar';
 import useThemeColors from '@/app/contexts/ThemeColors';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useConversaciones } from '@/app/contexts/ConversacionesContext';
+import { coincide } from '@/lib/buscar';
 
 type NavItemProps = { onPress: () => void; icon: IconName; label: string; description?: string };
 
@@ -34,8 +35,8 @@ export default function CustomDrawerContent() {
   const [busqueda, setBusqueda] = useState('');
 
   const visibles = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
-    return (q ? lista.filter((c) => c.nombre.toLowerCase().includes(q)) : lista).slice(0, 30);
+    const q = busqueda.trim();
+    return (q ? lista.filter((c) => coincide(q, [c.nombre, c.ultimo_mensaje?.contenido].filter(Boolean).join(' '))) : lista).slice(0, 30);
   }, [lista, busqueda]);
 
   return (
@@ -57,12 +58,13 @@ export default function CustomDrawerContent() {
         </View>
 
         <View className="flex-col pb-4 mb-4 mt-4 border-b border-neutral-200 dark:border-dark-secondary">
-          <NavItem onPress={() => router.replace('/(drawer)')} icon="Plus" label="Nueva conversacion" />
-          <NavItem onPress={() => router.push('/screens/historial')} icon="History" label="Historial" description="Renombrar o eliminar conversaciones" />
+          <NavItem onPress={() => router.replace('/(drawer)')} icon="MessageSquare" label="Conversaciones" description="Tu listado para retomar cualquiera" />
+          <NavItem onPress={() => router.push({ pathname: '/(drawer)', params: { nueva: '1' } })} icon="Plus" label="Nueva conversacion" />
           {usuario?.rol === 'admin' ? (
             <>
               <NavItem onPress={() => router.push('/screens/admin-idiomas')} icon="Globe" label="Idiomas y regiones" description="Administrador" />
               <NavItem onPress={() => router.push('/screens/admin-reportes')} icon="Flag" label="Reportes de calidad" description="Administrador" />
+              <NavItem onPress={() => router.push('/screens/admin-problemas')} icon="Inbox" label="Problemas reportados" description="Administrador" />
             </>
           ) : null}
         </View>
