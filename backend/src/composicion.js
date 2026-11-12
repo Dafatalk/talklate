@@ -7,6 +7,7 @@ const { crearHasheadorBcrypt } = require('./adaptadores/credenciales/bcrypt');
 const { crearFirmadorJwt } = require('./adaptadores/credenciales/jwt');
 const { crearMotorQwen } = require('./adaptadores/traduccion/qwen');
 const { crearMotorClaude } = require('./adaptadores/traduccion/claude');
+const { crearMotorVertex } = require('./adaptadores/traduccion/vertex');
 const { crearMotorReglas } = require('./adaptadores/traduccion/reglas');
 const { crearNotificadorConsola } = require('./adaptadores/correo/consola');
 const { crearCifradorAesGcm } = require('./adaptadores/cifrado/aesGcm');
@@ -26,12 +27,21 @@ const { crearServicioReportes } = require('./aplicacion/reportes');
 const esProduccion = (entorno) => entorno.NODE_ENV === 'production';
 
 // Cadena de motores segun TRADUCTOR (ADR-004):
-//   auto (por defecto): Qwen -> Claude (si hay ANTHROPIC_API_KEY) -> reglas
+//   auto (por defecto): Qwen -> Claude (si esta disponible) -> reglas
 //   qwen: Qwen -> reglas · claude: Claude -> reglas · local: solo reglas
+// Claude se sirve por Google Vertex AI (Sonnet, auth por ADC) cuando ANTHROPIC_USE_VERTEX esta activo;
+// si no, por la API directa de Anthropic (necesita ANTHROPIC_API_KEY). Ver adaptadores/traduccion/{vertex,claude}.js.
 function crearMotores(entorno = process.env, { fetchFn } = {}) {
   const modo = (entorno.TRADUCTOR || 'auto').toLowerCase();
+  const usaVertex = /^(1|true|si|sí|on|yes)$/i.test(String(entorno.ANTHROPIC_USE_VERTEX || ''));
   const qwen = () => crearMotorQwen({ url: entorno.OLLAMA_URL || undefined, modelo: entorno.QWEN_MODEL || undefined, timeoutMs: Number(entorno.QWEN_TIMEOUT_MS) || undefined, fetchFn });
-  const claude = () => crearMotorClaude({ apiKey: entorno.ANTHROPIC_API_KEY, modelo: entorno.TALKLATE_MODEL || undefined, fetchFn });
+  const claude = () => (usaVertex
+    ? crearMotorVertex({
+      proyecto: entorno.ANTHROPIC_VERTEX_PROJECT_ID,
+      region: entorno.CLOUD_ML_REGION || undefined,
+      modelo: entorno.TALKLATE_MODEL || entorno.ANTHROPIC_DEFAULT_SONNET_MODEL || undefined,
+    })
+    : crearMotorClaude({ apiKey: entorno.ANTHROPIC_API_KEY, modelo: entorno.TALKLATE_MODEL || undefined, fetchFn }));
   const reglas = crearMotorReglas();
   if (modo === 'local') return [reglas];
   if (modo === 'qwen') return [qwen(), reglas];

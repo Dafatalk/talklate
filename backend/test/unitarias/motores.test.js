@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 process.env.TALKLATE_LOGS = 'silencio';
 const { traducirLocal } = require('../../src/adaptadores/traduccion/reglas');
 const { crearMotorClaude } = require('../../src/adaptadores/traduccion/claude');
+const { crearMotorVertex } = require('../../src/adaptadores/traduccion/vertex');
 const { crearMotorQwen } = require('../../src/adaptadores/traduccion/qwen');
 const { crearServicioTraduccion } = require('../../src/aplicacion/traduccion');
 const { crearMotores, crearTraduccion } = require('../../src/composicion');
@@ -61,6 +62,44 @@ test('adaptador Claude arma la peticion y lee el JSON de respuesta', async () =>
   assert.equal(enviado.op.headers['x-api-key'], 'clave-falsa');
   assert.match(JSON.parse(enviado.op.body).messages[0].content, /California/);
   assert.equal(crearMotorClaude({}).disponible(), false); // sin clave no se usa
+});
+
+test('adaptador Vertex traduce con Sonnet por el SDK de Google (ADC) y lee el JSON de respuesta', async () => {
+  let enviado;
+  const clienteFalso = {
+    messages: {
+      create: async (op) => {
+        enviado = op;
+        return { content: [{ text: '{"traduccion":"Hey buddy","tono":"Amigable","nota_cultural":"parce se adapta a buddy","region_origen":"Antioquia"}' }] };
+      },
+    },
+  };
+  const motor = crearMotorVertex({ cliente: clienteFalso, modelo: 'claude-sonnet-4-6' });
+  assert.equal(motor.disponible(), true);
+  const r = await motor.traducir({ texto: 'Parce', origen: { codigo: 'es', nombre: 'Espanol' }, destino: { codigo: 'en', nombre: 'Ingles' }, regionDestino: { nombre: 'California', paisCodigo: 'US' }, tonos: ['Neutral', 'Amigable'] });
+  assert.equal(r.traduccion, 'Hey buddy');
+  assert.equal(r.tono, 'Amigable');
+  assert.equal(enviado.model, 'claude-sonnet-4-6');
+  assert.match(enviado.messages[0].content, /California/);
+  assert.equal(motor.etiqueta(), 'vertex:claude-sonnet-4-6');
+  assert.equal(crearMotorVertex({}).disponible(), false); // sin proyecto ni cliente no se usa
+  // el cliente del SDK se construye perezosamente: nunca en el factory, solo cuando hace falta traducir
+  let construido = 0;
+  const perezoso = crearMotorVertex({ proyecto: 'cerebro-481401', crearCliente: () => { construido += 1; return clienteFalso; } });
+  assert.equal(construido, 0);
+  await perezoso.traducir({ texto: 'Parce', origen: { codigo: 'es' }, destino: { codigo: 'en' }, tonos: ['Neutral', 'Amigable'] });
+  assert.equal(construido, 1);
+});
+
+test('composicion: con ANTHROPIC_USE_VERTEX el motor Claude se sirve por Vertex (ADC, sin API key)', () => {
+  const env = { TRADUCTOR: 'claude', ANTHROPIC_USE_VERTEX: '1', ANTHROPIC_VERTEX_PROJECT_ID: 'cerebro-481401', ANTHROPIC_DEFAULT_SONNET_MODEL: 'claude-sonnet-4-6' };
+  const [claude] = crearMotores(env);
+  assert.equal(claude.nombre, 'claude');
+  assert.equal(claude.disponible(), true);
+  assert.equal(claude.etiqueta(), 'vertex:claude-sonnet-4-6');
+  // sin la bandera sigue siendo la API directa de Anthropic (que necesita ANTHROPIC_API_KEY)
+  const [claudeApi] = crearMotores({ TRADUCTOR: 'claude', ANTHROPIC_API_KEY: 'k' });
+  assert.match(claudeApi.etiqueta(), /^claude:/);
 });
 
 test('adaptador Qwen (Ollama) arma la peticion y lee la respuesta', async () => {
