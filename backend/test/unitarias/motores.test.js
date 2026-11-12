@@ -76,11 +76,12 @@ test('adaptador Claude arma la peticion y lee el JSON de respuesta', async () =>
 });
 
 test('adaptador Vertex traduce con Sonnet por el SDK de Google (ADC) y lee el JSON de respuesta', async () => {
-  let enviado;
+  let enviado, opcionesEnviadas;
   const clienteFalso = {
     messages: {
-      create: async (op) => {
+      create: async (op, opciones) => {
         enviado = op;
+        opcionesEnviadas = opciones;
         return { content: [{ text: '{"traduccion":"Hey buddy","tono":"Amigable","nota_cultural":"parce se adapta a buddy","region_origen":"Antioquia"}' }] };
       },
     },
@@ -91,6 +92,7 @@ test('adaptador Vertex traduce con Sonnet por el SDK de Google (ADC) y lee el JS
   assert.equal(r.traduccion, 'Hey buddy');
   assert.equal(r.tono, 'Amigable');
   assert.equal(enviado.model, 'claude-sonnet-4-6');
+  assert.deepEqual(opcionesEnviadas, { timeout: 30000, maxRetries: 0 }); // acotado y sin reintentos del SDK
   assert.match(enviado.messages[0].content, /California/);
   assert.equal(motor.etiqueta(), 'vertex:claude-sonnet-4-6');
   assert.equal(crearMotorVertex({}).disponible(), false); // sin proyecto ni cliente no se usa

@@ -15,6 +15,7 @@ function crearMotorVertex({
   region = 'global',
   modelo = 'claude-sonnet-4-6',
   maxTokens = 1024,
+  timeoutMs = 30000, // el SDK espera minutos por defecto: se acota como en claude.js
   cliente, // inyectable en pruebas; si no se pasa, se construye con el SDK la primera vez que se usa
   crearCliente = crearClienteVertex,
 } = {}) {
@@ -32,11 +33,12 @@ function crearMotorVertex({
     async traducir(entrada) {
       const c = obtenerCliente();
       if (!c) throw new Error('Vertex no esta configurado (falta ANTHROPIC_VERTEX_PROJECT_ID)');
+      // Sin reintentos del SDK (maxRetries 0): si falla, el Circuit Breaker pasa al siguiente motor (ADR-004)
       const respuesta = await c.messages.create({
         model: modelo,
         max_tokens: maxTokens,
         messages: [{ role: 'user', content: armarPrompt(paraPrompt(entrada)) }],
-      });
+      }, { timeout: timeoutMs, maxRetries: 0 });
       return leerRespuesta((respuesta.content || []).map((b) => b.text || '').join(''), entrada.tonos);
     },
   };
