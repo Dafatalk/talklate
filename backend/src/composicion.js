@@ -35,10 +35,13 @@ function crearMotores(entorno = process.env, { fetchFn } = {}) {
   const modo = (entorno.TRADUCTOR || 'auto').toLowerCase();
   const usaVertex = /^(1|true|si|sí|on|yes)$/i.test(String(entorno.ANTHROPIC_USE_VERTEX || ''));
   const qwen = () => crearMotorQwen({ url: entorno.OLLAMA_URL || undefined, modelo: entorno.QWEN_MODEL || undefined, timeoutMs: Number(entorno.QWEN_TIMEOUT_MS) || undefined, fetchFn });
+  // Region propia de TalkLate (default 'global'): Claude en Vertex NO se sirve en todas las regiones
+  // (p. ej. us-central1, el default del SDK, falla). No usamos CLOUD_ML_REGION para no heredar una
+  // region generica de GCP que no sirva para Claude. Sobreescribible con TALKLATE_VERTEX_REGION.
   const claude = () => (usaVertex
     ? crearMotorVertex({
       proyecto: entorno.ANTHROPIC_VERTEX_PROJECT_ID,
-      region: entorno.CLOUD_ML_REGION || undefined,
+      region: entorno.TALKLATE_VERTEX_REGION || undefined,
       modelo: entorno.TALKLATE_MODEL || entorno.ANTHROPIC_DEFAULT_SONNET_MODEL || undefined,
     })
     : crearMotorClaude({ apiKey: entorno.ANTHROPIC_API_KEY, modelo: entorno.TALKLATE_MODEL || undefined, fetchFn }));

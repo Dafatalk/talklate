@@ -25,6 +25,11 @@ WHISPER_PORT=9000
 
 # Motor de traduccion: Claude via Vertex (Vertex -> reglas), sin Qwen/Ollama. Sobreescribible.
 export TRADUCTOR="${TRADUCTOR:-claude}"
+# Config de Vertex fijada aqui para que el backend sea determinista y no dependa del shell/.env.
+# OJO: Claude NO se sirve en us-central1 (default del SDK); TalkLate usa su propia region (default global).
+export ANTHROPIC_USE_VERTEX="${ANTHROPIC_USE_VERTEX:-1}"
+export ANTHROPIC_VERTEX_PROJECT_ID="${ANTHROPIC_VERTEX_PROJECT_ID:-cerebro-481401}"
+export TALKLATE_VERTEX_REGION="${TALKLATE_VERTEX_REGION:-global}"
 
 # Modelo de Whisper (sobreescribible: WHISPER_MODEL=... ./run-talklate.sh --full)
 WHISPER_MODEL="${WHISPER_MODEL:-$HOME/modelos/ggml-small.bin}"
