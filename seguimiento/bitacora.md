@@ -154,3 +154,11 @@
 - **Documentos:** ADR-019 y ADR-020 en la entrega; actualizados los 11 documentos que decian VoiceStudio o Qwen como motor principal, la politica de datos y la matriz (Google Cloud, ElevenLabs, genero de la voz, problemas), Trivy con historial de escaneos y OWASP v1.1 como documento 20. Entrega version 1.2 con Word y PDF regenerados. Diagramas de Archify al dia (Claude en Vertex, ElevenLabs, 9 puertos) mas la secuencia de voz y el modelo de datos.
 - **Pendiente:** medir calidad y tiempo con el motor de produccion; validar el glosario con nativos; probar en celular fisico; aviso en la app de que el texto sale a terceros; tope de gasto; SBOM; unificar el modelo por defecto (`claude-sonnet-4-6` en Vertex y `claude-sonnet-5-5` en la API directa); sacar el identificador del proyecto de Google y el correo personal del codigo.
 - Engram no esta disponible en esta sesion; esta bitacora es el registro.
+
+## 2026-11-12 (3) - Dafatalk (Claude / Sonnet)
+
+- PR 54 integrado en develop (CI en verde: backend, backend-surreal, frontend, e2e-web y trivy).
+- **Manual de entendimiento:** `seguimiento/manual_de_entendimiento_talklate.md` (19 partes: producto, mapa de impacto, las 26 historias con criterios, los 26 REQ y 11 RNF, funcionalidades, recorrido de un mensaje, arquitectura, IA, voz, datos, seguridad, app, pruebas, metodologia, puntos debiles, preguntas, guion y glosario).
+- `requerimientos/req.md` ya lista los 11 requisitos no funcionales (antes 9).
+- Criterios de HU0001 y HU0004 siguen hablando de dictado y voz del dispositivo; hoy es grabacion + Whisper y voz de ElevenLabs.
+- Engram no esta disponible en esta sesion; esta bitacora es el registro.
