@@ -13,7 +13,7 @@ function crearClienteVertex({ proyecto, region }) {
 function crearMotorVertex({
   proyecto,
   region = 'global',
-  modelo = 'claude-sonnet-5-5',
+  modelo = 'claude-sonnet-4-6',
   maxTokens = 1024,
   cliente, // inyectable en pruebas; si no se pasa, se construye con el SDK la primera vez que se usa
   crearCliente = crearClienteVertex,
