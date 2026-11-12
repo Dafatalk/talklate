@@ -130,7 +130,7 @@ function motorFalso(nombre, comportamiento, pares = null) {
   };
   return motor;
 }
-const ENTRADA = { texto: 'Hay que ponerse las pilas con el trabajo', origen: { codigo: 'es', nombre: 'Espanol' }, destino: { codigo: 'en', nombre: 'Ingles' }, regionDestino: { nombre: 'Miami', paisCodigo: 'US' }, tonos: ['Neutral', 'Preocupado'] };
+const ENTRADA = { texto: 'Hay que ponerse las pilas con el trabajo', origen: { codigo: 'es', nombre: 'Espanol' }, destino: { codigo: 'en', nombre: 'Ingles' }, regionDestino: { nombre: 'New York', paisCodigo: 'US' }, tonos: ['Neutral', 'Preocupado'] };
 const falla = () => { throw new Error('sin red'); };
 
 test('caso de uso de traduccion: usa el primer motor que responde y salta los caidos (Circuit Breaker)', async () => {

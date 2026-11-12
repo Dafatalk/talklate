@@ -133,11 +133,11 @@ test('crear conversacion: region valida (Conversacion-RN-1, 422), nombre (RN-4, 
   const en = catalogoDatos.idiomas.find((i) => i.codigo === 'en');
   const es = catalogoDatos.idiomas.find((i) => i.codigo === 'es');
   const antioquia = es.regiones.find((x) => x.nombre === 'Antioquia');
-  const miami = en.regiones.find((x) => x.nombre === 'Miami');
+  const ny = en.regiones.find((x) => x.nombre === 'New York');
   assert.equal((await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: antioquia.id }, token)).estado, 422);
-  assert.equal((await api('POST', '/conversaciones', { nombre: 'ab', idioma_destino_id: en.id, region_destino_id: miami.id }, token)).estado, 400);
-  assert.equal((await api('POST', '/conversaciones', { nombre: 'Hola @#$', idioma_destino_id: en.id, region_destino_id: miami.id }, token)).estado, 400);
-  const ok = await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: miami.id }, token);
+  assert.equal((await api('POST', '/conversaciones', { nombre: 'ab', idioma_destino_id: en.id, region_destino_id: ny.id }, token)).estado, 400);
+  assert.equal((await api('POST', '/conversaciones', { nombre: 'Hola @#$', idioma_destino_id: en.id, region_destino_id: ny.id }, token)).estado, 400);
+  const ok = await api('POST', '/conversaciones', { idioma_destino_id: en.id, region_destino_id: ny.id }, token);
   assert.equal(ok.estado, 201);
   assert.equal(ok.cabeceras.get('location'), `/api/v1/conversaciones/${ok.datos.id}`);
   assert.equal(ok.datos.nombre, 'Nueva Conversacion');

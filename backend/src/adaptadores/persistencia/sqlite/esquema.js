@@ -134,12 +134,12 @@ CREATE TABLE IF NOT EXISTS reporte (
 );
 `;
 
-// Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./Miami).
+// Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./New York).
 const PAISES = [['Colombia', 'CO'], ['Estados Unidos', 'US']];
 const REGIONES = [
   // [nombre, pais, lenguajes]
   ['Antioquia', 'Colombia', ['es']],
-  ['Miami', 'Estados Unidos', ['en']],
+  ['New York', 'Estados Unidos', ['en']],
 ];
 const LENGUAJES = [['Espanol', 'es', 1], ['Ingles', 'en', 1]];
 const ENTONACIONES = ['Neutral', 'Amigable', 'Alegre', 'Preocupado', 'Enojado', 'Formal'];

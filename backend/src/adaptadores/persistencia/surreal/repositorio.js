@@ -14,12 +14,12 @@ const S = require('./cliente');
 
 const ESQUEMA = fs.readFileSync(path.join(__dirname, '..', '..', '..', '..', 'db', 'surreal', 'schema.surql'), 'utf8');
 
-// Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./Miami).
+// Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./New York).
 // Nombres de catalogo (datos) en espanol; ambos idiomas activos.
 const PAISES = [['Colombia', 'CO'], ['Estados Unidos', 'US']];
 const REGIONES = [
   ['Antioquia', 'Colombia', ['es']],
-  ['Miami', 'Estados Unidos', ['en']],
+  ['New York', 'Estados Unidos', ['en']],
 ];
 const LENGUAJES = [['Espanol', 'es', true], ['Ingles', 'en', true]];
 const ENTONACIONES = ['Neutral', 'Amigable', 'Alegre', 'Preocupado', 'Enojado', 'Formal'];

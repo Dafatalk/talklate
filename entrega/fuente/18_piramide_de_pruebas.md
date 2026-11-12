@@ -45,7 +45,7 @@ La misma suite corre dos veces en el CI: contra SQLite (`backend`) y contra un S
 | Prueba | Que hace |
 | --- | --- |
 | `backend/test/e2e/recorrido-usuario.test.js` | Arranca `node src/server.js` como proceso aparte con SQLite en un archivo temporal. Reemplaza Whisper y VoiceStudio por servidores HTTP falsos que hablan su mismo protocolo. Recorre registro, conversacion, mensaje escrito, mensaje hablado, voz natural con vector de emocion, historial, reporte y borrado de la cuenta. Tambien comprueba que sin sesion no se puede usar la API. |
-| `e2e/pruebas/traducir.spec.js` (Playwright) | Abre la app web exportada en Chromium con vista de celular (Pixel 7). Inicia sesion, crea una conversacion a Ingles / Miami, ve la burbuja de voz, pasa al chat, escribe "Hay que ponerse las pilas con el trabajo" y comprueba la traduccion adaptada "We need to get cracking on the work". Tambien comprueba que una contrasena incorrecta no deja entrar. |
+| `e2e/pruebas/traducir.spec.js` (Playwright) | Abre la app web exportada en Chromium con vista de celular (Pixel 7). Inicia sesion, crea una conversacion a Ingles / New York, ve la burbuja de voz, pasa al chat, escribe "Hay que ponerse las pilas con el trabajo" y comprueba la traduccion adaptada "We need to get cracking on the work". Tambien comprueba que una contrasena incorrecta no deja entrar. |
 
 Playwright levanta solo el backend y un servidor estatico para la web (`e2e/playwright.config.js`). Guarda capturas y trazas de las pruebas que fallan, y el CI sube el reporte como artefacto.
 
