@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "erd",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/user/talklate/.archify/erd-datos/candidate.json",
+    "sha256": "8622018331ea995dd28635766ac1e005b54b78a22371db1434924f5540773e15",
+    "bytes": 9466
+  },
+  "artifact": {
+    "path": "/home/user/talklate/entrega/diagramas/modelo_datos.html",
+    "sha256": "4b365bc6b24e19eb34aaae0364b18ee42177d8061980e445e9859e1a1de78b58",
+    "bytes": 881187
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/user/talklate/.archify/erd-datos/modelo_datos.finalize.json",
+    "summaryReceipt": "/home/user/talklate/.archify/erd-datos/modelo_datos.finalize-summary.json",
+    "browserCheckReceipt": "/home/user/talklate/.archify/erd-datos/modelo_datos.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-12T21:43:55.703Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 3296,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

@@ -7,13 +7,13 @@
   "quality": "showcase",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
-    "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
-    "bytes": 3008
+    "sha256": "db5c78471612b87e193dba83dea43f1d4076afad5e7e6d1c6aa152db9c25e14b",
+    "bytes": 4606
   },
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
-    "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-    "bytes": 846096
+    "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
+    "bytes": 849210
   },
   "gates": {
     "validate": "pass",
@@ -37,15 +37,95 @@
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "checkedAt": "2026-11-12T21:43:55.703Z",
     "source": "cache",
     "noticeRequired": false,
     "noticeText": null
   },
   "visualReview": "not-requested",
-  "durationMs": 3334,
+  "durationMs": 3752,
   "browserCheck": {
     "requested": true,
     "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "resolvedCrossovers": 1,
+      "routesOverSuggestedBends": 2
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [
+        {
+          "left": {
+            "id": "api-qwen",
+            "from": "api",
+            "to": "qwen",
+            "label": "2. traduce",
+            "collectionIndex": 4,
+            "artifactIndex": 5
+          },
+          "right": {
+            "id": "api-elevenlabs",
+            "from": "api",
+            "to": "elevenlabs",
+            "label": "3. voz con emocion (HTTPS)",
+            "collectionIndex": 5,
+            "artifactIndex": 6
+          },
+          "point": [
+            820,
+            337.99999999999994
+          ],
+          "sharedNode": "api"
+        }
+      ],
+      "detours": [
+        {
+          "relationship": {
+            "id": "api-qwen",
+            "from": "api",
+            "to": "qwen",
+            "label": "2. traduce",
+            "collectionIndex": 4,
+            "artifactIndex": 5
+          },
+          "bends": 3,
+          "stretch": 1.212
+        },
+        {
+          "relationship": {
+            "id": "api-claude",
+            "from": "api",
+            "to": "claude",
+            "label": "respaldo (HTTPS, solo el texto)",
+            "collectionIndex": 7,
+            "artifactIndex": 8
+          },
+          "bends": 4,
+          "stretch": 1.139,
+          "directCorridorBlockers": [
+            {
+              "id": "qwen",
+              "label": "Ollama + Qwen",
+              "box": [
+                860,
+                250,
+                170,
+                64
+              ]
+            }
+          ]
+        }
+      ],
+      "truncated": false
+    },
+    "hints": [
+      "api has 4 relationships facing its right side, which fits 3 ports: make that side at least 74px, or move some of those neighbours so they face another side of api.",
+      "api → qwen and api → elevenlabs cross next to api: move node qwen or elevenlabs so the two reach api from different sides (for example one level with it, one directly above or below it).",
+      "api → qwen needs 3 bends: move node api or qwen so they share a row or column with matching centers, or sit diagonally with a clear corner."
+    ],
+    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
   }
 }

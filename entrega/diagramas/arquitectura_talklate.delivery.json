@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "receiptId": "018656b4-0a11-4a32-b33a-ec37efc67215",
+  "receiptId": "987894f4-47b5-4944-987b-6ec99f76665b",
   "status": "current",
   "command": "deliver",
   "type": "architecture",
   "input": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
   "output": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
   "specification": {
-    "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
-    "bytes": 3008
+    "sha256": "db5c78471612b87e193dba83dea43f1d4076afad5e7e6d1c6aa152db9c25e14b",
+    "bytes": 4606
   },
   "artifact": {
-    "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-    "bytes": 846096
+    "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
+    "bytes": 849210
   }
 }

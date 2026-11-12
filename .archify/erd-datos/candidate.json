@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "diagram_type": "erd",
+  "meta": {
+    "title": "TalkLate - Modelo de datos (nucleo)",
+    "locale": "es",
+    "output": "entrega/diagramas/modelo_datos.html",
+    "quality_profile": "showcase"
+  },
+  "layout": {
+    "mode": "grid",
+    "gapY": 38,
+    "gapX": 72
+  },
+  "entities": [
+    {
+      "id": "usuario",
+      "label": "usuario",
+      "row": 0,
+      "col": 0,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "correo",
+          "type": "texto",
+          "key": "uk"
+        },
+        {
+          "name": "password_hash",
+          "type": "bcrypt"
+        },
+        {
+          "name": "rol",
+          "type": "cliente|admin"
+        },
+        {
+          "name": "consentimiento_datos",
+          "type": "fecha"
+        }
+      ]
+    },
+    {
+      "id": "conversacion",
+      "label": "conversacion",
+      "row": 0,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "nombre",
+          "type": "texto"
+        },
+        {
+          "name": "usuario_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "usuario.id"
+        }
+      ]
+    },
+    {
+      "id": "lenguaje_por_conversacion",
+      "label": "lenguaje_por_conversacion",
+      "row": 0,
+      "col": 2,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "conversacion_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "conversacion.id"
+        },
+        {
+          "name": "lenguaje_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "lenguaje.id"
+        },
+        {
+          "name": "region_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "region.id"
+        },
+        {
+          "name": "rol",
+          "type": "origen|destino"
+        }
+      ],
+      "width": 290
+    },
+    {
+      "id": "lenguaje",
+      "label": "lenguaje",
+      "row": 0,
+      "col": 3,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "codigo",
+          "type": "es|en",
+          "key": "uk"
+        },
+        {
+          "name": "activo",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "id": "mensaje_original",
+      "label": "mensaje_original",
+      "row": 1,
+      "col": 2,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "lenguaje_conversacion_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "lenguaje_por_conversacion.id"
+        },
+        {
+          "name": "canal_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "canal.id"
+        },
+        {
+          "name": "entonacion_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "entonacion.id"
+        },
+        {
+          "name": "contenido",
+          "type": "cifrado AES"
+        },
+        {
+          "name": "genero",
+          "type": "hombre|mujer"
+        }
+      ],
+      "width": 290
+    },
+    {
+      "id": "mensaje_destino",
+      "label": "mensaje_destino",
+      "row": 1,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "mensaje_original_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "mensaje_original.id"
+        },
+        {
+          "name": "contenido_traducido",
+          "type": "cifrado AES"
+        },
+        {
+          "name": "nota_cultural",
+          "type": "texto"
+        },
+        {
+          "name": "aproximada",
+          "type": "bool"
+        },
+        {
+          "name": "motor",
+          "type": "texto"
+        }
+      ],
+      "width": 290
+    },
+    {
+      "id": "reporte",
+      "label": "reporte",
+      "row": 1,
+      "col": 0,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "mensaje_destino_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "mensaje_destino.id"
+        },
+        {
+          "name": "usuario_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "usuario.id"
+        },
+        {
+          "name": "estado",
+          "type": "abierto|revisado|descartado"
+        }
+      ],
+      "width": 290
+    },
+    {
+      "id": "region",
+      "label": "region",
+      "row": 1,
+      "col": 3,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "nombre",
+          "type": "texto"
+        },
+        {
+          "name": "pais_id",
+          "type": "uuid",
+          "key": "fk",
+          "references": "pais.id"
+        }
+      ]
+    },
+    {
+      "id": "canal",
+      "label": "canal",
+      "row": 2,
+      "col": 2,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "nombre",
+          "type": "Texto|Voz",
+          "key": "uk"
+        }
+      ]
+    },
+    {
+      "id": "entonacion",
+      "label": "entonacion",
+      "row": 2,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "nombre",
+          "type": "6 tonos",
+          "key": "uk"
+        }
+      ]
+    },
+    {
+      "id": "pais",
+      "label": "pais",
+      "row": 2,
+      "col": 3,
+      "attributes": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "key": "pk"
+        },
+        {
+          "name": "nombre",
+          "type": "texto",
+          "key": "uk"
+        },
+        {
+          "name": "codigo",
+          "type": "CO|US",
+          "key": "uk"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": "conversacion_usuario",
+      "from": "conversacion",
+      "to": "usuario",
+      "label": "pertenece a",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "lenguaje_por_conversacion_conversacion",
+      "from": "lenguaje_por_conversacion",
+      "to": "conversacion",
+      "label": "configura",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "lenguaje_por_conversacion_lenguaje",
+      "from": "lenguaje_por_conversacion",
+      "to": "lenguaje",
+      "label": "usa",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "mensaje_original_lenguaje_por_conversacion",
+      "from": "mensaje_original",
+      "to": "lenguaje_por_conversacion",
+      "label": "escrito en",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "mensaje_destino_mensaje_original",
+      "from": "mensaje_destino",
+      "to": "mensaje_original",
+      "label": "traduce",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "reporte_mensaje_destino",
+      "from": "reporte",
+      "to": "mensaje_destino",
+      "label": "reporta",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "mensaje_original_canal",
+      "from": "mensaje_original",
+      "to": "canal",
+      "label": "por",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "mensaje_original_entonacion",
+      "from": "mensaje_original",
+      "to": "entonacion",
+      "label": "con tono",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "region_pais",
+      "from": "region",
+      "to": "pais",
+      "label": "esta en",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    },
+    {
+      "id": "lenguaje_por_conversacion_region",
+      "from": "lenguaje_por_conversacion",
+      "to": "region",
+      "label": "region",
+      "fromCardinality": "many",
+      "toCardinality": "one",
+      "toOptional": true
+    },
+    {
+      "id": "reporte_usuario",
+      "from": "reporte",
+      "to": "usuario",
+      "label": "hecho por",
+      "fromCardinality": "many",
+      "toCardinality": "one"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Cadena de mensajes",
+      "items": [
+        "conversacion -> lenguaje_por_conversacion -> mensaje_original -> mensaje_destino",
+        "El idioma de origen se detecta con el primer mensaje y ya no cambia"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Datos sensibles",
+      "items": [
+        "contenido y contenido_traducido se guardan cifrados (AES-256-GCM)",
+        "password_hash es bcrypt; los tokens de refresco solo se guardan como hash"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Catalogo",
+      "items": [
+        "lenguaje, region, pais, canal y entonacion se agregan sin tocar codigo",
+        "Hoy: es / en, Antioquia y New York"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Tablas de apoyo",
+      "items": [
+        "token_refresco, sesion_revocada y recuperacion (cuentas)",
+        "Reglas en la base: UNIQUE, CHECK y borrado en cascada"
+      ]
+    }
+  ]
+}
