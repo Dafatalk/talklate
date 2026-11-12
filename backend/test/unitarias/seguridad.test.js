@@ -99,3 +99,18 @@ test('reportar un problema tiene limite de uso por usuario (429)', async () => {
     delete process.env.LIMITE_PROBLEMAS_POR_HORA;
   }
 });
+
+test('en produccion no se crea el administrador con la contrasena de desarrollo', () => {
+  const { abrir } = require('../../src/adaptadores/persistencia/sqlite/esquema');
+  const previo = { env: process.env.NODE_ENV, pass: process.env.ADMIN_PASSWORD };
+  process.env.NODE_ENV = 'production';
+  delete process.env.ADMIN_PASSWORD;
+  try {
+    assert.throws(() => abrir(':memory:'), /ADMIN_PASSWORD/);
+    process.env.ADMIN_PASSWORD = 'Clave-De-Produccion-1!';
+    assert.doesNotThrow(() => abrir(':memory:'));
+  } finally {
+    if (previo.env === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = previo.env;
+    if (previo.pass === undefined) delete process.env.ADMIN_PASSWORD; else process.env.ADMIN_PASSWORD = previo.pass;
+  }
+});

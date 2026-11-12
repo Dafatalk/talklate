@@ -197,6 +197,7 @@ function sembrar(db) {
   const correo = (process.env.ADMIN_CORREO || 'dafa123.daf@gmail.com').toLowerCase();
   const existe = db.prepare('SELECT id FROM usuario WHERE correo = ?').get(correo);
   if (!existe) {
+    if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_PASSWORD) throw new Error('Falta ADMIN_PASSWORD en produccion: no se crea el administrador con la contrasena de desarrollo');
     db.prepare(
       'INSERT INTO usuario (id, nombre, apellido, correo, password_hash, fecha_nacimiento, rol, consentimiento_datos, creado) VALUES (?,?,?,?,?,?,?,?,?)'
     ).run(randomUUID(), 'Admin', 'TalkLate', correo, bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'Admin123!', 10), '1990-01-01', 'admin', new Date().toISOString(), new Date().toISOString());

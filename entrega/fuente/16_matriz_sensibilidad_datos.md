@@ -20,6 +20,8 @@ Clasificaciones: **Publico**, **Interno** (solo usuarios autenticados), **Confid
 | MensajeOriginal | contenido (texto o voz transcrita) | PII | **Cifrado en reposo** AES-256-GCM; solo el dueno; nunca en logs; se borra con la conversacion o la cuenta | `adaptadores/cifrado/aesGcm.js` |
 | MensajeDestino | contenido traducido | PII | Igual que el mensaje original | `adaptadores/cifrado/aesGcm.js` |
 | Mensaje hablado | audio grabado y medidas de volumen | PII | Viaja por HTTPS, se transcribe en el servidor (Whisper local) y no se guarda: solo queda el texto cifrado; tipo y tamano validados (maximo 10 MB) | `aplicacion/conversaciones.js` |
+| Genero inferido de la voz | hombre o mujer, estimado por el pitch del audio | PII (dato inferido) | Se guarda por mensaje (`mensaje_original.genero`) solo para elegir la voz de salida y viaja a ElevenLabs; no se muestra a terceros; se borra con la cuenta | `adaptadores/audio/genero.js` |
+| Problema de la app | descripcion, categoria, contacto (texto libre) | PII | Solo el autor (al crearlo) y el administrador; maximo 10 por hora por usuario; se borra con la cuenta | `aplicacion/problemas.js` |
 | Voz sintetizada | audio de la traduccion | PII | Solo en memoria del servidor, con id aleatorio de 128 bits que vence en 5 minutos; nunca en la base ni en logs | `aplicacion/voz.js` |
 | MensajeDestino | nota cultural, motor, estado | Interno | JWT | - |
 | Reporte | motivo, sugerencia | PII | Solo el autor (al crearlo) y el administrador; se borra con la cuenta | `aplicacion/reportes.js` |
@@ -28,9 +30,10 @@ Clasificaciones: **Publico**, **Interno** (solo usuarios autenticados), **Confid
 
 ## Envio a terceros
 
-- **Qwen local (Ollama):** corre en el servidor de TalkLate; el contenido no sale a terceros.
-- **Whisper y VoiceStudio locales:** corren en el servidor de TalkLate; el audio y la traduccion no salen a terceros.
-- **Claude Sonnet (respaldo de traduccion):** si se usa, el texto del mensaje se envia a Anthropic para traducirlo.
+- **Claude Sonnet en Google Vertex AI (traduccion):** es el motor principal (ADR-020). El texto del mensaje y el contexto del prompt (idiomas, region, tono y, en voz, una descripcion de como hablo la persona) se envian a Google Cloud para traducirlo.
+- **Qwen local (Ollama):** adaptador alternativo que corre en el servidor de TalkLate y no envia nada a terceros; no se usa en la configuracion actual.
+- **Whisper local:** corre en el servidor de TalkLate; el audio original no sale a terceros.
+- **ElevenLabs (voz):** recibe el texto ya traducido, el tono, el genero de quien habla y la velocidad para generar el audio; nunca recibe el audio original.
 - **Azure Speech u OpenAI (respaldo de voz):** si se usan, reciben solo el texto ya traducido para convertirlo en voz.
 - Estos envios se informan en la politica de tratamiento de datos (`17_politica_tratamiento_datos.md`), que el usuario acepta al registrarse.
 

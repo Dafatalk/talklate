@@ -27,10 +27,10 @@ los adaptadores concretos. Las reglas de dependencia se verifican con dependency
 ```mermaid
 flowchart LR
     app["<b>App movil</b><br/>[Contenedor externo]"]
-    ollama["<b>Ollama + Qwen</b><br/>[Sistema externo]"]
-    claude["<b>Claude Sonnet</b><br/>[Sistema externo]"]
+    ollama["<b>Ollama + Qwen</b><br/>[Alternativo]"]
+    claude["<b>Claude Sonnet (Vertex AI)</b><br/>[Sistema externo]"]
     whisper["<b>Whisper</b><br/>[Sistema externo]"]
-    vstudio["<b>VoiceStudio / Azure / OpenAI</b><br/>[Sistemas externos]"]
+    eleven["<b>ElevenLabs / Azure / OpenAI</b><br/>[Sistemas externos]"]
     db[("<b>SurrealDB / SQLite</b><br/>[Contenedor]")]
 
     subgraph api["Contenedor: API TalkLate (Node.js 22) - arquitectura hexagonal"]
@@ -56,18 +56,20 @@ flowchart LR
                 pro["C30 Prosodia"]
                 exv["C31 Expresion de voz"]
             end
-            puertos{{"<b>C17 Puertos</b><br/>Repositorio, MotorTraduccion,<br/>Transcriptor, Sintetizador,<br/>Notificador, Cifrador"}}
+            puertos{{"<b>C17 Puertos</b><br/>Repositorio, MotorTraduccion,<br/>Transcriptor, Sintetizador,<br/>DetectorGenero, Notificador,<br/>Cifrador, Hasheador, FirmadorTokens"}}
         end
         subgraph salida["Adaptadores de salida"]
             mq["C18 Motor Qwen"]
             mc["C19 Motor Claude"]
+            mv["C36 Motor Vertex"]
             mr["C20 Motor de reglas"]
             rs["C22 Repositorio SurrealDB"]
             rq["C23 Repositorio SQLite"]
             nt["C24 Notificador"]
             cf["C25 Cifrador AES-GCM"]
             tw["C32 Transcriptor Whisper"]
-            sv["C33-C35 Sintetizadores<br/>VoiceStudio, Azure, OpenAI"]
+            dg["C37 Detector de genero"]
+            sv["C33-C35 Sintetizadores<br/>ElevenLabs, Azure, OpenAI"]
         end
         comp["<b>C27 Composicion</b><br/>[composicion.js]<br/>elige y conecta adaptadores"]
     end
@@ -77,16 +79,17 @@ flowchart LR
     rutas -->|llaman casos de uso| apl
     apl --> dom
     apl -->|solo conocen contratos| puertos
-    mq & mc & mr -.->|cumplen MotorTraduccion| puertos
+    mq & mc & mv & mr -.->|cumplen MotorTraduccion| puertos
     rs & rq -.->|cumplen Repositorio| puertos
     nt -.->|cumple Notificador| puertos
     cf -.->|cumple Cifrador| puertos
     tw -.->|cumple Transcriptor| puertos
+    dg -.->|cumple DetectorGenero| puertos
     sv -.->|cumplen Sintetizador| puertos
     tw --> whisper
-    sv --> vstudio
+    sv --> eleven
     mq --> ollama
-    mc --> claude
+    mc & mv --> claude
     rs & rq --> db
     comp -.->|arma| apl
     comp -.->|elige| salida
@@ -95,9 +98,9 @@ flowchart LR
     classDef contenedor fill:#438DD5,stroke:#3C7FC0,color:#FFFFFF
     classDef componente fill:#85BBF0,stroke:#5D82A8,color:#000000
     classDef nucleo fill:#C6E0B4,stroke:#548235,color:#000000
-    class app,ollama,claude,whisper,vstudio externo
+    class app,ollama,claude,whisper,eleven externo
     class db contenedor
-    class http,rutas,ses,mq,mc,mr,rs,rq,nt,cf,tw,sv,comp componente
+    class http,rutas,ses,mq,mc,mv,mr,rs,rq,nt,cf,tw,dg,sv,comp componente
     class ucC,ucS,ucV,ucT,ucK,ucR,ucZ,val,err,ana,pro,exv,puertos nucleo
 ```
 
@@ -129,11 +132,11 @@ flowchart LR
 | C14 | Validaciones | Dominio | Plataforma | Reglas de formato de entrada (nombres, correo, contrasena, contenido, nombre de conversacion). | `src/dominio/validaciones.js` | ADR-011 |
 | C15 | Errores | Dominio | Plataforma | `ErrorNegocio` y cuerpo de error uniforme de la API. | `src/dominio/errores.js` | ADR-011 |
 | C16 | Analisis de texto | Dominio | Traduccion | Detecta idioma, tono y region de origen por vocabulario. | `src/dominio/analisis.js` | ADR-004, ADR-005 |
-| C17 | Puertos | Puertos | (todos) | Contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `Notificador`, `Cifrador`, `Hasheador` y `FirmadorTokens`, y su verificacion al arrancar. | `src/puertos/index.js` | Puertos y adaptadores / ADR-013 |
+| C17 | Puertos | Puertos | (todos) | Contratos `Repositorio`, `MotorTraduccion`, `Transcriptor`, `Sintetizador`, `DetectorGenero`, `Notificador`, `Cifrador`, `Hasheador` y `FirmadorTokens`, y su verificacion al arrancar. | `src/puertos/index.js` | Puertos y adaptadores / ADR-013 |
 | C18 | Motor Qwen | Salida | Traduccion | Cumple `MotorTraduccion` via Ollama local (HTTP `/api/chat`). | `src/adaptadores/traduccion/qwen.js` | ADR-004 |
 | C19 | Motor Claude | Salida | Traduccion | Cumple `MotorTraduccion` via la API de Anthropic (solo si hay clave). | `src/adaptadores/traduccion/claude.js` | ADR-004 |
-| C20 | Motor de reglas | Salida | Traduccion | Cumple `MotorTraduccion` sin red: espanol/ingles con modismos por pais; degradacion aceptable. | `src/adaptadores/traduccion/reglas.js`, `acentos.js` | ADR-004 |
-| C21 | Constructor de prompt | Salida | Traduccion | Prompt de equivalente cultural comun a Qwen y Claude (incluye tono y prosodia de la voz), y lectura de su JSON. | `src/adaptadores/traduccion/prompt.js` | ADR-004 |
+| C20 | Motor de reglas | Salida | Traduccion | Cumple `MotorTraduccion` sin red: espanol/ingles con modismos por pais. Solo traduce si el texto trae modismos conocidos; sin coincidencias falla en vez de entregar una traduccion palabra por palabra. | `src/adaptadores/traduccion/reglas.js`, `acentos.js` | ADR-004 |
+| C21 | Constructor de prompt | Salida | Traduccion | Prompt de transcreacion cultural comun a Qwen y Claude (incluye tono, prosodia de la voz y ejemplos del glosario), y lectura de su JSON validado (la nota y la region solo se aceptan como texto de largo acotado). | `src/adaptadores/traduccion/prompt.js` | ADR-004 |
 | C22 | Repositorio SurrealDB | Salida | (todos) | Cumple `Repositorio` sobre SurrealDB (HTTP `/sql` con token de sesion; valores serializados, nunca texto concatenado). | `src/adaptadores/persistencia/surreal/repositorio.js`, `cliente.js` | Repository / ADR-012 |
 | C23 | Repositorio SQLite | Salida | (todos) | Cumple `Repositorio` sobre SQLite para pruebas sin servidor. | `src/adaptadores/persistencia/sqlite/repositorio.js`, `esquema.js` | Repository / ADR-003 |
 | C24 | Notificador | Salida | Identidad y Acceso | Cumple `Notificador`; en desarrollo devuelve el codigo de recuperacion en la respuesta; un proveedor de correo se conecta como otro adaptador del mismo puerto. | `src/adaptadores/correo/consola.js` | ADR-006 |
@@ -143,11 +146,14 @@ flowchart LR
 | C28 | Rutas de voz | Entrada | Voz | `POST /voz` (con sesion y limite por usuario) y `GET /voz/audio/:id` (id aleatorio de 128 bits que vence en 5 minutos). | `src/adaptadores/http/rutas/voz.js` | ADR-015 |
 | C29 | Caso de uso Voz | Aplicacion | Voz | Valida texto, idioma y tono; prueba los sintetizadores en orden; guarda el audio en memoria con vencimiento. | `src/aplicacion/voz.js` | ADR-015 |
 | C30 | Prosodia | Dominio | Voz | Estima intensidad, ritmo y expresividad con el volumen y las palabras por segundo; combina el tono de la voz con el de las palabras. | `src/dominio/prosodia.js` | ADR-014 |
-| C31 | Expresion de voz | Dominio | Voz | Define como suena cada tono: voz por idioma y pais, estilo SSML, prosodia, instruccion y vector de emocion. | `src/dominio/voz.js` | ADR-015, ADR-016 |
+| C31 | Expresion de voz | Dominio | Voz | Define como suena cada tono: voz por idioma y pais, estilo SSML, prosodia, instruccion y vector de emocion. | `src/dominio/voz.js` | ADR-015, ADR-019 |
 | C32 | Transcriptor Whisper | Salida | Voz | Cumple `Transcriptor`: envia el audio multipart a la API compatible con OpenAI y devuelve el texto. | `src/adaptadores/transcripcion/whisper.js` | ADR-014 |
-| C33 | Sintetizador VoiceStudio | Salida | Voz | Cumple `Sintetizador`: IndexTTS 2 por `/generate` con vector de emocion, u otros motores por `/v1/audio/speech`. | `src/adaptadores/sintesis/voicestudio.js` | ADR-016 |
+| C33 | Sintetizador ElevenLabs | Salida | Voz | Cumple `Sintetizador`: API REST de ElevenLabs con voz por region (paisa, New York) y genero; la emocion va en `voice_settings`. | `src/adaptadores/sintesis/elevenlabs.js` | ADR-019 |
 | C34 | Sintetizador Azure | Salida | Voz | Cumple `Sintetizador`: SSML con `mstts:express-as` y prosodia de respaldo. | `src/adaptadores/sintesis/azure.js` | ADR-015 |
 | C35 | Sintetizador OpenAI | Salida | Voz | Cumple `Sintetizador`: `/v1/audio/speech` con la emocion y el acento como instruccion. | `src/adaptadores/sintesis/openai.js` | ADR-015 |
+| C36 | Motor Vertex | Salida | Traduccion | Cumple `MotorTraduccion` con Claude Sonnet en Google Vertex AI (SDK oficial, credenciales de Google); tiempo limite de 30 s y sin reintentos del SDK. | `src/adaptadores/traduccion/vertex.js` | ADR-020 |
+| C37 | Detector de genero | Salida | Voz | Cumple `DetectorGenero`: decodifica el audio con ffmpeg y estima el pitch; menos de 160 Hz hombre, mas de 180 Hz mujer, en medio no decide. | `src/adaptadores/audio/genero.js` | ADR-019 |
+| C38 | Caso de uso Problemas | Aplicacion | Reportes de Calidad | Reportar un problema general de la app (con limite de 10 por hora por usuario) y revision del administrador. | `src/aplicacion/problemas.js`, `src/adaptadores/http/rutas/problemas.js` | ADR-010 |
 
 ---
 

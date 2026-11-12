@@ -92,6 +92,7 @@ async function sembrar() {
   const correo = (process.env.ADMIN_CORREO || 'dafa123.daf@gmail.com').toLowerCase();
   const existe = await usuarios.porCorreo(correo);
   if (!existe) {
+    if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_PASSWORD) throw new Error('Falta ADMIN_PASSWORD en produccion: no se crea el administrador con la contrasena de desarrollo');
     const ahora = new Date().toISOString();
     await usuarios.crear({
       id: randomUUID(),

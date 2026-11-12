@@ -54,8 +54,9 @@ multilingüe.
 - **Tiempo real** significa traduccion **por turno**: cada mensaje se traduce y se entrega en pocos segundos (objetivo: 3 segundos o menos por mensaje de texto, ver `arquitectura/drivers.md`, DRV-01). No es traduccion simultanea mientras la persona habla.
 - **Acentos y variaciones regionales:** en el MVP la region de origen se reconoce por el **vocabulario** (por ejemplo "parce", "wey", "che") y el motor adapta los modismos a la region de destino. Reconocer el acento por el **sonido** de la voz es evolucion futura.
 - **Emociones y tono:** se estima el tono del mensaje (neutral, amigable, alegre, preocupado, enojado, formal) a partir del texto y se aplica a la traduccion y a la voz.
-- **Idiomas:** espanol e ingles activos al inicio; frances y portugues existen en el catalogo pero inactivos (vision evolutiva).
-- **Motor de IA:** Qwen corre en el **servidor** de TalkLate (no en el celular); Claude Sonnet es el respaldo.
+- **Voz:** la app graba el mensaje y el servidor lo transcribe con Whisper; la traduccion se escucha con una voz neuronal con emocion y acento regional (ElevenLabs, con Azure Speech u OpenAI como respaldo).
+- **Idiomas:** espanol e ingles activos al inicio; otros idiomas (por ejemplo frances y portugues) se agregan desde la administracion, sin tocar codigo (vision evolutiva).
+- **Motor de IA:** la traduccion la hace **Claude Sonnet**, servido por Google Vertex AI y llamado desde el **servidor** de TalkLate (no desde el celular); el motor de reglas es un respaldo parcial y Qwen local (Ollama) queda como adaptador alternativo (ADR-020).
 
 ## Objetivo medible
 
