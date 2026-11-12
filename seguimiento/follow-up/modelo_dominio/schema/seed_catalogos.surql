@@ -6,7 +6,7 @@ OPTION IMPORT;
 -- Run AFTER talklate.surql
 --
 -- Scope (per request): only two regional contexts
---   - English  -> United States / Miami
+--   - English  -> United States / New York
 --   - Spanish  -> Colombia / Antioquia
 --
 -- Data mirrors the simulation samples in arquitectura/modelo_datos.md and
@@ -29,8 +29,8 @@ CREATE country:colombia       SET name = 'Colombia',      code = 'CO';
 -- ---------------------------------------------------------------------------
 -- Regions (name + country is the unique composite)
 -- ---------------------------------------------------------------------------
-CREATE region:miami SET
-	name = 'Miami',
+CREATE region:new_york SET
+	name = 'New York',
 	country = country:united_states;
 
 CREATE region:antioquia SET
@@ -42,7 +42,7 @@ CREATE region:antioquia SET
 -- ---------------------------------------------------------------------------
 CREATE language:en SET
 	name = 'English',
-	region = region:miami,
+	region = region:new_york,
 	code = 'en',
 	active = true;
 
