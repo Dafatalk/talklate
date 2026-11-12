@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "receiptId": "0d963998-ee91-4d40-978f-c98b4267fc9c",
+  "receiptId": "d3d58cce-faf2-400a-a299-c6a6750daabd",
   "status": "current",
   "command": "deliver",
   "type": "architecture",
   "input": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
   "output": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
   "specification": {
-    "sha256": "4554f98bc18ec4675b9b227ef0cac3cabff41a8649e36a8e663246ea64105f93",
-    "bytes": 13097
+    "sha256": "3eb33d5666f94429f6fdd4738f4a56dc0ecefac01afbc05b657921f8aa662b8b",
+    "bytes": 13764
   },
   "artifact": {
-    "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
-    "bytes": 875014
+    "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
+    "bytes": 877215
   }
 }

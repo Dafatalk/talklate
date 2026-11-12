@@ -132,3 +132,10 @@
 - **Docs:** carpeta `calidad/` y documentos 18 y 19 en la entrega (Word y PDF); entrega en version 1.1.
 - **Revision:** PR #42 de Julian (`run-talklate.sh`) revisado; dos sugerencias menores en el PR.
 - **Integracion de `feature/glosario-cultural` (Julian):** glosario cultural paisa / New York en el prompt de Qwen y Claude, y la region de ejemplo pasa de Miami a New York. Se probo toda la piramide con sus cambios (Expo SDK 58, nueva pantalla de Nueva conversacion con selectores desplegables, ElevenLabs): backend 63 unitarias, 81 con cobertura (96.3 % de lineas), 2 E2E de la API, `arch:check` limpio, frontend 5 pruebas y tipos ok, Trivy limpio. La prueba de Playwright se adapto a los selectores desplegables y a New York.
+
+## 2026-11-12 - Dafatalk (Claude / Sonnet)
+
+- **Guia tecnica para exponer:** `seguimiento/guia_tecnica_para_exponer.md` (contexto completo del proyecto de cero: producto, recorrido de un mensaje, arquitectura hexagonal con 9 puertos, traduccion, voz, datos, seguridad, app, pruebas, metodologia, puntos debiles, preguntas probables, guion y glosario).
+- **Diagramas Archify actualizados** (los 4 pasan validate, deliver, check y browser-check): arquitectura general y hexagonal con ElevenLabs, Claude de respaldo, deteccion de genero por pitch y 9 puertos (antes decian VoiceStudio y 8 puertos); nuevos: secuencia de un mensaje de voz (`entrega/diagramas/secuencia_voz.html`) y modelo de datos (`entrega/diagramas/modelo_datos.html`).
+- **Hallazgos nuevos sin corregir:** el genero inferido de la voz se guarda por mensaje y no esta en la matriz de sensibilidad; `tech_stack.md` dice Expo SDK 57 / React Native 0.86 (hoy 58 / 0.88); el documento de vision dice que frances y portugues existen inactivos (en el codigo solo hay espanol e ingles).
+- Engram no esta disponible en esta sesion; esta bitacora es el registro.

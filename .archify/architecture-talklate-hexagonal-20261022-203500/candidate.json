@@ -3,14 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "TalkLate — Arquitectura hexagonal (backend) con voz",
-    "subtitle": "Puertos y adaptadores (ADR-013): el nucleo depende de 8 contratos, no de tecnologia; la voz entra por Transcriptor y sale por Sintetizador, y las credenciales pasan por Hasheador y FirmadorTokens",
+    "subtitle": "Puertos y adaptadores (ADR-013): el nucleo depende de 9 contratos, no de tecnologia; la voz entra por Transcriptor, se mide con DetectorGenero y sale por Sintetizador, y las credenciales pasan por Hasheador y FirmadorTokens",
     "output": ".archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
     "locale": "es",
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/Dafatalk/talklate",
       "provider": "github",
-      "revision": "efd0498a5296b32c8e3c67cbec50ead1d636b8b6"
+      "revision": "54a348ed0ba6a23d407b22a092f295f672fe9881"
     }
   },
   "components": [
@@ -152,14 +152,14 @@
       "type": "backend",
       "label": "Puertos",
       "sublabel": "contratos de salida",
-      "tag": "8 contratos",
+      "tag": "9 contratos",
       "pos": [
         760,
         110
       ],
       "size": [
         160,
-        672
+        750
       ],
       "sources": [
         {
@@ -246,7 +246,7 @@
       "id": "sintesis",
       "type": "backend",
       "label": "Adaptador síntesis",
-      "sublabel": "voicestudio → azure → openai",
+      "sublabel": "elevenlabs → azure → openai",
       "pos": [
         1010,
         420
@@ -257,9 +257,9 @@
       ],
       "sources": [
         {
-          "path": "backend/src/adaptadores/sintesis/voicestudio.js",
-          "line": 9,
-          "label": "voicestudio"
+          "path": "backend/src/adaptadores/sintesis/elevenlabs.js",
+          "line": 17,
+          "label": "elevenlabs"
         },
         {
           "path": "backend/src/adaptadores/sintesis/azure.js",
@@ -280,7 +280,7 @@
       "sublabel": "AES-256-GCM",
       "pos": [
         1010,
-        540
+        600
       ],
       "size": [
         184,
@@ -301,7 +301,7 @@
       "sublabel": "consola / correo",
       "pos": [
         1010,
-        630
+        690
       ],
       "size": [
         184,
@@ -321,7 +321,7 @@
       "sublabel": "bcrypt · jwt",
       "pos": [
         1010,
-        720
+        780
       ],
       "size": [
         184,
@@ -395,10 +395,10 @@
       ]
     },
     {
-      "id": "voicestudio",
+      "id": "elevenlabs",
       "type": "external",
-      "label": "VoiceStudio",
-      "sublabel": "IndexTTS 2 local",
+      "label": "ElevenLabs",
+      "sublabel": "voz con emoción · nube",
       "pos": [
         1300,
         404
@@ -420,6 +420,26 @@
       "size": [
         150,
         58
+      ]
+    },
+    {
+      "id": "genero",
+      "type": "backend",
+      "label": "Adaptador género de voz",
+      "sublabel": "pitch con ffmpeg",
+      "pos": [
+        1010,
+        510
+      ],
+      "size": [
+        184,
+        62
+      ],
+      "sources": [
+        {
+          "path": "backend/src/adaptadores/audio/genero.js",
+          "label": "crearDetectorGeneroPitch()"
+        }
       ]
     }
   ],
@@ -562,12 +582,13 @@
       "toSide": "left"
     },
     {
-      "id": "sintesis-voicestudio",
+      "id": "sintesis-elevenlabs",
       "from": "sintesis",
-      "to": "voicestudio",
-      "label": "emo_vector",
+      "to": "elevenlabs",
+      "label": "HTTPS",
       "fromSide": "right",
-      "toSide": "left"
+      "toSide": "left",
+      "variant": "security"
     },
     {
       "id": "sintesis-nube",
@@ -577,6 +598,12 @@
       "variant": "security",
       "fromSide": "right",
       "toSide": "left"
+    },
+    {
+      "id": "genero-puertos",
+      "from": "genero",
+      "to": "puertos",
+      "variant": "dashed"
     }
   ],
   "cards": [
@@ -592,7 +619,7 @@
       "dot": "cyan",
       "title": "Puertos y adaptadores",
       "items": [
-        "8 contratos: Repositorio, MotorTraducción, Transcriptor, Sintetizador, Notificador, Cifrador, Hasheador, FirmadorTokens",
+        "9 contratos: Repositorio, MotorTraducción, Transcriptor, Sintetizador, DetectorGénero, Notificador, Cifrador, Hasheador, FirmadorTokens",
         "asegurarPuerto() valida el contrato al arrancar, no en mitad de una petición",
         "Las flechas punteadas hacia Puertos significan \"implementa el contrato\""
       ]
@@ -602,7 +629,8 @@
       "title": "Flujo de voz",
       "items": [
         "Whisper transcribe; la prosodia (volumen y ritmo) ajusta el tono",
-        "La traducción sale con la emoción: VoiceStudio → Azure → OpenAI → voz del celular"
+        "El género de quien habla sale del pitch del audio (ffmpeg) y elige la voz",
+        "La traducción sale con la emoción: ElevenLabs → Azure → OpenAI → voz del celular"
       ]
     },
     {

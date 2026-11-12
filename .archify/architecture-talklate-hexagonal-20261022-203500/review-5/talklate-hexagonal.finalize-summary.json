@@ -7,13 +7,13 @@
   "quality": "showcase",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/candidate.json",
-    "sha256": "4554f98bc18ec4675b9b227ef0cac3cabff41a8649e36a8e663246ea64105f93",
-    "bytes": 13097
+    "sha256": "3eb33d5666f94429f6fdd4738f4a56dc0ecefac01afbc05b657921f8aa662b8b",
+    "bytes": 13764
   },
   "artifact": {
     "path": "/home/user/talklate/.archify/architecture-talklate-hexagonal-20261022-203500/talklate-hexagonal.html",
-    "sha256": "08b008a3c0ad630b84a411d173564716878e0c1739900d3a81166969133e0c7a",
-    "bytes": 875014
+    "sha256": "cf9a94a10d9d813cff10329ac3fd5888721f87ecf9ede5c0d828a3b9cdeb147b",
+    "bytes": 877215
   },
   "gates": {
     "validate": "pass",
@@ -37,13 +37,13 @@
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-11-05T15:54:34.166Z",
+    "checkedAt": "2026-11-12T21:43:55.703Z",
     "source": "cache",
     "noticeRequired": false,
     "noticeText": null
   },
   "visualReview": "not-requested",
-  "durationMs": 4601,
+  "durationMs": 3563,
   "browserCheck": {
     "requested": true,
     "ran": true

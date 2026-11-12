@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "sequence",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/user/talklate/.archify/secuencia-voz/candidate.json",
+    "sha256": "ba5f517376852a728d04506e68e157b6610e83a452b77b6f55771dde03c98ed9",
+    "bytes": 3338
+  },
+  "artifact": {
+    "path": "/home/user/talklate/entrega/diagramas/secuencia_voz.html",
+    "sha256": "bbee806bb53c969ad2cadbf472c3bc64ca8785d3a158441334d547b17105d636",
+    "bytes": 841282
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/user/talklate/.archify/secuencia-voz/secuencia_voz.finalize.json",
+    "summaryReceipt": "/home/user/talklate/.archify/secuencia-voz/secuencia_voz.finalize-summary.json",
+    "browserCheckReceipt": "/home/user/talklate/.archify/secuencia-voz/secuencia_voz.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-12T21:43:55.703Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2817,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

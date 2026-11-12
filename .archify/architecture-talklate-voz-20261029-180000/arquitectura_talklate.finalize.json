@@ -5,16 +5,16 @@
   "status": "pass",
   "type": "architecture",
   "quality": "showcase",
-  "startedAt": "2026-10-29T22:47:14.228Z",
+  "startedAt": "2026-11-12T21:44:09.878Z",
   "specification": {
     "path": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
-    "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
-    "bytes": 3008
+    "sha256": "db5c78471612b87e193dba83dea43f1d4076afad5e7e6d1c6aa152db9c25e14b",
+    "bytes": 4606
   },
   "artifact": {
     "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
-    "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-    "bytes": 846096
+    "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
+    "bytes": 849210
   },
   "stages": {
     "validate": {
@@ -31,6 +31,8 @@
         "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "--quality",
         "showcase",
+        "--repo-root",
+        "/home/user/talklate",
         "--json"
       ],
       "receipt": {
@@ -38,8 +40,8 @@
         "ok": true,
         "command": "validate",
         "specification": {
-          "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
-          "bytes": 3008
+          "sha256": "db5c78471612b87e193dba83dea43f1d4076afad5e7e6d1c6aa152db9c25e14b",
+          "bytes": 4606
         },
         "validation": {
           "checksPassed": 9,
@@ -54,7 +56,7 @@
     "deliver": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 562,
+      "durationMs": 553,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -64,23 +66,25 @@
         "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "--quality",
         "showcase",
+        "--repo-root",
+        "/home/user/talklate",
         "--json"
       ],
       "receipt": {
         "schemaVersion": 1,
-        "receiptId": "018656b4-0a11-4a32-b33a-ec37efc67215",
+        "receiptId": "987894f4-47b5-4944-987b-6ec99f76665b",
         "ok": true,
         "command": "deliver",
         "type": "architecture",
         "input": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/candidate.json",
         "output": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "specification": {
-          "sha256": "c4400ec5d771c03482a921b56ac6d5e6bd9e1761b4b1a0401a67d6425eeb4f4e",
-          "bytes": 3008
+          "sha256": "db5c78471612b87e193dba83dea43f1d4076afad5e7e6d1c6aa152db9c25e14b",
+          "bytes": 4606
         },
         "artifact": {
-          "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-          "bytes": 846096
+          "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
+          "bytes": 849210
         },
         "validation": {
           "checksPassed": 9,
@@ -106,7 +110,7 @@
     "check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 204,
+      "durationMs": 200,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -118,8 +122,8 @@
         "ok": true,
         "file": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
         "artifact": {
-          "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-          "bytes": 846096
+          "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
+          "bytes": 849210
         },
         "checks": [
           {
@@ -180,22 +184,22 @@
           },
           "metrics": {
             "properCrossings": 0,
-            "resolvedCrossovers": 0,
+            "resolvedCrossovers": 1,
             "ambiguousCorridors": 0,
             "arrowheadCollisions": 0,
             "containerBorderRuns": 0,
             "labelRouteClearanceIssues": 0,
             "labelCanvasOverflowIssues": 0,
-            "minLabelRouteClearance": 21.1,
+            "minLabelRouteClearance": 12,
             "desktopReadabilityIssues": 0,
             "viewportHeightIssues": 0,
             "minProjectedNodeTextPx": 7.5,
-            "maxBends": 2,
-            "routesOverSuggestedBends": 0,
-            "maxStretch": 1,
+            "maxBends": 4,
+            "routesOverSuggestedBends": 2,
+            "maxStretch": 1.212,
             "routesOverSuggestedStretch": 0,
-            "minSegmentPx": 32,
-            "minInteriorSegmentPx": 146,
+            "minSegmentPx": 24,
+            "minInteriorSegmentPx": 29.7,
             "shortSegmentCount": 0,
             "shortEndpointSegmentCount": 0,
             "shortInteriorSegmentCount": 0,
@@ -208,8 +212,79 @@
             "microSegmentPx": 8
           },
           "routeReview": {
-            "crossings": [],
-            "detours": []
+            "crossings": [
+              {
+                "left": {
+                  "id": "api-qwen",
+                  "from": "api",
+                  "to": "qwen",
+                  "label": "2. traduce",
+                  "collectionIndex": 4,
+                  "artifactIndex": 5
+                },
+                "right": {
+                  "id": "api-elevenlabs",
+                  "from": "api",
+                  "to": "elevenlabs",
+                  "label": "3. voz con emocion (HTTPS)",
+                  "collectionIndex": 5,
+                  "artifactIndex": 6
+                },
+                "point": [
+                  820,
+                  337.99999999999994
+                ],
+                "sharedNode": "api"
+              }
+            ],
+            "crowdedSides": [
+              {
+                "node": "api",
+                "label": "API TalkLate",
+                "side": "right",
+                "relationships": 4,
+                "sidePx": 64,
+                "neededPx": 74
+              }
+            ],
+            "detours": [
+              {
+                "relationship": {
+                  "id": "api-qwen",
+                  "from": "api",
+                  "to": "qwen",
+                  "label": "2. traduce",
+                  "collectionIndex": 4,
+                  "artifactIndex": 5
+                },
+                "bends": 3,
+                "stretch": 1.212
+              },
+              {
+                "relationship": {
+                  "id": "api-claude",
+                  "from": "api",
+                  "to": "claude",
+                  "label": "respaldo (HTTPS, solo el texto)",
+                  "collectionIndex": 7,
+                  "artifactIndex": 8
+                },
+                "bends": 4,
+                "stretch": 1.139,
+                "directCorridorBlockers": [
+                  {
+                    "id": "qwen",
+                    "label": "Ollama + Qwen",
+                    "box": [
+                      860,
+                      250,
+                      170,
+                      64
+                    ]
+                  }
+                ]
+              }
+            ]
           },
           "leadingSpace": {
             "measured": true,
@@ -224,10 +299,10 @@
           "desktopReadability": {
             "budgetBasis": "recognized-declared-wide",
             "readerContract": "declared-wide-v1",
-            "availableDiagramWidth": 1031.25,
-            "actualBudgetPx": 1031.25,
-            "actualReaderWidth": 1061.25,
-            "desiredReaderWidth": 1061.25,
+            "availableDiagramWidth": 1284.375,
+            "actualBudgetPx": 1284.375,
+            "actualReaderWidth": 1314.375,
+            "desiredReaderWidth": 1314.375,
             "viewportCap": 1376,
             "limit": "source-size",
             "requestedTargetPx": 7.5,
@@ -242,18 +317,18 @@
             },
             "minimumSourceTextPx": 8,
             "minimumProjectedTextPx": 7.5,
-            "semanticTextCount": 24
+            "semanticTextCount": 27
           },
           "issues": []
         },
         "provenance": "current",
-        "deliveryReceiptId": "018656b4-0a11-4a32-b33a-ec37efc67215"
+        "deliveryReceiptId": "987894f4-47b5-4944-987b-6ec99f76665b"
       }
     },
     "browser-check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 2445,
+      "durationMs": 2913,
       "command": [
         "/opt/node22/bin/node",
         "/tmp/claude-0/-home-user-talklate/71b0cc82-678a-5f39-b5a7-35d33d3038c2/scratchpad/archify-src/archify/bin/archify.mjs",
@@ -273,11 +348,11 @@
         "status": "pass",
         "visualReview": "not-requested",
         "provenance": "current",
-        "deliveryReceiptId": "018656b4-0a11-4a32-b33a-ec37efc67215",
+        "deliveryReceiptId": "987894f4-47b5-4944-987b-6ec99f76665b",
         "artifact": {
           "path": "/home/user/talklate/entrega/diagramas/arquitectura_talklate.html",
-          "sha256": "24b870ba4e3e840381c70eae6010e301e0fd61e252ff79a7703f2726f099ba00",
-          "bytes": 846096
+          "sha256": "0e94edaedf1e376227b2f6372c269ce61b20d7b3c2a93da8bf7dcfeca75b58e0",
+          "bytes": 849210
         },
         "state": {
           "detail": "read",
@@ -285,7 +360,7 @@
         },
         "chrome": {
           "status": "available",
-          "executable": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+          "executable": "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"
         },
         "diagnostics": [],
         "containment": {
@@ -308,20 +383,20 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1216,
-              "diagramWidth": 1186,
+              "readerWidth": 1376,
+              "diagramWidth": 1346,
               "pageComposition": {
                 "bodyPaddingPx": 12,
                 "headerPx": 52,
                 "diagramChromePx": 78,
-                "svgPx": 746,
+                "svgPx": 680,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 8.7,
-              "minimumProjectedEdgeTextPx": 8,
+              "viewBoxWidth": 1370,
+              "minimumProjectedNodeTextPx": 7.8598540145985405,
+              "minimumProjectedNonEdgeTextPx": 8.547591240875912,
+              "minimumProjectedEdgeTextPx": 7.8598540145985405,
               "minimumProjectedNodeText": "habla o escribe",
               "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
@@ -360,17 +435,17 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1270,
-              "diagramWidth": 1240,
+              "readerWidth": 1536,
+              "diagramWidth": 1506,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 780,
+                "svgPx": 761,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -412,8 +487,8 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1397,
-              "diagramWidth": 1367,
+              "readerWidth": 1733,
+              "diagramWidth": 1703,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 60,
@@ -422,7 +497,7 @@
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -464,17 +539,17 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1840,
-              "diagramWidth": 1650,
+              "readerWidth": 1920,
+              "diagramWidth": 1870,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 68,
-                "diagramChromePx": 138,
-                "svgPx": 1038,
+                "diagramChromePx": 94,
+                "svgPx": 945,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -495,8 +570,8 @@
               "dockStageGap": 10,
               "requiredDockStageGap": 10,
               "viewerChromeStageOk": true,
-              "viewerChromeReserve": 0,
-              "viewerChromeActive": false,
+              "viewerChromeReserve": 44,
+              "viewerChromeActive": true,
               "viewerChromeOk": true,
               "resolvedTheme": "light"
             }
@@ -569,20 +644,20 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1216,
-              "diagramWidth": 1186,
+              "readerWidth": 1376,
+              "diagramWidth": 1346,
               "pageComposition": {
                 "bodyPaddingPx": 12,
                 "headerPx": 52,
                 "diagramChromePx": 78,
-                "svgPx": 746,
+                "svgPx": 680,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 8.7,
-              "minimumProjectedEdgeTextPx": 8,
+              "viewBoxWidth": 1370,
+              "minimumProjectedNodeTextPx": 7.8598540145985405,
+              "minimumProjectedNonEdgeTextPx": 8.547591240875912,
+              "minimumProjectedEdgeTextPx": 7.8598540145985405,
               "minimumProjectedNodeText": "habla o escribe",
               "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
@@ -621,17 +696,17 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1270,
-              "diagramWidth": 1240,
+              "readerWidth": 1536,
+              "diagramWidth": 1506,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 780,
+                "svgPx": 761,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -673,8 +748,8 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1397,
-              "diagramWidth": 1367,
+              "readerWidth": 1733,
+              "diagramWidth": 1703,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 60,
@@ -683,7 +758,7 @@
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -725,17 +800,17 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1840,
-              "diagramWidth": 1650,
+              "readerWidth": 1920,
+              "diagramWidth": 1870,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 68,
-                "diagramChromePx": 138,
-                "svgPx": 1038,
+                "diagramChromePx": 94,
+                "svgPx": 945,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -756,8 +831,8 @@
               "dockStageGap": 10,
               "requiredDockStageGap": 10,
               "viewerChromeStageOk": true,
-              "viewerChromeReserve": 0,
-              "viewerChromeActive": false,
+              "viewerChromeReserve": 44,
+              "viewerChromeActive": true,
               "viewerChromeOk": true,
               "resolvedTheme": "light"
             }
@@ -782,20 +857,20 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1216,
-              "diagramWidth": 1186,
+              "readerWidth": 1376,
+              "diagramWidth": 1346,
               "pageComposition": {
                 "bodyPaddingPx": 12,
                 "headerPx": 52,
                 "diagramChromePx": 78,
-                "svgPx": 746,
+                "svgPx": 680,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 8.7,
-              "minimumProjectedEdgeTextPx": 8,
+              "viewBoxWidth": 1370,
+              "minimumProjectedNodeTextPx": 7.8598540145985405,
+              "minimumProjectedNonEdgeTextPx": 8.547591240875912,
+              "minimumProjectedEdgeTextPx": 7.8598540145985405,
               "minimumProjectedNodeText": "habla o escribe",
               "minimumProjectedNodeTextDetail": "edge",
               "minimumProjectedNodeTextOwner": {
@@ -834,17 +909,17 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1270,
-              "diagramWidth": 1240,
+              "readerWidth": 1536,
+              "diagramWidth": 1506,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 60,
                 "diagramChromePx": 84,
-                "svgPx": 780,
+                "svgPx": 761,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -886,8 +961,8 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1397,
-              "diagramWidth": 1367,
+              "readerWidth": 1733,
+              "diagramWidth": 1703,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 60,
@@ -896,7 +971,7 @@
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -938,17 +1013,17 @@
               "readerOverflow": null,
               "readerFit": "intrinsic-height",
               "ok": true,
-              "readerWidth": 1840,
-              "diagramWidth": 1650,
+              "readerWidth": 1920,
+              "diagramWidth": 1870,
               "pageComposition": {
                 "bodyPaddingPx": 64,
                 "headerPx": 68,
-                "diagramChromePx": 138,
-                "svgPx": 1038,
+                "diagramChromePx": 94,
+                "svgPx": 945,
                 "cardsPx": 0,
                 "viewBoxHeight": 692
               },
-              "viewBoxWidth": 1100,
+              "viewBoxWidth": 1370,
               "minimumProjectedNodeTextPx": 8,
               "minimumProjectedNonEdgeTextPx": 8.7,
               "minimumProjectedEdgeTextPx": 8,
@@ -969,8 +1044,8 @@
               "dockStageGap": 10,
               "requiredDockStageGap": 10,
               "viewerChromeStageOk": true,
-              "viewerChromeReserve": 0,
-              "viewerChromeActive": false,
+              "viewerChromeReserve": 44,
+              "viewerChromeActive": true,
               "viewerChromeOk": true,
               "resolvedTheme": "light"
             }
@@ -1000,14 +1075,14 @@
     "browserCheckReceipt": "/home/user/talklate/.archify/architecture-talklate-voz-20261029-180000/arquitectura_talklate.browser-check.json"
   },
   "visualReview": "not-requested",
-  "finishedAt": "2026-10-29T22:47:17.562Z",
-  "durationMs": 3334,
+  "finishedAt": "2026-11-12T21:44:13.631Z",
+  "durationMs": 3752,
   "update": {
     "status": "current",
     "installedVersion": "3.2.0",
     "availableVersion": "3.2.0",
     "releaseNotes": null,
-    "checkedAt": "2026-10-29T22:45:45.708Z",
+    "checkedAt": "2026-11-12T21:43:55.703Z",
     "source": "cache",
     "noticeRequired": false,
     "noticeText": null
