@@ -24,6 +24,7 @@ module.exports = function crearRepoSqlite(db) {
     async contarAdmins() { return uno("SELECT COUNT(*) AS n FROM usuario WHERE rol = 'admin'").n; },
     async eliminar(id) {
       transaccion(db, () => {
+        corre('DELETE FROM problema WHERE usuario_id = ?', id);
         corre('DELETE FROM reporte WHERE usuario_id = ?', id);
         corre('DELETE FROM recuperacion WHERE usuario_id = ?', id);
         corre('DELETE FROM token_refresco WHERE usuario_id = ?', id);
@@ -200,5 +201,26 @@ module.exports = function crearRepoSqlite(db) {
     async actualizar(id, estado, nota) { corre('UPDATE reporte SET estado = ?, nota_admin = ? WHERE id = ?', estado, nota ?? null, id); },
   };
 
-  return { async inicializar() {}, usuarios, tokens, sesiones, recuperaciones, catalogo, conversaciones, mensajes, reportes, _db: db };
+  const CONSULTA_PROBLEMA = `
+    SELECT p.id, p.categoria, p.descripcion, p.contacto, p.estado, p.nota_admin, p.fecha,
+           u.nombre || ' ' || u.apellido AS reportado_por
+    FROM problema p
+    JOIN usuario u ON u.id = p.usuario_id`;
+
+  const problemas = {
+    async crear({ id, usuarioId, categoria, descripcion, contacto, estado, fecha }) {
+      corre(
+        'INSERT INTO problema (id, usuario_id, categoria, descripcion, contacto, estado, fecha) VALUES (?,?,?,?,?,?,?)',
+        id, usuarioId, categoria ?? null, descripcion, contacto ?? null, estado || 'abierto', fecha,
+      );
+    },
+    async listar({ estado }) {
+      return todo(`${CONSULTA_PROBLEMA} ${estado ? 'WHERE p.estado = ?' : ''}
+        ORDER BY CASE p.estado WHEN 'abierto' THEN 0 ELSE 1 END, p.fecha DESC`, ...(estado ? [estado] : []));
+    },
+    async porId(id) { return uno(`${CONSULTA_PROBLEMA} WHERE p.id = ?`, id) || null; },
+    async actualizar(id, estado, nota) { corre('UPDATE problema SET estado = ?, nota_admin = ? WHERE id = ?', estado, nota ?? null, id); },
+  };
+
+  return { async inicializar() {}, usuarios, tokens, sesiones, recuperaciones, catalogo, conversaciones, mensajes, reportes, problemas, _db: db };
 };

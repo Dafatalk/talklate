@@ -132,6 +132,17 @@ CREATE TABLE IF NOT EXISTS reporte (
   fecha TEXT NOT NULL,
   UNIQUE (mensaje_destino_id, usuario_id)
 );
+
+CREATE TABLE IF NOT EXISTS problema (
+  id TEXT PRIMARY KEY,
+  usuario_id TEXT NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
+  categoria TEXT,
+  descripcion TEXT NOT NULL,
+  contacto TEXT,
+  estado TEXT NOT NULL DEFAULT 'abierto' CHECK (estado IN ('abierto','revisado','descartado')),
+  nota_admin TEXT,
+  fecha TEXT NOT NULL
+);
 `;
 
 // Alcance del proyecto: solo espanol (Colombia/Antioquia) e ingles (EE.UU./New York).

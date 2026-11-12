@@ -23,6 +23,7 @@ const { crearServicioCuentas } = require('./aplicacion/cuentas');
 const { crearServicioConversaciones } = require('./aplicacion/conversaciones');
 const { crearServicioCatalogo } = require('./aplicacion/catalogo');
 const { crearServicioReportes } = require('./aplicacion/reportes');
+const { crearServicioProblemas } = require('./aplicacion/problemas');
 
 const esProduccion = (entorno) => entorno.NODE_ENV === 'production';
 
@@ -129,6 +130,7 @@ function componer({ repo, entorno = process.env, adaptadores = {} }) {
     conversaciones: crearServicioConversaciones({ repo, traduccion, cifrador, transcriptor, detectorGenero, log }),
     catalogo: crearServicioCatalogo({ repo, log }),
     reportes: crearServicioReportes({ repo, cifrador, log }),
+    problemas: crearServicioProblemas({ repo, log }),
   };
 }
 
