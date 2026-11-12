@@ -26,6 +26,9 @@ Thumbs.db
 # Logs
 *.log
 
+# QR del frontend generado por run-talklate.sh al levantar (artefacto local)
+talklate-qr.png
+
 # SurrealDB / SQLite — store local de datos (no versionar)
 .surrealdb/
 *.db
