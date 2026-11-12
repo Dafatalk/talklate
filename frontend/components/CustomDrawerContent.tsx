@@ -60,7 +60,6 @@ export default function CustomDrawerContent() {
         <View className="flex-col pb-4 mb-4 mt-4 border-b border-neutral-200 dark:border-dark-secondary">
           <NavItem onPress={() => router.replace('/(drawer)')} icon="MessageSquare" label="Conversaciones" description="Tu listado para retomar cualquiera" />
           <NavItem onPress={() => router.push({ pathname: '/(drawer)', params: { nueva: '1' } })} icon="Plus" label="Nueva conversacion" />
-          <NavItem onPress={() => router.push('/screens/reportar-problema')} icon="Bug" label="Reportar un problema" />
           {usuario?.rol === 'admin' ? (
             <>
               <NavItem onPress={() => router.push('/screens/admin-idiomas')} icon="Globe" label="Idiomas y regiones" description="Administrador" />

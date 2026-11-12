@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, TextInput, View } from 'react-native';
 import ThemedText from '@/components/ThemedText';
 import { Button } from '@/components/Button';
+import Glass from '@/components/Glass';
 import useThemeColors from '@/app/contexts/ThemeColors';
 
 type Props = {
@@ -29,7 +30,8 @@ export default function PromptModal({ visible, titulo, mensaje, valorInicial = '
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <Pressable onPress={onCancel} className="flex-1 bg-black/50 items-center justify-center px-global">
-        <Pressable onPress={() => {}} className="w-full max-w-md bg-light-secondary dark:bg-dark-secondary rounded-2xl p-5">
+        <Pressable onPress={() => {}} className="w-full max-w-md">
+          <Glass className="rounded-2xl p-5" intensity={50}>
           <ThemedText className="text-lg font-bold mb-1">{titulo}</ThemedText>
           {mensaje ? <ThemedText className="text-light-subtext dark:text-dark-subtext mb-3">{mensaje}</ThemedText> : null}
           {conCampo ? (
@@ -56,6 +58,7 @@ export default function PromptModal({ visible, titulo, mensaje, valorInicial = '
               onPress={() => onConfirm(valor)}
             />
           </View>
+          </Glass>
         </Pressable>
       </Pressable>
     </Modal>
