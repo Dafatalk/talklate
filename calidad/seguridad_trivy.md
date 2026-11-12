@@ -1,6 +1,6 @@
 # Seguridad con Trivy - TalkLate
 
-**Version:** 1.0 (05/11/2026)
+**Version:** 1.1 (12/11/2026)
 
 TalkLate escanea su codigo con Trivy en cada pull request, en cada push a `develop` y `main`, y cada lunes. El escaneo busca dependencias con vulnerabilidades conocidas, secretos escritos en el codigo y configuraciones inseguras. Si encuentra algo de severidad alta o critica, el CI falla y no se puede hacer merge.
 
@@ -79,3 +79,16 @@ tar xzf trivy.tgz trivy
 - Responde a DRV-03 (privacidad de los datos) y a la convencion de seguridad del proyecto: dependencias sin vulnerabilidades conocidas y ningun secreto en el codigo.
 - Complementa los controles que ya prueba la piramide: cifrado AES-256-GCM, logs sin datos personales, limites de uso, JWT corto con refresco rotativo (ver `piramide_de_pruebas.md`).
 - Decision registrada en ADR-018 (`arquitectura/decisiones.md`).
+
+## 8. Historial de escaneos
+
+| Fecha | Que cambio | Resultado | Notas |
+| --- | --- | --- | --- |
+| 05/11/2026 | Primer escaneo completo, con dependencias de desarrollo | 1 HIGH en el backend y 1 CRITICAL y 50 HIGH en el frontend; todos corregidos | Ver las secciones 1 y 2 |
+| 12/11/2026 | Se integra el pull request 53 (traduccion con Claude en Google Vertex AI, pantalla de inicio nueva, reporte de problemas y mejoras de voz). Dependencia nueva en el backend: `@anthropic-ai/vertex-sdk`, con sus dependencias de autenticacion de Google | **0 vulnerabilidades HIGH o CRITICAL, 0 secretos y 0 configuraciones inseguras** en `backend`, `frontend` y `e2e`, con la base de vulnerabilidades descargada el mismo dia | La excepcion de `decode-uri-component` sigue vigente hasta el 28/02/2027 |
+
+**Observaciones del reescaneo del 12/11/2026:**
+- La traduccion con Vertex se autentica con las credenciales de Google (ADC), no con una clave escrita en el codigo ni en el repositorio; el escaner de secretos no encontro ninguna.
+- El script de arranque `run-talklate.sh` trae por defecto el identificador del proyecto de Google Cloud. Un identificador de proyecto no es un secreto, pero es mejor leerlo del entorno que dejarlo escrito.
+- Trivy se mantiene fijado en la version 0.69.3 con su checksum. Ya existe una version mas nueva; actualizarla implica cambiar la version y el checksum en `seguridad.yml` y es una tarea pendiente.
+- El escaneo cubre dependencias, secretos y configuraciones. **No** revisa riesgos propios del uso de modelos de lenguaje (para eso, ver `owasp_llm_top10.md`).
