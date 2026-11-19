@@ -72,17 +72,19 @@
 
 ## Requerimientos no funcionales
 
-| ID | Requerimiento | Driver | Como se verifica |
-| --- | --- | --- | --- |
-| RNF-001 | "Tiempo real" significa traduccion **por turno**: cada mensaje de texto se traduce en 3 segundos o menos (p95); uno de voz en 5 segundos o menos. | DRV-01 | `npm run medir` en `backend/` y el evento `traduccion` (duracion_ms) del log |
-| RNF-002 | El 80 % de los modismos del glosario de prueba se traducen con su equivalente cultural. | DRV-02 | `npm run medir` |
-| RNF-003 | Los datos personales (correo, fecha de nacimiento, mensajes) se tratan segun `matriz_sensibilidad_datos.md`: mensajes cifrados en reposo, acceso solo del dueno, logs sin datos personales, consentimiento y eliminacion de cuenta. | DRV-03 | Pruebas de `backend/test/api.test.js` y `seguridad.test.js` |
-| RNF-004 | Se agregan idiomas y regiones sin cambiar codigo. | DRV-04 | Prueba del administrador |
-| RNF-005 | Si el motor de IA falla, el servicio sigue con un motor de reglas reducido. | DRV-05 | `backend/test/motores.test.js` |
-| RNF-006 | Limites de uso: 30 mensajes por minuto por usuario, 8 intentos de login fallidos, 5 solicitudes de recuperacion cada 15 minutos. | DRV-06 | Pruebas de seguridad |
-| RNF-007 | Una sola base de codigo para iOS, Android y web. | DRV-07 | Compilacion web y Expo Go |
-| RNF-008 | Cobertura de pruebas de 80 % o mas en la logica de negocio. | DRV-08 | `npm run coverage` en `backend/` |
-| RNF-009 | La API sigue `convenciones/api-rest.md` y esta documentada en OpenAPI. | - | `backend/openapi.yaml` y `/api/v1/docs` |
+| ID | Atributo de calidad | Requisito y criterio medible | Driver | Como se verifica |
+| --- | --- | --- | --- | --- |
+| RNF-001 | Desempeno | "Tiempo real" es traduccion por turno: texto en 3 s o menos (p95); voz en 5 s o menos, contando transcripcion y audio de salida. | DRV-01 | `npm run medir`, `npm run medir:voz` y evento de log `traduccion` (`duracion_ms`) |
+| RNF-002 | Exactitud cultural | El 80 % de los modismos del glosario de prueba se traducen con su equivalente cultural, no literal. | DRV-02 | `npm run medir` con el motor de produccion (Claude en Vertex) |
+| RNF-003 | Seguridad y privacidad | Datos personales segun `16_matriz_sensibilidad_datos.md`: mensajes cifrados en reposo (AES-GCM), acceso solo del dueno, logs sin datos personales, consentimiento y eliminacion de cuenta (Ley 1581 de 2012). | DRV-03 | Pruebas `api.test.js` y `seguridad.test.js` |
+| RNF-004 | Extensibilidad | Se agregan idiomas y regiones sin cambiar codigo. | DRV-04 | Prueba del administrador |
+| RNF-005 | Disponibilidad | Si un motor de IA falla, el servicio sigue: traduccion Claude (Vertex) -> reglas, que solo adaptan los modismos que conocen (sin coincidencias responden un error claro, no una traduccion palabra por palabra); voz ElevenLabs -> Azure -> OpenAI -> voz del celular. | DRV-05 | `motores.test.js` |
+| RNF-006 | Seguridad (abuso) | 30 mensajes por minuto por usuario, 8 intentos de inicio de sesion fallidos, 5 solicitudes de recuperacion cada 15 minutos. | DRV-06 | Pruebas de seguridad |
+| RNF-007 | Portabilidad | Una sola base de codigo para iOS, Android y web. | DRV-07 | Compilacion web y Expo Go |
+| RNF-008 | Mantenibilidad | Cobertura de pruebas de 80 % o mas en la logica de negocio; piramide de pruebas (unitarias, integracion y punta a punta) en el CI; arquitectura hexagonal con puertos verificados al arrancar y reglas de dependencia validadas con dependency-cruiser. | DRV-08 | `npm run coverage`, `npm run arch:check` y CI |
+| RNF-009 | Interoperabilidad | La API sigue la convencion REST del proyecto y esta documentada en OpenAPI 3.0. | DRV-08 | `backend/openapi.yaml` y `/api/v1/docs` |
+| RNF-010 | Naturalidad de la voz | La voz de salida replica la emocion detectada (enojo, alegria, preocupacion, amabilidad, formalidad); 7 de cada 10 personas de prueba la califican como comprensible y natural. | DRV-02 | Prueba de escucha con usuarios y audios de `npm run medir:voz` |
+| RNF-011 | Seguridad de la cadena de suministro | 0 vulnerabilidades HIGH o CRITICAL en las dependencias (de produccion y de desarrollo) y 0 secretos en el codigo, salvo excepciones documentadas con fecha de vencimiento. | DRV-03 | Trivy en CI en cada pull request y cada lunes (`.github/workflows/seguridad.yml`) |
 
 ## Fuera del alcance del MVP (decision registrada)
 

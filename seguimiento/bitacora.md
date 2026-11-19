@@ -160,4 +160,11 @@
 - **Pregunta del profesor Farid (16/11):** "El trabajo metodologico esta listo?" y "la exposicion sigue una presentacion similar a la de practicas". Se actualizo `seguimiento/marco_metodologico.md` (version 1.1: ya no es borrador; fases F9 y F10, piramide de pruebas, Trivy, OWASP, 20 ADR, motor de produccion con Claude en Vertex y ElevenLabs).
 - **Presentacion de sustentacion:** `entrega/presentacion/TalkLate_sustentacion.pptx` (y PDF), 15 diapositivas sobre la plantilla de la UCO, con notas del ponente en cada una y capturas reales de la app. Pendiente de completar por el equipo: el programa academico en la portada y revisar que los objetivos coincidan con los del anteproyecto.
 - **Correcciones de documentos:** la imagen de la piramide seguia con las cifras viejas (51, 18 y 96.6 %) y la imagen de la arquitectura hexagonal salia cortada en los Word y PDF (`render.js` recortaba con medidas fijas). Corregidas y regenerados los Word y PDF.
+
+## 2026-11-12 (3) - Dafatalk (Claude / Sonnet)
+
+- PR 54 integrado en develop (CI en verde: backend, backend-surreal, frontend, e2e-web y trivy).
+- **Manual de entendimiento:** `seguimiento/manual_de_entendimiento_talklate.md` (19 partes: producto, mapa de impacto, las 26 historias con criterios, los 26 REQ y 11 RNF, funcionalidades, recorrido de un mensaje, arquitectura, IA, voz, datos, seguridad, app, pruebas, metodologia, puntos debiles, preguntas, guion y glosario).
+- `requerimientos/req.md` ya lista los 11 requisitos no funcionales (antes 9).
+- Criterios de HU0001 y HU0004 siguen hablando de dictado y voz del dispositivo; hoy es grabacion + Whisper y voz de ElevenLabs.
 - Engram no esta disponible en esta sesion; esta bitacora es el registro.
