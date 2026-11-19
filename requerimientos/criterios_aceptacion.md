@@ -1,12 +1,13 @@
 # Criterios de aceptacion - TalkLate
 
-Cada criterio se puede comprobar en la app o en las pruebas de `backend/test`. Estan tambien en la hoja Entregables del Excel `Mapa de Impacto.xlsx`.
+Cada criterio se comprueba en la app o en las pruebas automaticas de `backend/test`. Tambien estan en la hoja Entregables de `anexos/Mapa_de_Impacto.xlsx`.
 
 ## Traduccion de mensajes
 
 ### HU0001 Ingresar mi mensaje hablando
-1. Dado que estoy en una conversacion en modo voz, cuando dicto mi mensaje (microfono del navegador o del teclado), entonces el texto aparece y se envia por el canal de voz.
-2. Cuando el microfono no esta permitido o el dispositivo no puede dictar, entonces veo un aviso claro y puedo escribir el mensaje.
+1. Dado que abro una conversacion, entonces veo la burbuja de voz; cuando la toco y hablo, la burbuja muestra que escucha y, al terminar de hablar (1.5 s de silencio o un segundo toque), el mensaje se transcribe y se envia por el canal Voz.
+2. Se detecta la entonacion del mensaje por las palabras y por la voz (volumen, variacion y velocidad), y queda registrada en el mensaje.
+3. Cuando el microfono no esta permitido, la grabacion es muy corta o no se entiende el audio, entonces veo un aviso claro y puedo escribir el mensaje desde el modo chat.
 
 ### HU0002 Ingresar mi mensaje escribiendo
 1. Dado que estoy en una conversacion, cuando escribo un mensaje y lo envio, entonces aparecen mi mensaje original y su traduccion.
@@ -18,8 +19,9 @@ Cada criterio se puede comprobar en la app o en las pruebas de `backend/test`. E
 3. Cuando el servicio no puede traducir, entonces veo un mensaje de error en vez de un resultado vacio.
 
 ### HU0004 Escuchar el mensaje traducido
-1. Dado un mensaje traducido, cuando toco 'Escuchar', entonces se reproduce con la voz del idioma y pais destino.
-2. La velocidad y el tono de la voz cambian segun la entonacion detectada (por ejemplo, alegre o preocupado).
+1. Dado un mensaje traducido, cuando toco 'Escuchar', entonces se reproduce con una voz natural del idioma y pais destino.
+2. La voz replica la emocion detectada (enojo, alegria, preocupacion, amabilidad o formalidad) y la velocidad con que hablo la persona.
+3. Si el motor de voz natural no esta disponible, la traduccion se escucha igual con la voz del celular.
 
 ### HU0005 Recibir la traduccion por el mismo canal que use
 1. Dado que envie el mensaje por voz, entonces la traduccion se reproduce sola y tambien queda escrita.

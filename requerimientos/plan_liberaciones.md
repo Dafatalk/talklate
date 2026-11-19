@@ -19,3 +19,9 @@ Al cierre de cada liberacion se publica una version con etiqueta (`v0.1.0`, `v0.
 ## Nota
 
 El orden sale de la prioridad por valor, no de las dependencias. El plan es metodologico: las horas reales de cada mes pueden variar. Despues de la construccion viene un mes de cierre (11/01 al 05/02/2027): pruebas con usuarios, manual de usuario y documento final.
+
+## Estado de avance (19/11/2026)
+
+- **Liberacion 1 (traduccion funcional):** cumplida.
+- La funcionalidad de las liberaciones 2 y 3 ya esta construida: las 26 historias tienen su funcionalidad en la API y en la app.
+- **Ajuste del plan:** el tiempo restante de las liberaciones 2 y 3 se dedica a lo que falta para cumplir los indicadores SMART: medir calidad y tiempo con el motor de produccion (DRV-01 y DRV-02), validar el glosario cultural con hablantes nativos, probar la app en un celular fisico, agregar el aviso de privacidad en la app y hacer las pruebas con personas de prueba.

@@ -49,21 +49,21 @@
     },
     "F7": {
       "nombre": "Desarrollo Backend API & Base de Datos",
-      "estado": "desbloqueada",
-      "timestamp": null,
-      "notas": "En curso por sprints (19/10 al 06/11/2026): API v1 completa con pruebas; cada HU se cierra con su issue."
+      "estado": "completada",
+      "timestamp": "2026-11-19T00:00:00Z",
+      "notas": "API v1 con 22 rutas; 78 pruebas unitarias y 29 de integracion, 96.5 % de cobertura de lineas. Traduccion con Claude Sonnet en Vertex AI y voz con ElevenLabs."
     },
     "F8": {
       "nombre": "Desarrollo Frontend Móvil",
-      "estado": "desbloqueada",
-      "timestamp": null,
-      "notas": "En curso por sprints: app con todas las pantallas; falta probar en celular fisico."
+      "estado": "completada",
+      "timestamp": "2026-11-19T00:00:00Z",
+      "notas": "App con todas las pantallas (inicio con lista de conversaciones, chat, voz, historial, reportes y administracion). Falta probarla en un celular fisico."
     },
     "F9": {
       "nombre": "Integración & Verificación E2E",
-      "estado": "bloqueada",
+      "estado": "desbloqueada",
       "timestamp": null,
-      "bloqueo": "Requiere completar: F7, F8"
+      "notas": "En curso: piramide de pruebas, CI, Trivy y OWASP hechos. Pendientes: medicion con el motor de produccion y pruebas con usuarios."
     },
     "F10": {
       "nombre": "Despliegue & Producción",

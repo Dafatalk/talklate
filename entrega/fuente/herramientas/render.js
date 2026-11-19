@@ -27,11 +27,17 @@ const DIAG = path.resolve(__dirname, '../../diagramas') + '/';
       out[name] = true;
     }
   }
-  const a = await b.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2 });
-  await a.goto('file://' + DIAG + 'arquitectura_talklate.html'); await a.waitForTimeout(1500);
-  await a.screenshot({ path: IMG + 'archify_general.png', clip: { x: 43, y: 93, width: 1354, height: 790 } });
-  await a.goto('file://' + DIAG + 'arquitectura_hexagonal.html'); await a.waitForTimeout(1500);
-  await a.screenshot({ path: IMG + 'archify_hexagonal.png', clip: { x: 33, y: 140, width: 1374, height: 775 } });
+  // Vistas Archify: se recorta el dibujo (el svg mas grande) con su tamano real, para que no se corte si el diagrama crece
+  const a = await b.newPage({ viewport: { width: 1440, height: 1400 }, deviceScaleFactor: 2 });
+  for (const [html, png] of [['arquitectura_talklate.html', 'archify_general.png'], ['arquitectura_hexagonal.html', 'archify_hexagonal.png']]) {
+    await a.goto('file://' + DIAG + html); await a.waitForTimeout(1500);
+    const c = await a.evaluate(() => {
+      let m = null;
+      document.querySelectorAll('svg').forEach((s) => { const r = s.getBoundingClientRect(); if (!m || r.width * r.height > m.width * m.height) m = { x: r.x, y: r.y + window.scrollY, width: r.width, height: r.height }; });
+      return m;
+    });
+    await a.screenshot({ path: IMG + png, clip: { x: c.x, y: c.y, width: c.width, height: c.height } });
+  }
   console.log(Object.keys(out).join('\n'));
   await b.close();
 })();
