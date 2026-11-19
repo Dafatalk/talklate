@@ -1,4 +1,6 @@
-# Marco metodologico - TalkLate (borrador para el documento de grado)
+# Marco metodologico - TalkLate
+
+**Version:** 1.1 (19/11/2026)
 
 Este documento resume **como** se desarrolla TalkLate, para que lo que se diga en la sustentacion coincida con los artefactos del repositorio.
 
@@ -13,6 +15,8 @@ El proyecto sigue el framework **SoftVerse**: fases F0 a F10 con dependencias (`
 | F3 Arquitectura | `arquitectura/modelo_datos.md` (modelo de dominio enriquecido), `drivers.md`, `decisiones.md` (ADR), `tech_stack.md` |
 | F4 y F5 | Diagramas C4 (`arquitectura/diagramas/`), `componentes/especificacion_vistas_ui.md` (Customer Journey Map y vistas) |
 | F6 a F8 | `backend/` y `frontend/` |
+| F9 Integracion y verificacion | Piramide de pruebas y CI (`calidad/piramide_de_pruebas.md`), escaneo de seguridad con Trivy (`calidad/seguridad_trivy.md`) y revision OWASP LLM Top 10 (`calidad/owasp_llm_top10.md`) |
+| F10 Despliegue | Pendiente: el MVP corre en local y en el CI; no hay despliegue en produccion |
 
 ## 2. Descubrimiento
 1. **Vision** (Geoffrey Moore) validada con el mentor el 15/08/2026.
@@ -40,13 +44,15 @@ Desde la correccion del issue #1 y en todos los sprints, el trabajo sigue `conve
 Lo anterior al issue #1 (descubrimiento y prueba de concepto) se subio directamente a `develop`; se reconoce asi.
 
 ## 6. Calidad
-- Pruebas automaticas: backend con `node:test` (cobertura minima 80 %, hoy cerca de 98 % de lineas) y reglas del frontend.
-- Integracion continua en GitHub Actions (`.github/workflows/ci.yml`).
-- Medicion de los drivers DRV-01 (tiempo) y DRV-02 (modismos) con `npm run medir`.
+- **Piramide de pruebas** (ADR-017): 78 unitarias (73 del backend y 5 del frontend), 29 de integracion (la API contra SQLite y SurrealDB) y 4 de punta a punta (2 de la API y 2 en navegador con Playwright). Cobertura del backend: 96.5 % de lineas (minimo 80 %).
+- **Seguridad:** escaneo con Trivy en cada pull request y cada semana (ADR-018), con 0 vulnerabilidades altas o criticas y 0 secretos en el reescaneo del 12/11/2026; revision contra el OWASP Top 10 para aplicaciones con LLM, edicion 2026 (3 riesgos cubiertos, 1 no aplica y 6 parciales con plan de cierre); proteccion de datos segun la Ley 1581 de 2012.
+- **Decisiones:** 20 ADR en `arquitectura/decisiones.md`; trazabilidad impacto -> historia -> requisito -> driver -> ADR -> componente -> prueba.
+- Integracion continua en GitHub Actions (`.github/workflows/ci.yml` y `seguridad.yml`): backend, backend contra SurrealDB, frontend, prueba en navegador y Trivy en cada pull request.
+- Medicion de los drivers DRV-01 (tiempo) y DRV-02 (modismos) con `npm run medir`. **Pendiente** con el motor de produccion (Claude en Vertex y ElevenLabs): la linea base actual (14 de 15 modismos) es del motor de reglas.
 - Pruebas de punta a punta en navegador y pruebas con usuarios por liberacion (indicadores SMART del Mapa de Impacto).
 
 ## 7. Uso de inteligencia artificial (declaracion)
-- **En el producto:** la traduccion la hace un modelo de lenguaje (Qwen local en Ollama, con Claude Sonnet de respaldo).
+- **En el producto:** la traduccion la hace un modelo de lenguaje, Claude Sonnet servido por Google Vertex AI (ADR-020); Qwen local en Ollama queda como adaptador alternativo y un motor de reglas como respaldo parcial. La voz de entrada se transcribe con Whisper (local) y la de salida la genera ElevenLabs (ADR-019). El texto de los mensajes sale a Google Cloud y a ElevenLabs, y esta informado en la politica de tratamiento de datos.
 - **En el desarrollo:** el equipo uso un asistente de programacion con IA (Claude Code) como apoyo para: migrar los artefactos a Markdown y Excel, redactar borradores de documentos, construir la prueba de concepto y revisar la coherencia del proyecto. En el historial de git esos aportes aparecen con el autor o coautor "Claude".
 - **Control del equipo:** cada artefacto lo revisa y valida el equipo y, cuando aplica, el mentor (actas en `seguimiento/records/`). Las decisiones de producto, alcance y priorizacion son del equipo. Los integrantes deben poder explicar cada parte del codigo y de los documentos.
 - En el documento de grado la IA se usa solo como apoyo de redaccion, siguiendo la recomendacion del mentor.

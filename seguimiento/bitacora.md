@@ -154,3 +154,10 @@
 - **Documentos:** ADR-019 y ADR-020 en la entrega; actualizados los 11 documentos que decian VoiceStudio o Qwen como motor principal, la politica de datos y la matriz (Google Cloud, ElevenLabs, genero de la voz, problemas), Trivy con historial de escaneos y OWASP v1.1 como documento 20. Entrega version 1.2 con Word y PDF regenerados. Diagramas de Archify al dia (Claude en Vertex, ElevenLabs, 9 puertos) mas la secuencia de voz y el modelo de datos.
 - **Pendiente:** medir calidad y tiempo con el motor de produccion; validar el glosario con nativos; probar en celular fisico; aviso en la app de que el texto sale a terceros; tope de gasto; SBOM; unificar el modelo por defecto (`claude-sonnet-4-6` en Vertex y `claude-sonnet-5-5` en la API directa); sacar el identificador del proyecto de Google y el correo personal del codigo.
 - Engram no esta disponible en esta sesion; esta bitacora es el registro.
+
+## 2026-11-19 - Dafatalk (Claude / Sonnet)
+
+- **Pregunta del profesor Farid (16/11):** "El trabajo metodologico esta listo?" y "la exposicion sigue una presentacion similar a la de practicas". Se actualizo `seguimiento/marco_metodologico.md` (version 1.1: ya no es borrador; fases F9 y F10, piramide de pruebas, Trivy, OWASP, 20 ADR, motor de produccion con Claude en Vertex y ElevenLabs).
+- **Presentacion de sustentacion:** `entrega/presentacion/TalkLate_sustentacion.pptx` (y PDF), 15 diapositivas sobre la plantilla de la UCO, con notas del ponente en cada una y capturas reales de la app. Pendiente de completar por el equipo: el programa academico en la portada y revisar que los objetivos coincidan con los del anteproyecto.
+- **Correcciones de documentos:** la imagen de la piramide seguia con las cifras viejas (51, 18 y 96.6 %) y la imagen de la arquitectura hexagonal salia cortada en los Word y PDF (`render.js` recortaba con medidas fijas). Corregidas y regenerados los Word y PDF.
+- Engram no esta disponible en esta sesion; esta bitacora es el registro.
