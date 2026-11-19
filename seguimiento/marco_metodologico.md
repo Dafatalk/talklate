@@ -40,7 +40,7 @@ Desde la correccion del issue #1 y en todos los sprints, el trabajo sigue `conve
 - **Ramas** `feature/{issue}-{descripcion}` o `fix/{issue}-{descripcion}` desde `develop`.
 - **Commits convencionales** (`feat(...)`, `fix(...)`, `docs(...)`) con la referencia `(#N)`.
 - **Pull request** a `develop` con `Closes #N`, revisado por el otro integrante; integracion continua (pruebas) en cada PR.
-- **Liberacion** al cierre de cada sprint: merge a `main` y etiqueta SemVer.
+- **Liberacion** al cierre de cada sprint: merge a `main` y etiqueta SemVer. La entrega de noviembre de 2026 queda en `main` con la etiqueta `v1.0.0-rc1`.
 Lo anterior al issue #1 (descubrimiento y prueba de concepto) se subio directamente a `develop`; se reconoce asi.
 
 ## 6. Calidad

@@ -168,3 +168,10 @@
 - `requerimientos/req.md` ya lista los 11 requisitos no funcionales (antes 9).
 - Criterios de HU0001 y HU0004 siguen hablando de dictado y voz del dispositivo; hoy es grabacion + Whisper y voz de ElevenLabs.
 - Engram no esta disponible en esta sesion; esta bitacora es el registro.
+
+## 2026-11-19 (2) - Dafatalk (Claude / Sonnet): organizar el repositorio
+
+- Se integran las ramas de documentacion pendientes (manual, presentacion de sustentacion, marco metodologico 1.1, correccion de las imagenes de la piramide y de la arquitectura) y se regeneran los Word y PDF.
+- Coherencia entre el marco y el repositorio: estado de fases actualizado (F7 y F8 completadas, F9 en curso), criterios de aceptacion de HU0001 y HU0004 al dia, seccion "Estado de avance" en el plan de liberaciones.
+- En GitHub: se cierran los issues de las historias demostradas con pruebas y los de infraestructura ya integrados, se corrigen las etiquetas de sprint de HU0018 y HU0025, y se crea `main` con la etiqueta `v1.0.0-rc1`. HU0001 y HU0004 quedan abiertas hasta probar la voz en un celular fisico.
+- Engram no esta disponible en esta sesion; esta bitacora es el registro.
